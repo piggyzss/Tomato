@@ -80,7 +80,7 @@ AI对话历史	最近10条猫咪对话记录
 tomato/
 ├── src/
 │   ├── components/     # 公共组件
-│   ├── pages/         # 页面（sidepanel、popup、options）
+│   ├── pages/         # 页面（sidepanel）
 │   ├── hooks/         # 自定义 Hooks
 │   ├── store/         # Zustand 状态管理
 │   ├── utils/         # 工具函数
@@ -120,7 +120,6 @@ tomato/
 - 每日番茄数统计
 - 专注时长趋势图
 - 任务完成率分析
-- 周/月数据对比
 
 11、Chrome 插件配置要点
 manifest版本	Manifest V3

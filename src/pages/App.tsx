@@ -1,4 +1,5 @@
 import { BigTimer } from '@/components/BigTimer'
+import { CatMessage } from '@/components/CatMessage'
 import { CurrentTask } from '@/components/CurrentTask'
 import { TaskListNew } from '@/components/TaskListNew'
 import { useSettingsStore } from '@/store/useSettingsStore'
@@ -42,6 +43,9 @@ function App() {
   return (
     <div className="min-h-screen bg-tomato">
       <div className="max-w-2xl mx-auto px-6 py-6">
+
+        {/* Cat Message */}
+        <CatMessage />
 
         {/* Timer Card */}
         <div className="bg-tomato-light/30 rounded-2xl px-8 py-8 mb-5">
