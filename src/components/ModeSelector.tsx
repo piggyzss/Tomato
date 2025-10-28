@@ -21,7 +21,7 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
       >
         Pomodoro
       </button>
-      
+
       <button
         onClick={() => onModeChange('shortBreak')}
         className={clsx(
@@ -33,7 +33,7 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
       >
         Short Break
       </button>
-      
+
       <button
         onClick={() => onModeChange('longBreak')}
         className={clsx(
@@ -48,4 +48,3 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
     </div>
   )
 }
-

@@ -15,8 +15,10 @@ const defaultData: Partial<StorageData> = {
     notificationEnabled: true,
     theme: 'light',
     language: 'zh-CN',
-    aiEnabled: false
-  }
+    aiEnabled: false,
+    aiMessages: [],
+    useAIMessages: false,
+  },
 }
 
 // 获取存储数据
@@ -71,8 +73,7 @@ export function onStorageChange(
   callback: (changes: { [key: string]: chrome.storage.StorageChange }) => void
 ) {
   chrome.storage.local.onChanged.addListener(callback)
-  
+
   // 返回取消监听函数
   return () => chrome.storage.local.onChanged.removeListener(callback)
 }
-

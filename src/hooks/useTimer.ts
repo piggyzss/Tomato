@@ -7,18 +7,23 @@ import { useCallback, useEffect } from 'react'
  * 番茄钟计时器逻辑 Hook
  */
 export function useTimer() {
-  const { 
-    status, 
-    remainingSeconds, 
+  const {
+    status,
+    remainingSeconds,
     totalSeconds,
-    setStatus, 
+    setStatus,
     reset: resetTimer,
     incrementPomodoro,
-    setTotalSeconds
+    setTotalSeconds,
   } = useTimerStore()
-  
+
   const { currentTaskId, updateTask } = useTaskStore()
-  const { workDuration, shortBreakDuration, soundEnabled, notificationEnabled } = useSettingsStore()
+  const {
+    workDuration,
+    shortBreakDuration,
+    soundEnabled,
+    notificationEnabled,
+  } = useSettingsStore()
 
   // 开始工作计时
   const startWork = useCallback(() => {
@@ -50,13 +55,15 @@ export function useTimer() {
   // 完成一个番茄钟
   const completePomodo = useCallback(() => {
     incrementPomodoro()
-    
+
     // 更新当前任务的番茄数
     if (currentTaskId) {
-      const currentTask = useTaskStore.getState().tasks.find(t => t.id === currentTaskId)
+      const currentTask = useTaskStore
+        .getState()
+        .tasks.find(t => t.id === currentTaskId)
       if (currentTask) {
         updateTask(currentTaskId, {
-          pomodoroCount: currentTask.pomodoroCount + 1
+          pomodoroCount: currentTask.pomodoroCount + 1,
         })
       }
     }
@@ -66,7 +73,7 @@ export function useTimer() {
       chrome.runtime.sendMessage({
         type: 'SHOW_NOTIFICATION',
         title: '🍅 番茄钟完成！',
-        body: '干得漂亮！休息一下吧~'
+        body: '干得漂亮！休息一下吧~',
       })
     }
 
@@ -74,7 +81,13 @@ export function useTimer() {
     if (soundEnabled) {
       // TODO: 添加音效播放逻辑
     }
-  }, [currentTaskId, updateTask, incrementPomodoro, notificationEnabled, soundEnabled])
+  }, [
+    currentTaskId,
+    updateTask,
+    incrementPomodoro,
+    notificationEnabled,
+    soundEnabled,
+  ])
 
   // 倒计时结束处理
   useEffect(() => {
@@ -93,7 +106,6 @@ export function useTimer() {
     startBreak,
     pause,
     resume,
-    reset
+    reset,
   }
 }
-

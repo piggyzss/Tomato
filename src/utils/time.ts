@@ -9,7 +9,10 @@ export function formatTime(seconds: number): string {
 }
 
 // 格式化日期
-export function formatDate(timestamp: number, formatStr: string = 'yyyy-MM-dd'): string {
+export function formatDate(
+  timestamp: number,
+  formatStr: string = 'yyyy-MM-dd'
+): string {
   return format(timestamp, formatStr, { locale: zhCN })
 }
 
@@ -33,4 +36,3 @@ export function minutesToMs(minutes: number): number {
 export function msToMinutes(ms: number): number {
   return Math.floor(ms / 60000)
 }
-

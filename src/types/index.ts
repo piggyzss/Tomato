@@ -48,11 +48,21 @@ export interface Statistics {
   completedTasks: number
 }
 
+// AI 生成的消息
+export interface GeneratedAIMessage {
+  id: string
+  text: string
+  context: string
+  createdAt: number
+}
+
 // 用户设置
 export interface UserSettings extends PomodoroConfig {
   theme: 'light' | 'dark' | 'auto'
   language: 'zh-CN' | 'en-US' | 'ja-JP'
   aiEnabled: boolean
+  aiMessages: GeneratedAIMessage[]
+  useAIMessages: boolean
 }
 
 // 猫咪状态
@@ -78,4 +88,3 @@ export interface StorageData {
   aiHistory: AIMessage[]
   currentTaskId?: string
 }
-

@@ -16,17 +16,19 @@ const defaultSettings: UserSettings = {
   notificationEnabled: true,
   theme: 'light',
   language: 'zh-CN',
-  aiEnabled: false
+  aiEnabled: false,
+  aiMessages: [], // Add support for custom AI messages
+  useAIMessages: false, // Toggle to use AI messages instead of default ones
 }
 
-export const useSettingsStore = create<SettingsState>((set) => ({
+export const useSettingsStore = create<SettingsState>(set => ({
   ...defaultSettings,
 
-  updateSettings: (updates) => set((state) => ({
-    ...state,
-    ...updates
-  })),
+  updateSettings: updates =>
+    set(state => ({
+      ...state,
+      ...updates,
+    })),
 
-  setSettings: (settings) => set(settings)
+  setSettings: settings => set(settings),
 }))
-

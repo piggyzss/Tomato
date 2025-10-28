@@ -1,9 +1,9 @@
 // Background Service Worker for Chrome Extension
 
 // 监听插件安装
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(details => {
   console.log('番茄猫插件已安装:', details.reason)
-  
+
   if (details.reason === 'install') {
     // 首次安装，初始化默认数据
     chrome.storage.local.set({
@@ -20,8 +20,8 @@ chrome.runtime.onInstalled.addListener((details) => {
         notificationEnabled: true,
         theme: 'light',
         language: 'zh-CN',
-        aiEnabled: false
-      }
+        aiEnabled: false,
+      },
     })
   }
 })
@@ -29,7 +29,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 // 监听来自页面的消息
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   console.log('收到消息:', message)
-  
+
   switch (message.type) {
     case 'START_TIMER':
       handleStartTimer(message.duration)
@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     default:
       console.warn('未知消息类型:', message.type)
   }
-  
+
   sendResponse({ success: true })
   return true
 })
@@ -61,11 +61,11 @@ function handleStopTimer() {
 }
 
 // 监听定时器结束
-chrome.alarms.onAlarm.addListener((alarm) => {
+chrome.alarms.onAlarm.addListener(alarm => {
   if (alarm.name === 'pomodoro') {
     console.log('番茄钟时间到！')
     showNotification('🍅 时间到！', '是时候休息一下了，干得漂亮！')
-    
+
     // 通知所有打开的页面
     chrome.runtime.sendMessage({ type: 'TIMER_FINISHED' })
   }
@@ -74,19 +74,20 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 // 显示通知
 function showNotification(title: string, message: string) {
   // 使用简单的数据 URI 作为图标（一个番茄色的圆形）
-  const iconDataUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI2NCIgY3k9IjY0IiByPSI2MCIgZmlsbD0iI0ZGNjM0NyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjM1ZW0iIGZvbnQtc2l6ZT0iNjAiPvCfkK88L3RleHQ+PC9zdmc+'
-  
+  const iconDataUrl =
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI2NCIgY3k9IjY0IiByPSI2MCIgZmlsbD0iI0ZGNjM0NyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjM1ZW0iIGZvbnQtc2l6ZT0iNjAiPvCfkK88L3RleHQ+PC9zdmc+'
+
   chrome.notifications.create({
     type: 'basic',
     iconUrl: iconDataUrl,
     title: title,
     message: message,
-    priority: 2
+    priority: 2,
   })
 }
 
 // 监听点击插件图标
-chrome.action.onClicked.addListener(async (tab) => {
+chrome.action.onClicked.addListener(async tab => {
   // 打开侧边栏
   if (tab.id) {
     await chrome.sidePanel.open({ tabId: tab.id })
@@ -110,7 +111,7 @@ function stopKeepAlive() {
 }
 
 // 当有连接时保持活跃
-chrome.runtime.onConnect.addListener((port) => {
+chrome.runtime.onConnect.addListener(port => {
   if (port.name === 'keepAlive') {
     startKeepAlive()
     port.onDisconnect.addListener(() => {
@@ -120,4 +121,3 @@ chrome.runtime.onConnect.addListener((port) => {
 })
 
 console.log('番茄猫 Service Worker 已启动')
-

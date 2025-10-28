@@ -4,7 +4,7 @@ import { create } from 'zustand'
 interface TaskState {
   tasks: Task[]
   currentTaskId: string | null
-  
+
   // Actions
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void
   updateTask: (id: string, updates: Partial<Task>) => void
@@ -13,33 +13,36 @@ interface TaskState {
   setTasks: (tasks: Task[]) => void
 }
 
-export const useTaskStore = create<TaskState>((set) => ({
+export const useTaskStore = create<TaskState>(set => ({
   tasks: [],
   currentTaskId: null,
 
-  addTask: (taskData) => set((state) => ({
-    tasks: [
-      ...state.tasks,
-      {
-        ...taskData,
-        id: crypto.randomUUID(),
-        createdAt: Date.now()
-      }
-    ]
-  })),
+  addTask: taskData =>
+    set(state => ({
+      tasks: [
+        ...state.tasks,
+        {
+          ...taskData,
+          id: crypto.randomUUID(),
+          createdAt: Date.now(),
+        },
+      ],
+    })),
 
-  updateTask: (id, updates) => set((state) => ({
-    tasks: state.tasks.map((task) =>
-      task.id === id ? { ...task, ...updates } : task
-    )
-  })),
+  updateTask: (id, updates) =>
+    set(state => ({
+      tasks: state.tasks.map(task =>
+        task.id === id ? { ...task, ...updates } : task
+      ),
+    })),
 
-  deleteTask: (id) => set((state) => ({
-    tasks: state.tasks.filter((task) => task.id !== id),
-    currentTaskId: state.currentTaskId === id ? null : state.currentTaskId
-  })),
+  deleteTask: id =>
+    set(state => ({
+      tasks: state.tasks.filter(task => task.id !== id),
+      currentTaskId: state.currentTaskId === id ? null : state.currentTaskId,
+    })),
 
-  setCurrentTask: (id) => set({ currentTaskId: id }),
+  setCurrentTask: id => set({ currentTaskId: id }),
 
-  setTasks: (tasks) => set({ tasks })
+  setTasks: tasks => set({ tasks }),
 }))

@@ -16,18 +16,18 @@ export function useStorage() {
     const loadData = async () => {
       const [savedTasks, savedSettings] = await Promise.all([
         getStorage('tasks'),
-        getStorage('settings')
+        getStorage('settings'),
       ])
-      
+
       if (savedTasks) {
         setTasks(savedTasks)
       }
-      
+
       if (savedSettings) {
         setSettings(savedSettings)
       }
     }
-    
+
     loadData()
   }, [setTasks, setSettings])
 
@@ -45,7 +45,7 @@ export function useStorage() {
 
   // 监听其他标签页的数据变化
   useEffect(() => {
-    const unsubscribe = onStorageChange((changes) => {
+    const unsubscribe = onStorageChange(changes => {
       if (changes.tasks) {
         setTasks(changes.tasks.newValue)
       }
@@ -57,4 +57,3 @@ export function useStorage() {
     return unsubscribe
   }, [setTasks, setSettings])
 }
-

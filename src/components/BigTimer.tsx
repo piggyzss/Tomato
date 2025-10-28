@@ -14,15 +14,16 @@ interface TimerPersistState {
 }
 
 export function BigTimer() {
-  const { 
-    status, 
-    remainingSeconds, 
-    setStatus, 
-    tick, 
+  const {
+    status,
+    remainingSeconds,
+    mode,
+    setStatus,
+    tick,
     reset,
     setRemainingSeconds,
   } = useTimerStore()
-  
+
   const { currentTaskId, updateTask, tasks, setCurrentTask } = useTaskStore()
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(0)
@@ -32,15 +33,15 @@ export function BigTimer() {
   useEffect(() => {
     if (hasLoadedRef.current) return
     hasLoadedRef.current = true
-    
-    chrome.storage.local.get(['timerState'], (result) => {
+
+    chrome.storage.local.get(['timerState'], result => {
       const savedState = result.timerState as TimerPersistState | undefined
-      
+
       if (savedState && savedState.status === 'running') {
         // 计算经过的时间
         const elapsed = Math.floor((Date.now() - savedState.startTime) / 1000)
         const newRemaining = Math.max(0, savedState.remainingSeconds - elapsed)
-        
+
         setRemainingSeconds(newRemaining)
         setStatus('running')
         if (savedState.currentTaskId) {
@@ -77,44 +78,44 @@ export function BigTimer() {
 
     const interval = setInterval(() => {
       tick()
-      
-      // 每秒更新当前任务的时间
-      if (currentTaskId) {
+
+      // 只在番茄钟模式下更新当前任务的时间
+      if (currentTaskId && mode === 'pomodoro') {
         const currentTask = tasks.find(t => t.id === currentTaskId)
         if (currentTask) {
           updateTask(currentTaskId, {
-            totalTimeSpent: currentTask.totalTimeSpent + 1
+            totalTimeSpent: currentTask.totalTimeSpent + 1,
           })
         }
       }
-      
+
       if (remainingSeconds <= 1) {
         setStatus('idle')
-        
+
         // 番茄钟完成，增加计数
         if (currentTaskId) {
           const currentTask = tasks.find(t => t.id === currentTaskId)
           if (currentTask) {
             updateTask(currentTaskId, {
-              pomodoroCount: currentTask.pomodoroCount + 1
+              pomodoroCount: currentTask.pomodoroCount + 1,
             })
           }
         }
-        
+
         // 清除保存的状态
         saveTimerState({
           status: 'idle',
           remainingSeconds: 0,
           startTime: 0,
           pausedTime: 0,
-          currentTaskId: null
+          currentTaskId: null,
         })
-        
+
         // 发送通知
         chrome.runtime.sendMessage({
           type: 'SHOW_NOTIFICATION',
-          title: '🍅 Time\'s up!',
-          body: 'Take a break~'
+          title: "🍅 Time's up!",
+          body: 'Take a break~',
         })
       }
     }, 1000)
@@ -126,7 +127,15 @@ export function BigTimer() {
         clearInterval(timerIntervalRef.current)
       }
     }
-  }, [status, remainingSeconds, tick, setStatus, currentTaskId, tasks, updateTask])
+  }, [
+    status,
+    remainingSeconds,
+    tick,
+    setStatus,
+    currentTaskId,
+    tasks,
+    updateTask,
+  ])
 
   const handleStart = () => {
     // 检查是否选中了任务
@@ -135,41 +144,41 @@ export function BigTimer() {
       return
     }
     setStatus('running')
-    
+
     // 保存状态
     saveTimerState({
       status: 'running',
       remainingSeconds: remainingSeconds,
       startTime: Date.now(),
       pausedTime: 0,
-      currentTaskId: currentTaskId
+      currentTaskId: currentTaskId,
     })
   }
 
   const handleStop = () => {
     setStatus('paused')
-    
+
     // 保存暂停状态
     saveTimerState({
       status: 'paused',
       remainingSeconds: 0,
       startTime: 0,
       pausedTime: remainingSeconds,
-      currentTaskId: currentTaskId
+      currentTaskId: currentTaskId,
     })
   }
 
   const handleReset = () => {
     reset()
     setStatus('idle')
-    
+
     // 清除保存的状态
     saveTimerState({
       status: 'idle',
       remainingSeconds: 0,
       startTime: 0,
       pausedTime: 0,
-      currentTaskId: null
+      currentTaskId: null,
     })
   }
 
@@ -188,14 +197,14 @@ export function BigTimer() {
       {/* Control Buttons */}
       <div className="flex items-center gap-4">
         {status === 'running' ? (
-          <button 
+          <button
             onClick={handleStop}
             className="px-14 py-3.5 bg-white text-tomato text-base font-bold rounded-lg hover:bg-white/90 active:scale-95 transition-all shadow-lg tracking-wide"
           >
             PAUSE
           </button>
         ) : (
-          <button 
+          <button
             onClick={handleStart}
             disabled={isTimeUp}
             className="px-14 py-3.5 bg-white text-tomato text-base font-bold rounded-lg hover:bg-white/90 active:scale-95 transition-all shadow-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:active:scale-100"
@@ -203,7 +212,7 @@ export function BigTimer() {
             {status === 'paused' ? 'RESUME' : 'START'}
           </button>
         )}
-        
+
         {showResetButton && (
           <button
             onClick={handleReset}
@@ -217,4 +226,3 @@ export function BigTimer() {
     </div>
   )
 }
-
