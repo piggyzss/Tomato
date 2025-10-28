@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    * {
+        @apply box-border;
+    }
+
+    body {
+        @apply bg-cream text-gray-800 antialiased;
+        font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    button {
+        @apply cursor-pointer transition-all duration-200;
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    input,
+    textarea {
+        @apply outline-none;
+        font-family: 'Quicksand', sans-serif;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-tomato text-white px-4 py-2 rounded-cat shadow-soft hover:bg-tomato-dark active:scale-95 transition-all;
+    }
+
+    .btn-secondary {
+        @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-cat shadow-soft hover:bg-gray-300 active:scale-95 transition-all;
+    }
+
+    .card {
+        @apply bg-white rounded-cat shadow-soft p-4;
+    }
+
+    .input-field {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-cat focus:border-tomato focus:ring-2 focus:ring-tomato/20 transition-all;
+    }
+}
+
+@layer utilities {
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}

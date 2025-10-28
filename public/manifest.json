@@ -1,0 +1,24 @@
+{
+    "manifest_version": 3,
+    "name": "番茄猫 - Tomato Cat Timer",
+    "version": "0.1.0",
+    "description": "基于番茄工作法的学习工作陪伴插件，可爱的猫咪陪你专注每一刻",
+    "action": {
+        "default_title": "番茄猫"
+    },
+    "side_panel": {
+        "default_path": "index.html"
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "permissions": [
+        "storage",
+        "sidePanel",
+        "alarms",
+        "notifications",
+        "tabs"
+    ],
+    "host_permissions": []
+}
