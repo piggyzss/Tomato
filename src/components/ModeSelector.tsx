@@ -9,11 +9,11 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
   return (
-    <div className="flex gap-3 mb-8">
+    <div className="flex gap-3 mb-8 justify-center">
       <button
         onClick={() => onModeChange('pomodoro')}
         className={clsx(
-          'px-5 py-1.5 rounded-lg font-semibold transition-all text-sm',
+          'px-3 py-1.5 rounded-lg font-semibold transition-all text-sm whitespace-nowrap',
           mode === 'pomodoro'
             ? 'bg-black/20 text-white'
             : 'text-white/70 hover:text-white'
@@ -25,7 +25,7 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
       <button
         onClick={() => onModeChange('shortBreak')}
         className={clsx(
-          'px-5 py-1.5 rounded-lg font-semibold transition-all text-sm',
+          'px-3 py-1.5 rounded-lg font-semibold transition-all text-sm whitespace-nowrap',
           mode === 'shortBreak'
             ? 'bg-black/20 text-white'
             : 'text-white/70 hover:text-white'
@@ -37,7 +37,7 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
       <button
         onClick={() => onModeChange('longBreak')}
         className={clsx(
-          'px-5 py-1.5 rounded-lg font-semibold transition-all text-sm',
+          'px-3 py-1.5 rounded-lg font-semibold transition-all text-sm whitespace-nowrap',
           mode === 'longBreak'
             ? 'bg-black/20 text-white'
             : 'text-white/70 hover:text-white'

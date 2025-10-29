@@ -1,0 +1,126 @@
+import { useSettingsStore } from '@/store/useSettingsStore'
+import { MessageCircle, Calendar, X, ArrowLeft } from 'lucide-react'
+
+interface AIMainMenuProps {
+  onClose?: () => void
+  onNavigate: (view: 'catMessages' | 'dailySummary') => void
+  apiStatus: {
+    aiAvailable: boolean
+    writerAvailable: boolean
+    summarizerAvailable: boolean
+  }
+}
+
+export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMenuProps) {
+  const { theme } = useSettingsStore()
+
+  const aiMenu = [
+    {
+      id: 'catMessages' as const,
+      title: 'Cat Messages',
+      description: 'AI-generated encouragement',
+      icon: MessageCircle,
+      color: 'bg-pink-500',
+    },
+    {
+      id: 'dailySummary' as const,
+      title: 'Daily Summary',
+      description: 'AI productivity insights',
+      icon: Calendar,
+      color: 'bg-blue-500',
+    },
+  ]
+
+  return (
+    <div>
+      {/* Fixed Header with Close Button */}
+      <div className={`sticky top-0 z-10 pb-3 ${
+        theme === 'dark'
+          ? 'bg-gray-900'
+          : 'bg-[#D84848]'
+      }`}>
+        <div className="flex items-center justify-between py-3">
+          <div className="flex-1 text-left">
+            <h1 className="text-base font-bold text-white mb-0.5">🤖 AI Assistant</h1>
+            <p className="text-white/70 text-xs">Enhance your productivity with AI</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            title="Close"
+          >
+            <X size={18} className="text-white/90" />
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-4 mt-4">
+        {/* API Status Display */}
+        {!apiStatus.aiAvailable && (
+          <div className="p-4 rounded-lg bg-black/20 border border-white/20">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-yellow-400">⚠️</span>
+              <span className="font-medium text-sm text-white">
+                Gemini Nano Not Available
+              </span>
+            </div>
+            <p className="text-xs text-white/70 mb-2">
+              To use AI features, please use <strong>Chrome Canary</strong> with these flags enabled:
+            </p>
+            <ul className="text-xs space-y-1 text-white/60">
+              <li>• chrome://flags/#optimization-guide-on-device-model</li>
+              <li>• chrome://flags/#prompt-api-for-gemini-nano</li>
+              <li>• chrome://flags/#translation-api</li>
+            </ul>
+          </div>
+        )}
+
+        {apiStatus.aiAvailable && (
+          <div className="p-3 rounded-lg bg-black/20 border border-white/20">
+            <div className="flex items-center gap-2">
+              <span className="text-green-400">✓</span>
+              <span className="font-medium text-xs text-white">
+                AI Features Available
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* AI Features Grid */}
+        <div className="grid gap-2.5">
+          {aiMenu.map(feature => {
+            const Icon = feature.icon
+            return (
+              <button
+                key={feature.id}
+                onClick={() => onNavigate(feature.id)}
+                className="w-full p-2.5 rounded-lg bg-black/20 hover:bg-black/30 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-md ${feature.color}`}>
+                    <Icon size={18} color="white" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-sm text-white">{feature.title}</div>
+                    <div className="text-xs text-white/70">
+                      {feature.description}
+                    </div>
+                  </div>
+                  <div className="text-white/50">
+                    <ArrowLeft size={16} className="rotate-180" />
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-4 text-center text-xs text-white/60 bg-black/20 rounded-lg p-2.5">
+          <div className="mb-1">🤖 Powered by Gemini Nano</div>
+          <div className="text-[10px]">On-device AI processing</div>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,18 +1,19 @@
-import { useState } from 'react'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import {
-  Save,
+  ArrowLeft,
+  Bell,
+  Bot,
   Clock,
   Coffee,
+  Globe,
+  Palette,
   RefreshCw,
-  ArrowLeft,
+  Save,
   Timer,
   Volume2,
-  Bell,
-  Palette,
-  Bot,
-  Globe,
+  X
 } from 'lucide-react'
+import { useState } from 'react'
 import { TimerMode } from './ModeSelector'
 
 // Settings menu type
@@ -25,7 +26,11 @@ type SettingsView =
   | 'ai'
   | 'language'
 
-export default function SettingsPanel() {
+interface SettingsPanelProps {
+  onClose?: () => void
+}
+
+export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const {
     workDuration,
     shortBreakDuration,
@@ -36,6 +41,22 @@ export default function SettingsPanel() {
 
   // Navigation state
   const [currentView, setCurrentView] = useState<SettingsView>('menu')
+  const [nextView, setNextView] = useState<SettingsView | null>(null)
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left')
+
+  const handleViewChange = (view: SettingsView) => {
+    if (nextView !== null) return // 防止动画期间多次点击
+
+    const direction = view === 'menu' ? 'right' : 'left'
+    setSlideDirection(direction)
+    setNextView(view)
+
+    // 300ms 后完成切换
+    setTimeout(() => {
+      setCurrentView(view)
+      setNextView(null)
+    }, 300)
+  }
 
   // Local state for editing timer settings
   const [selectedMode, setSelectedMode] = useState<TimerMode>('pomodoro')
@@ -44,6 +65,8 @@ export default function SettingsPanel() {
     shortBreakDuration: shortBreakDuration,
     longBreakDuration: longBreakDuration,
   })
+
+  console.log('tempDurations', tempDurations)
   const [showSaved, setShowSaved] = useState(false)
   const [showThemeSaved, setShowThemeSaved] = useState(false)
 
@@ -83,13 +106,17 @@ export default function SettingsPanel() {
     setTimeout(() => setShowSaved(false), 2000)
   }
 
-  // Reset to current stored values
+  // Reset to default values
   const handleReset = () => {
-    setTempDurations({
-      workDuration: workDuration,
-      shortBreakDuration: shortBreakDuration,
-      longBreakDuration: longBreakDuration,
-    })
+    const defaultDurations = {
+      workDuration: 25,
+      shortBreakDuration: 5,
+      longBreakDuration: 15,
+    }
+    setTempDurations(defaultDurations)
+    updateSettings(defaultDurations)
+    setShowSaved(true)
+    setTimeout(() => setShowSaved(false), 2000)
   }
 
   // Mode configuration
@@ -165,35 +192,49 @@ export default function SettingsPanel() {
 
   // Render main menu
   const renderMainMenu = () => (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">⚙️ Settings</h1>
-        <p className="text-white/80">Customize your Tomato experience</p>
+    <div>
+      {/* Fixed Header with Close Button */}
+      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
+        ? 'bg-gray-900'
+        : 'bg-[#D84848]'
+        }`}>
+        <div className="flex items-center justify-between py-3">
+          <div className="flex-1 text-left">
+            <h1 className="text-base font-bold text-white mb-0.5">⚙️ Settings</h1>
+            <p className="text-white/70 text-xs">Customize your Tomato experience</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            title="Close"
+          >
+            <X size={18} className="text-white/90" />
+          </button>
+        </div>
       </div>
 
       {/* Settings Grid */}
-      <div className="grid gap-4">
+      <div className="grid gap-2.5">
         {settingsMenu.map(setting => {
           const Icon = setting.icon
           return (
             <button
               key={setting.id}
-              onClick={() => setCurrentView(setting.id)}
-              className="w-full p-4 rounded-xl bg-black/20 hover:bg-black/30 transition-all border border-white/20 hover:border-white/40"
+              onClick={() => handleViewChange(setting.id)}
+              className="w-full p-2.5 rounded-lg bg-black/20 hover:bg-black/30 transition-all"
             >
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-lg ${setting.color}`}>
-                  <Icon size={24} color="white" />
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-md ${setting.color}`}>
+                  <Icon size={18} color="white" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-semibold text-lg">{setting.title}</div>
-                  <div className="text-sm text-white/70">
+                  <div className="font-semibold text-sm text-white">{setting.title}</div>
+                  <div className="text-xs text-white/70">
                     {setting.description}
                   </div>
                 </div>
                 <div className="text-white/50">
-                  <ArrowLeft size={20} className="rotate-180" />
+                  <ArrowLeft size={16} className="rotate-180" />
                 </div>
               </div>
             </button>
@@ -202,166 +243,172 @@ export default function SettingsPanel() {
       </div>
 
       {/* Footer Info */}
-      <div className="mt-8 text-center text-sm text-white/70 bg-black/20 rounded-lg p-4">
-        <div className="mb-2">🍅 Tomato Cat Timer v0.1.0</div>
-        <div>Built with React + TypeScript + Zustand</div>
+      <div className="mt-4 text-center text-xs text-white/60 bg-black/20 rounded-lg p-2.5">
+        <div className="mb-1">🍅 Tomato Cat Timer v0.1.0</div>
+        <div className="text-[10px]">Built with React + TypeScript + Zustand</div>
       </div>
     </div>
   )
 
   // Render Timer Settings (existing functionality)
   const renderTimerSettings = () => (
-    <div className="space-y-6">
-      {/* Back Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => setCurrentView('menu')}
-          className="p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-all"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold">Timer Settings</h1>
-          <p className="text-white/80">Customize your Pomodoro durations</p>
+    <div>
+      {/* Fixed Header */}
+      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
+        ? 'bg-gray-900'
+        : 'bg-[#D84848]'
+        }`}>
+        <div className="flex items-center gap-3 py-3">
+          <button
+            onClick={() => handleViewChange('menu')}
+            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            title="Back"
+          >
+            <ArrowLeft size={18} className="text-white/90" />
+          </button>
+          <div className="flex-1 text-left">
+            <h1 className="text-base font-bold text-white mb-0.5">Timer Settings</h1>
+            <p className="text-white/70 text-xs">Customize your Pomodoro durations</p>
+          </div>
         </div>
       </div>
 
-      {/* Mode Selection */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Select Timer Mode</h2>
-        <div className="space-y-3">
-          {modes.map(mode => {
-            const Icon = mode.icon
-            return (
-              <button
-                key={mode.id}
-                onClick={() => setSelectedMode(mode.id)}
-                className={`w-full p-4 rounded-xl border-2 transition-all ${
-                  selectedMode === mode.id
-                    ? 'border-white bg-black/20 shadow-lg'
-                    : 'border-white/30 bg-black/10 hover:bg-black/20'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${mode.color}`}>
-                    <Icon size={20} color="white" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold">{mode.label}</div>
-                    <div className="text-sm text-white/70">
-                      {mode.description}
+      <div className="space-y-6 mt-4">
+
+        {/* Mode Selection */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-4">Select Timer Mode</h2>
+          <div className="space-y-3">
+            {modes.map(mode => {
+              const Icon = mode.icon
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setSelectedMode(mode.id)}
+                  className={`w-full p-4 rounded-xl transition-all ${selectedMode === mode.id
+                    ? 'bg-black/30'
+                    : 'bg-black/10 hover:bg-black/20'
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${mode.color}`}>
+                      <Icon size={20} color="white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold">{mode.label}</div>
+                      <div className="text-sm text-white/70">
+                        {mode.description}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
-            )
-          })}
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Duration Setting */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Set Duration</h2>
-        <div className="bg-black/20 rounded-xl p-6">
-          <div className="text-center mb-4">
-            <div className="text-4xl font-bold font-mono mb-2">
-              {getCurrentDuration()} min
+        {/* Duration Setting */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-4">Set Duration</h2>
+          <div className="bg-black/20 rounded-xl p-6">
+            <div className="text-center mb-4">
+              <div className="text-4xl font-bold font-mono mb-2">
+                {getCurrentDuration()} min
+              </div>
+              <div className="text-white/70">
+                {modes.find(m => m.id === selectedMode)?.label} Duration
+              </div>
             </div>
-            <div className="text-white/70">
-              {modes.find(m => m.id === selectedMode)?.label} Duration
-            </div>
-          </div>
 
-          {/* Duration Input Range */}
-          <div className="mb-4">
-            <input
-              type="range"
-              min="1"
-              max="60"
-              step="1"
-              value={getCurrentDuration()}
-              onChange={e => handleDurationChange(Number(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
-            />
-            <div className="flex justify-between text-sm text-white/60 mt-2">
-              <span>1 min</span>
-              <span>60 min</span>
+            {/* Duration Input Range */}
+            <div className="mb-4">
+              <input
+                type="range"
+                min="1"
+                max="60"
+                step="1"
+                value={getCurrentDuration()}
+                onChange={e => handleDurationChange(Number(e.target.value))}
+                className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <div className="flex justify-between text-sm text-white/60 mt-2">
+                <span>1 min</span>
+                <span>60 min</span>
+              </div>
             </div>
-          </div>
 
-          {/* Quick Duration Buttons */}
-          <div className="flex gap-2 justify-center">
-            {[5, 15, 25, 45].map(duration => (
-              <button
-                key={duration}
-                onClick={() => handleDurationChange(duration)}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                  getCurrentDuration() === duration
+            {/* Quick Duration Buttons */}
+            <div className="flex gap-2 justify-center">
+              {[5, 15, 25, 45].map(duration => (
+                <button
+                  key={duration}
+                  onClick={() => handleDurationChange(duration)}
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${getCurrentDuration() === duration
                     ? 'bg-white text-tomato'
                     : 'bg-white/20 text-white hover:bg-white/30'
-                }`}
-              >
-                {duration}m
-              </button>
-            ))}
+                    }`}
+                >
+                  {duration}m
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* All Durations Summary */}
-      <div className="mb-6 bg-black/20 rounded-xl p-4">
-        <h3 className="font-semibold mb-3 text-center">Current Settings</h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>🍅 Pomodoro:</span>
-            <span className="font-mono">{tempDurations.workDuration} min</span>
-          </div>
-          <div className="flex justify-between">
-            <span>☕ Short Break:</span>
-            <span className="font-mono">
-              {tempDurations.shortBreakDuration} min
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>🔄 Long Break:</span>
-            <span className="font-mono">
-              {tempDurations.longBreakDuration} min
-            </span>
+        {/* All Durations Summary */}
+        <div className="mb-6 bg-black/20 rounded-xl p-4">
+          <h3 className="font-semibold mb-3 text-center">Current Settings</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>🍅 Pomodoro:</span>
+              <span className="font-mono">{tempDurations.workDuration} min</span>
+            </div>
+            <div className="flex justify-between">
+              <span>☕ Short Break:</span>
+              <span className="font-mono">
+                {tempDurations.shortBreakDuration} min
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>🔄 Long Break:</span>
+              <span className="font-mono">
+                {tempDurations.longBreakDuration} min
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        <button
-          onClick={handleReset}
-          className="flex-1 px-6 py-3 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-all"
-        >
-          Reset
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={handleReset}
+            className="flex-1 px-4 py-2 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-all text-sm"
+          >
+            Reset
+          </button>
 
-        <button
-          onClick={handleSave}
-          className={`flex-1 px-6 py-3 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            showSaved
+          <button
+            onClick={handleSave}
+            className={`flex-1 px-4 py-2 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${showSaved
               ? 'bg-green-500 text-white'
               : 'bg-white text-tomato hover:bg-white/90'
-          }`}
-        >
-          {showSaved ? (
-            <>✅ Saved!</>
-          ) : (
-            <>
-              <Save size={18} />
-              Save Settings
-            </>
-          )}
-        </button>
-      </div>
+              }`}
+          >
+            {showSaved ? (
+              <>✅ Saved!</>
+            ) : (
+              <>
+                <Save size={16} />
+                Save
+              </>
+            )}
+          </button>
+        </div>
 
-      {/* Help Text */}
-      <div className="mt-6 text-center text-sm text-white/70">
-        💡 Tip: Changes will apply to new timer sessions
+        {/* Help Text */}
+        <div className="mt-6 mb-3 text-center text-sm text-white/70">
+          💡 Tip: Changes will apply to new timer sessions
+        </div>
       </div>
     </div>
   )
@@ -372,27 +419,23 @@ export default function SettingsPanel() {
       {
         id: 'light' as const,
         name: 'Light Mode',
-        description: 'Clean and bright interface',
+        description: 'Clean and bright',
         icon: '☀️',
-        preview: 'bg-gradient-to-br from-orange-100 to-red-100 text-gray-800',
-        selected: 'border-orange-400 bg-orange-50',
+        color: 'bg-orange-500',
       },
       {
         id: 'dark' as const,
         name: 'Dark Mode',
         description: 'Easy on the eyes',
         icon: '🌙',
-        preview: 'bg-gradient-to-br from-gray-800 to-gray-900 text-white',
-        selected: 'border-blue-400 bg-gray-800',
+        color: 'bg-blue-500',
       },
       {
         id: 'auto' as const,
         name: 'Auto',
-        description: 'Follows system preference',
+        description: 'Follows system',
         icon: '🔄',
-        preview:
-          'bg-gradient-to-br from-purple-200 to-indigo-300 text-gray-800',
-        selected: 'border-purple-400 bg-purple-100',
+        color: 'bg-purple-500',
       },
     ]
 
@@ -403,29 +446,65 @@ export default function SettingsPanel() {
     }
 
     return (
-      <div className="space-y-6">
-        {/* Back Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => setCurrentView('menu')}
-            className="p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-all"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">🎨 Theme Settings</h1>
-            <p className="text-white/80">Choose your visual experience</p>
+      <div>
+        {/* Fixed Header */}
+        <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
+          ? 'bg-gray-900'
+          : 'bg-[#D84848]'
+          }`}>
+          <div className="flex items-center gap-3 py-3">
+            <button
+              onClick={() => handleViewChange('menu')}
+              className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+              title="Back"
+            >
+              <ArrowLeft size={18} className="text-white/90" />
+            </button>
+            <div className="flex-1 text-left">
+              <h1 className="text-base font-bold text-white mb-0.5">Theme Settings</h1>
+              <p className="text-white/70 text-xs">Choose your visual experience</p>
+            </div>
           </div>
         </div>
 
-        {/* Current Theme Display */}
-        <div className="bg-black/20 rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-3">Current Theme</h2>
-          <div className="flex items-center gap-3">
-            <div className="text-2xl">
-              {themes.find(t => t.id === theme)?.icon}
+        <div className="space-y-6 mt-4">
+
+          {/* Theme Selection */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4">Select Theme</h2>
+            <div className="space-y-3">
+              {themes.map(themeOption => (
+                <button
+                  key={themeOption.id}
+                  onClick={() => handleThemeChange(themeOption.id)}
+                  className={`w-full p-4 rounded-xl transition-all ${theme === themeOption.id
+                    ? 'bg-black/30'
+                    : 'bg-black/10 hover:bg-black/20'
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${themeOption.color}`}>
+                      <span className="text-xl">{themeOption.icon}</span>
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold">{themeOption.name}</div>
+                      <div className="text-sm text-white/70">
+                        {themeOption.description}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
-            <div>
+          </div>
+
+          {/* Current Theme Summary */}
+          <div className="mb-6 bg-black/20 rounded-xl p-4">
+            <h3 className="font-semibold mb-3 text-center">Current Theme</h3>
+            <div className="text-center">
+              <div className="text-3xl mb-2">
+                {themes.find(t => t.id === theme)?.icon}
+              </div>
               <div className="font-semibold">
                 {themes.find(t => t.id === theme)?.name}
               </div>
@@ -434,121 +513,17 @@ export default function SettingsPanel() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Theme Options */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Choose Theme</h2>
-          {themes.map(themeOption => (
-            <button
-              key={themeOption.id}
-              onClick={() => handleThemeChange(themeOption.id)}
-              className={`w-full p-4 rounded-xl border-2 transition-all ${
-                theme === themeOption.id
-                  ? 'border-white bg-black/30 shadow-lg'
-                  : 'border-white/30 bg-black/10 hover:bg-black/20'
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                {/* Theme Preview */}
-                <div
-                  className={`w-12 h-12 rounded-lg ${themeOption.preview} flex items-center justify-center text-xl border-2 border-white/20`}
-                >
-                  {themeOption.icon}
-                </div>
+          {/* Save Confirmation */}
+          {showThemeSaved && (
+            <div className="bg-green-500 text-white rounded-lg p-3 text-center font-semibold text-sm">
+              ✅ Theme saved successfully!
+            </div>
+          )}
 
-                {/* Theme Info */}
-                <div className="text-left flex-1">
-                  <div className="font-semibold text-lg">
-                    {themeOption.name}
-                  </div>
-                  <div className="text-sm text-white/70">
-                    {themeOption.description}
-                  </div>
-                </div>
-
-                {/* Selection Indicator */}
-                {theme === themeOption.id && (
-                  <div className="text-white">
-                    <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                      <div className="w-3 h-3 rounded-full bg-tomato"></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Theme Preview Section */}
-        <div className="bg-black/20 rounded-xl p-6">
-          <h3 className="font-semibold mb-4">Preview</h3>
-          <div className="space-y-3">
-            {theme === 'light' && (
-              <div className="bg-white rounded-lg p-4 text-gray-800">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-4 h-4 bg-orange-400 rounded"></div>
-                  <span className="font-semibold">Light Mode Preview</span>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Clean, bright, and professional interface perfect for daytime
-                  use.
-                </p>
-              </div>
-            )}
-
-            {theme === 'dark' && (
-              <div className="bg-gray-800 rounded-lg p-4 text-white border border-gray-600">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-4 h-4 bg-blue-400 rounded"></div>
-                  <span className="font-semibold">Dark Mode Preview</span>
-                </div>
-                <p className="text-sm text-gray-300">
-                  Easy on the eyes with reduced strain for extended use.
-                </p>
-              </div>
-            )}
-
-            {theme === 'auto' && (
-              <div className="bg-gradient-to-r from-white to-gray-800 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-4 h-4 bg-purple-400 rounded"></div>
-                  <span className="font-semibold text-gray-800">
-                    Auto Mode Preview
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Automatically switches between light and dark based on your
-                  system.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Save Confirmation */}
-        {showThemeSaved && (
-          <div className="bg-green-500 text-white rounded-lg p-4 text-center font-semibold">
-            ✅ Theme saved! Changes will apply on next app restart.
-          </div>
-        )}
-
-        {/* Info Section */}
-        <div className="bg-black/20 rounded-xl p-4">
-          <h3 className="font-semibold mb-2">💡 Theme Information</h3>
-          <div className="space-y-2 text-sm text-white/80">
-            <p>
-              • <strong>Light Mode:</strong> Best for daytime use and bright
-              environments
-            </p>
-            <p>
-              • <strong>Dark Mode:</strong> Reduces eye strain in low-light
-              conditions
-            </p>
-            <p>
-              • <strong>Auto Mode:</strong> Follows your system's theme
-              preference
-            </p>
+          {/* Help Text */}
+          <div className="mt-6 mb-3 text-center text-sm text-white/70">
+            💡 Tip: Theme changes apply immediately
           </div>
         </div>
       </div>
@@ -557,27 +532,33 @@ export default function SettingsPanel() {
 
   // Render placeholder pages for other settings
   const renderPlaceholderPage = (title: string, icon: string) => (
-    <div className="space-y-6">
-      {/* Back Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => setCurrentView('menu')}
-          className="p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-all"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <p className="text-white/80">Coming soon...</p>
+    <div>
+      {/* Fixed Header */}
+      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
+        ? 'bg-gray-900'
+        : 'bg-[#D84848]'
+        }`}>
+        <div className="flex items-center gap-3 py-3">
+          <button
+            onClick={() => handleViewChange('menu')}
+            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            title="Back"
+          >
+            <ArrowLeft size={18} className="text-white/90" />
+          </button>
+          <div className="flex-1 text-left">
+            <h1 className="text-base font-bold text-white mb-0.5">{title}</h1>
+            <p className="text-white/70 text-xs">Coming soon...</p>
+          </div>
         </div>
       </div>
 
       {/* Placeholder Content */}
       <div className="text-center py-20">
-        <div className="text-8xl mb-6">{icon}</div>
-        <h2 className="text-2xl font-bold mb-4">{title}</h2>
+        <div className="text-6xl mb-6">{icon}</div>
+        <h2 className="text-xl font-bold mb-4 text-white">{title}</h2>
         <p className="text-white/70 mb-8">This feature is under development</p>
-        <div className="bg-black/20 rounded-xl p-6 max-w-sm mx-auto">
+        <div className="bg-black/20 rounded-xl p-6 max-w-sm mx-auto border border-white/20">
           <p className="text-sm text-white/80">
             We're working on bringing you amazing {title.toLowerCase()} options.
             Stay tuned for updates! 🚀
@@ -589,24 +570,38 @@ export default function SettingsPanel() {
 
   return (
     <div
-      className={`p-6 min-h-screen text-white transition-all duration-300 ${
-        theme === 'dark'
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
-          : 'bg-gradient-to-br from-tomato to-red-500'
-      }`}
+      className={`rounded-xl shadow-2xl overflow-hidden relative ${theme === 'dark'
+        ? 'bg-gray-900'
+        : 'bg-[#D84848]'
+        }`}
+      style={{
+        height: 'calc(100vh - 240px)',
+        maxHeight: '600px'
+      }}
     >
-      <div className="max-w-md mx-auto">
-        {/* Render different views based on current selection */}
-        {currentView === 'menu' && renderMainMenu()}
-        {currentView === 'timer' && renderTimerSettings()}
-        {currentView === 'sound' &&
-          renderPlaceholderPage('Sound Settings', '🔊')}
-        {currentView === 'notifications' &&
-          renderPlaceholderPage('Notifications', '🔔')}
-        {currentView === 'theme' && renderThemeSettings()}
-        {currentView === 'ai' && renderPlaceholderPage('AI Features', '🤖')}
-        {currentView === 'language' && renderPlaceholderPage('Language', '🌍')}
+      <div
+        className="max-w-md mx-auto h-full overflow-hidden text-white relative"
+      >
+        {/* 只渲染一个视图，使用 key 强制重新挂载 */}
+        <div
+          key={nextView || currentView}
+          className="absolute inset-0 px-4 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+          style={{
+            animation: nextView !== null
+              ? `slideInFrom${slideDirection === 'left' ? 'Right' : 'Left'} 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
+              : 'none'
+          }}
+        >
+          {(nextView || currentView) === 'menu' && renderMainMenu()}
+          {(nextView || currentView) === 'timer' && renderTimerSettings()}
+          {(nextView || currentView) === 'sound' && renderPlaceholderPage('Sound Settings', '🔊')}
+          {(nextView || currentView) === 'notifications' && renderPlaceholderPage('Notifications', '🔔')}
+          {(nextView || currentView) === 'theme' && renderThemeSettings()}
+          {(nextView || currentView) === 'ai' && renderPlaceholderPage('AI Features', '🤖')}
+          {(nextView || currentView) === 'language' && renderPlaceholderPage('Language', '🌍')}
+        </div>
       </div>
     </div>
   )
 }
+

@@ -1,9 +1,9 @@
-import { useTaskStore } from '@/store/useTaskStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
+import { useTaskStore } from '@/store/useTaskStore'
 import { useTimerStore } from '@/store/useTimerStore'
 import clsx from 'clsx'
-import { Check, X, Play, Pause, Coffee, RotateCcw } from 'lucide-react'
-import { useState } from 'react'
+import { Check, Coffee, Monitor, MonitorPlay, MonitorX, SquareMousePointer, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export function TaskListNew() {
   const {
@@ -14,10 +14,19 @@ export function TaskListNew() {
     deleteTask,
     setCurrentTask,
   } = useTaskStore()
-  const { theme, workDuration } = useSettingsStore()
-  const { status, mode, remainingSeconds, setStatus, setTotalSeconds, reset } =
-    useTimerStore()
+  const { theme } = useSettingsStore()
+  const { status, mode } = useTimerStore()
   const [newTaskTitle, setNewTaskTitle] = useState('')
+
+  // 初始化时自动选中第一个未完成的任务
+  useEffect(() => {
+    if (!currentTaskId && tasks.length > 0) {
+      const firstIncompleteTask = tasks.find(t => t.status !== 'completed')
+      if (firstIncompleteTask) {
+        setCurrentTask(firstIncompleteTask.id)
+      }
+    }
+  }, [tasks, currentTaskId, setCurrentTask])
 
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return
@@ -36,36 +45,8 @@ export function TaskListNew() {
     deleteTask(taskId)
   }
 
-  const handleTaskAction = (taskId: string) => {
-    const isActive = currentTaskId === taskId
-
-    // Only allow control in Pomodoro mode, not during breaks
-    if (mode !== 'pomodoro') {
-      return // Do nothing during break modes
-    }
-
-    if (isActive) {
-      // Timer finished (remainingSeconds = 0), act as reset button
-      if (remainingSeconds === 0 && status === 'idle') {
-        reset()
-        setTotalSeconds(workDuration * 60)
-        setStatus('running')
-        return
-      }
-
-      // Normal pause/resume functionality
-      if (status === 'running') {
-        setStatus('paused')
-      } else if (status === 'paused') {
-        setStatus('running')
-      } else if (status === 'idle') {
-        // Start timer like BigTimer start button
-        setStatus('running')
-      }
-    } else {
-      // If task is not active, select it
-      setCurrentTask(taskId)
-    }
+  const handleSelectTask = (taskId: string) => {
+    setCurrentTask(taskId)
   }
 
   const handleToggleComplete = (taskId: string, e: React.MouseEvent) => {
@@ -95,7 +76,7 @@ export function TaskListNew() {
   return (
     <div
       className={`w-full max-w-2xl mx-auto rounded-xl p-5 shadow-lg transition-all duration-300 ${
-        theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white'
+        theme === 'dark' ? 'bg-gray-800/80 backdrop-blur border border-gray-700' : 'bg-white'
       }`}
     >
       <div className="flex items-center justify-between mb-4">
@@ -150,7 +131,7 @@ export function TaskListNew() {
                       : 'bg-white'
                 )}
               >
-                <div className="px-4 py-3 flex items-center gap-3">
+                <div className="px-1.5 py-3 flex items-center gap-1">
                   {/* Checkbox */}
                   <button
                     onClick={e => handleToggleComplete(task.id, e)}
@@ -188,83 +169,64 @@ export function TaskListNew() {
                     </div>
                   </div>
 
-                  {/* Smart Timer Control Button */}
+                  {/* Status Display or Select Button */}
                   {task.status !== 'completed' && (
-                    <button
-                      onClick={() => handleTaskAction(task.id)}
-                      disabled={
-                        isActive && mode !== 'pomodoro' && mode !== undefined
-                      }
-                      className={clsx(
-                        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
-                        // Disabled state during breaks
-                        isActive && mode !== 'pomodoro' && mode !== undefined
-                          ? theme === 'dark'
-                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          : // Timer finished state (like BigTimer disabled state)
-                            isActive &&
-                              remainingSeconds === 0 &&
-                              status === 'idle'
-                            ? theme === 'dark'
-                              ? 'bg-green-600 text-white hover:bg-green-500'
-                              : 'bg-green-600 text-white hover:bg-green-500'
-                            : // Active task states
-                              isActive
-                              ? theme === 'dark'
-                                ? 'bg-tomato text-white hover:bg-tomato/90'
-                                : 'bg-tomato text-white hover:bg-tomato/90'
-                              : // Inactive task
-                                theme === 'dark'
-                                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      )}
-                    >
+                    <>
                       {isActive ? (
-                        // During break modes, show break status
-                        mode === 'shortBreak' || mode === 'longBreak' ? (
-                          <>
-                            <Coffee size={12} />
-                            In Break
-                          </>
-                        ) : remainingSeconds === 0 && status === 'idle' ? (
-                          // Timer finished, show restart option
-                          <>
-                            <RotateCcw size={12} />
-                            Restart
-                          </>
-                        ) : status === 'running' ? (
-                          // Timer running in pomodoro mode
-                          <>
-                            <Pause size={12} />
-                            Pause
-                          </>
-                        ) : status === 'paused' ? (
-                          // Timer paused in pomodoro mode
-                          <>
-                            <Play size={12} />
-                            Resume
-                          </>
-                        ) : (
-                          // Timer idle in pomodoro mode
-                          <>
-                            <Play size={12} />
-                            Start
-                          </>
-                        )
+                        <div
+                          className={clsx(
+                            'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
+                            theme === 'dark'
+                              ? 'bg-tomato/20 text-tomato'
+                              : 'bg-tomato/10 text-tomato'
+                          )}
+                        >
+                          {mode === 'shortBreak' || mode === 'longBreak' ? (
+                            // During break modes
+                            <>
+                              <Coffee size={12} />
+                              In Break
+                            </>
+                          ) : status === 'running' ? (
+                            // Timer running in pomodoro mode
+                            <>
+                              <Monitor size={12} />
+                              Working
+                            </>
+                          ) : status === 'paused' ? (
+                            // Timer paused in pomodoro mode
+                            <>
+                              <MonitorX size={12} />
+                              Paused
+                            </>
+                          ) : (
+                            // Timer idle in pomodoro mode
+                            <>
+                              <MonitorPlay size={12} />
+                              Ready
+                            </>
+                          )}
+                        </div>
                       ) : (
-                        // Task not selected
-                        <>
-                          <Play size={12} />
+                        <button
+                          onClick={() => handleSelectTask(task.id)}
+                          className={clsx(
+                            'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
+                            theme === 'dark'
+                              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          )}
+                        >
+                          <SquareMousePointer size={12} />
                           Select
-                        </>
+                        </button>
                       )}
-                    </button>
+                    </>
                   )}
 
                   {/* Time Spent */}
                   <div
-                    className={`text-xs font-bold min-w-[50px] text-right transition-colors duration-300 ${
+                    className={`text-xs font-bold min-w-[42px] text-right transition-colors duration-300 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                     }`}
                   >
@@ -274,7 +236,7 @@ export function TaskListNew() {
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDeleteTask(task.id)}
-                    className={`p-1.5 rounded-lg transition-colors duration-200 ${
+                    className={`p-0.5 rounded-lg transition-colors duration-200 ${
                       theme === 'dark'
                         ? 'hover:bg-red-600/20 text-gray-400 hover:text-red-400'
                         : 'hover:bg-red-50 text-gray-400 hover:text-red-500'

@@ -1,8 +1,8 @@
+import { useSettingsStore } from '@/store/useSettingsStore'
+import { useTimerStore } from '@/store/useTimerStore'
 import { useState } from 'react'
 import { BigTimer } from './BigTimer'
 import { ModeSelector, TimerMode } from './ModeSelector'
-import { useTimerStore } from '@/store/useTimerStore'
-import { useSettingsStore } from '@/store/useSettingsStore'
 
 // Parent component - contains the logic
 export default function TimerPage() {
@@ -35,7 +35,7 @@ export default function TimerPage() {
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="w-full flex flex-col">
       {/* Pass the function DOWN to child component */}
       <ModeSelector mode={currentMode} onModeChange={handleModeChange} />
       <BigTimer />

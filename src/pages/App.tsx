@@ -1,4 +1,4 @@
-import AI from '@/components/AI'
+import AI from '@/components/AI/index'
 import Analysis from '@/components/Analysis'
 import { CatMessage } from '@/components/CatMessage'
 import { CurrentTask } from '@/components/CurrentTask'
@@ -48,10 +48,19 @@ function App() {
   }, [workDuration, setTotalSeconds])
 
   const [activePanel, setActivePanel] = useState<'settings' | 'analysis' | 'ai' | null>(null)
+  const [isClosing, setIsClosing] = useState(false)
 
   function setSettingsPanel(e: React.MouseEvent) {
     e.preventDefault()
-    setActivePanel(activePanel === 'settings' ? null : 'settings')
+    if (activePanel === 'settings') {
+      setIsClosing(true)
+      setTimeout(() => {
+        setActivePanel(null)
+        setIsClosing(false)
+      }, 300)
+    } else {
+      setActivePanel('settings')
+    }
   }
 
   function setAnalysisPanel(e: React.MouseEvent) {
@@ -66,69 +75,67 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${
-        theme === 'dark'
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
-          : 'bg-tomato'
-      }`}
+      className={`h-screen flex flex-col transition-colors duration-300 ${theme === 'dark'
+        ? 'bg-gradient-to-br from-gray-900 to-gray-800'
+        : 'bg-tomato'
+        }`}
     >
-      <div className="max-w-2xl mx-auto px-6 py-6 flex flex-col items-center">
-        {/* Cat Message */}
-        <CatMessage />
+      {/* Fixed Top Section */}
+      <div className="flex-shrink-0 max-w-2xl mx-auto w-full pt-6">
+        {/* Cat Message - with horizontal padding */}
+        <div className="px-6">
+          <CatMessage />
+        </div>
 
-        {/* Timer Card */}
+        {/* Timer Card - full width, no outer padding */}
         <div
-          className={`rounded-2xl px-8 py-8 mb-5 transition-colors duration-300 ${
-            theme === 'dark'
-              ? 'bg-gray-800/80 backdrop-blur border border-gray-700'
-              : 'bg-tomato-light/30'
-          }`}
+          className={`py-8 px-6 mb-5 transition-colors duration-300 ${theme === 'dark'
+            ? 'bg-gray-800/80 backdrop-blur border-y border-gray-700'
+            : 'bg-tomato-light/30'
+            }`}
         >
           {/* Timer Display */}
           <TimerPage />
         </div>
+      </div>
 
+      {/* Scrollable Section */}
+      <div className="flex-1 overflow-y-auto max-w-2xl mx-auto w-full px-6 pb-6">
         {/* Current Task */}
         <CurrentTask />
 
         {/* Task List */}
         <TaskListNew />
 
-        {activePanel === 'settings' && <SettingsPanel />}
-        {activePanel === 'analysis' && <Analysis />}
-        {activePanel === 'ai' && <AI />}
-        
         {/* Action Buttons Row */}
-        <div className="flex items-center justify-center gap-4 mt-6">
+        <div className="flex items-center justify-center gap-4 mt-6 relative">
           <button
             onClick={setSettingsPanel}
-            className={`p-2 rounded-lg transition-all duration-300 ${
-              theme === 'dark'
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-white hover:bg-gray-100 text-gray-800'
-            }`}
+            id="settings-button"
+            className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-tomato hover:bg-black/20 text-white'
+              }`}
           >
             <Settings size={20} />
           </button>
 
           <button
             onClick={setAnalysisPanel}
-            className={`p-2 rounded-lg transition-all duration-300 ${
-              theme === 'dark'
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-white hover:bg-gray-100 text-gray-800'
-            }`}
+            className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-tomato hover:bg-black/20 text-white'
+              }`}
           >
             <BarChart3 className="w-5 h-5" />
             {/* <span className="ml-2">分析</span> */}
           </button>
-           <button
+          <button
             onClick={setAIPanel}
-            className={`p-2 rounded-lg transition-all duration-300 ${
-              theme === 'dark'
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-white hover:bg-gray-100 text-gray-800'
-            }`}
+            className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
+              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+              : 'bg-tomato hover:bg-black/20 text-white'
+              }`}
           >
             <Bot className="w-5 h-5" />
             {/* <span className="ml-2">分析</span> */}
@@ -137,13 +144,111 @@ function App() {
 
         {/* Footer */}
         <div
-          className={`text-center mt-6 mb-4 text-sm font-medium transition-colors duration-300 ${
-            theme === 'dark' ? 'text-gray-400' : 'text-white/50'
-          }`}
+          className={`text-center mt-6 mb-4 text-sm font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-white/50'
+            }`}
         >
           Tomato Cat v0.1.0
         </div>
       </div>
+
+      {/* Settings Modal */}
+      {(activePanel === 'settings' || isClosing) && (
+        <div
+          className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
+          style={{
+            top: 'auto',
+            bottom: '120px',
+            height: 'calc(100vh - 220px)',
+            pointerEvents: 'none'
+          }}
+        >
+          {/* Settings Panel */}
+          <div
+            className="relative w-full max-w-md mb-4"
+            style={{
+              animation: isClosing
+                ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
+                : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              pointerEvents: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SettingsPanel onClose={() => {
+              setIsClosing(true)
+              setTimeout(() => {
+                setActivePanel(null)
+                setIsClosing(false)
+              }, 300)
+            }} />
+          </div>
+        </div>
+      )}
+
+      {/* Analysis Modal */}
+      {(activePanel === 'analysis' || isClosing) && (
+        <div
+          className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
+          style={{
+            top: 'auto',
+            bottom: '120px',
+            height: 'calc(100vh - 220px)',
+            pointerEvents: 'none'
+          }}
+        >
+          {/* Analysis Panel */}
+          <div
+            className="relative w-full max-w-md mb-4"
+            style={{
+              animation: isClosing
+                ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
+                : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              pointerEvents: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Analysis onClose={() => {
+              setIsClosing(true)
+              setTimeout(() => {
+                setActivePanel(null)
+                setIsClosing(false)
+              }, 300)
+            }} />
+          </div>
+        </div>
+      )}
+
+      {/* AI Modal */}
+      {(activePanel === 'ai' || isClosing) && (
+        <div
+          className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
+          style={{
+            top: 'auto',
+            bottom: '120px',
+            height: 'calc(100vh - 220px)',
+            pointerEvents: 'none'
+          }}
+        >
+          {/* AI Panel */}
+          <div
+            className="relative w-full max-w-md mb-4"
+            style={{
+              animation: isClosing
+                ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
+                : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              pointerEvents: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AI onClose={() => {
+              setIsClosing(true)
+              setTimeout(() => {
+                setActivePanel(null)
+                setIsClosing(false)
+              }, 300)
+            }} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

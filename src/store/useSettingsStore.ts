@@ -8,7 +8,7 @@ interface SettingsState extends UserSettings {
 }
 
 const defaultSettings: UserSettings = {
-  workDuration: 10 / 60, // 10秒用于调试
+  workDuration: 25, // 25 分钟
   shortBreakDuration: 5,
   longBreakDuration: 15,
   pomodorosUntilLongBreak: 4,
