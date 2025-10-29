@@ -13,6 +13,17 @@
         "service_worker": "background.js",
         "type": "module"
     },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
     "permissions": [
         "storage",
         "sidePanel",
@@ -20,5 +31,15 @@
         "notifications",
         "tabs"
     ],
-    "host_permissions": []
+    "host_permissions": [],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "content.css"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
 }

@@ -26,8 +26,11 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 })
 
+// 跟踪侧边栏状态（每个 tab 一个状态）
+const sidePanelStatus = new Map<number, boolean>() // tabId -> isOpen
+
 // 监听来自页面的消息
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('收到消息:', message)
   
   switch (message.type) {
@@ -40,6 +43,45 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     case 'SHOW_NOTIFICATION':
       showNotification(message.title, message.body)
       break
+    case 'SIDE_PANEL_OPENED':
+      // 侧边栏打开时，隐藏页面上的悬浮组件
+      console.log('🐱 Background: Side panel opened, hiding widget')
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+          sidePanelStatus.set(tabs[0].id, true) // 标记为打开
+          console.log('🐱 Sending HIDE_FLOATING_WIDGET to tab:', tabs[0].id)
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'HIDE_FLOATING_WIDGET' }).catch(err => {
+            // 忽略错误：content script 可能还没加载
+            console.log('ℹ️ Content script not ready (this is normal):', err.message)
+          })
+        }
+      })
+      break
+    case 'SIDE_PANEL_CLOSED':
+      // 侧边栏关闭时，显示页面上的悬浮组件
+      console.log('🐱 Background: Side panel closed, showing widget')
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+          sidePanelStatus.set(tabs[0].id, false) // 标记为关闭
+          console.log('🐱 Sending SHOW_FLOATING_WIDGET to tab:', tabs[0].id)
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLOATING_WIDGET' }).catch(_err => {
+            // content script 可能还没加载，它会主动检查状态
+            console.log('ℹ️ Content script not ready yet. It will check status when loaded.')
+          })
+        }
+      })
+      break
+    case 'CHECK_SIDE_PANEL_STATUS':
+      // Content script 询问当前侧边栏状态
+      if (sender.tab?.id) {
+        const isOpen = sidePanelStatus.get(sender.tab.id) ?? false
+        const shouldShowWidget = !isOpen
+        console.log(`📊 Tab ${sender.tab.id}: Side panel is ${isOpen ? 'open' : 'closed'}, should show widget: ${shouldShowWidget}`)
+        sendResponse({ shouldShowWidget })
+      } else {
+        sendResponse({ shouldShowWidget: false })
+      }
+      return true // 异步响应
     default:
       console.warn('未知消息类型:', message.type)
   }

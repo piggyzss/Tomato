@@ -13,6 +13,43 @@ function App() {
   const { setSettings, workDuration } = useSettingsStore()
   const { setTotalSeconds } = useTimerStore()
 
+  // 通知 background 侧边栏已打开/关闭
+  useEffect(() => {
+    // 侧边栏打开时通知
+    console.log('🐱 Side panel opened')
+    chrome.runtime.sendMessage({ type: 'SIDE_PANEL_OPENED' }).catch(err => {
+      console.error('Failed to send SIDE_PANEL_OPENED:', err)
+    })
+    
+    // 监听页面可见性变化
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // 侧边栏被隐藏（关闭）
+        console.log('🐱 Side panel hidden/closed')
+        chrome.runtime.sendMessage({ type: 'SIDE_PANEL_CLOSED' }).catch(err => {
+          console.error('Failed to send SIDE_PANEL_CLOSED:', err)
+        })
+      } else {
+        // 侧边栏重新显示
+        console.log('🐱 Side panel visible again')
+        chrome.runtime.sendMessage({ type: 'SIDE_PANEL_OPENED' }).catch(err => {
+          console.error('Failed to send SIDE_PANEL_OPENED:', err)
+        })
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      // 组件卸载时发送关闭消息
+      console.log('🐱 Side panel component unmounting')
+      chrome.runtime.sendMessage({ type: 'SIDE_PANEL_CLOSED' }).catch(err => {
+        console.error('Failed to send SIDE_PANEL_CLOSED:', err)
+      })
+    }
+  }, [])
+
   // 加载数据
   useEffect(() => {
     const loadData = async () => {
