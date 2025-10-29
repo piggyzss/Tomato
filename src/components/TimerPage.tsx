@@ -35,7 +35,7 @@ export default function TimerPage() {
   }
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-row items-center justify-center">
       {/* Pass the function DOWN to child component */}
       <ModeSelector mode={currentMode} onModeChange={handleModeChange} />
       <BigTimer />

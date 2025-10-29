@@ -193,13 +193,13 @@ export function BigTimer() {
     <div className="w-full flex flex-col items-center relative">
       {/* Toast Notification */}
       {showNoTaskToast && (
-        <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-white text-tomato px-4 py-2 rounded-lg shadow-lg text-sm font-semibold animate-bounce z-50">
+        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-white text-tomato px-4 py-2 rounded-lg shadow-lg text-sm font-semibold animate-bounce z-50">
           Please select a task first!
         </div>
       )}
 
       {/* Timer Display */}
-      <div className="text-[80px] font-bold text-white leading-none mb-6 tracking-tight">
+      <div className="text-[48px] font-bold text-white leading-none mb-4 tracking-tight">
         {formatTime(remainingSeconds)}
       </div>
 

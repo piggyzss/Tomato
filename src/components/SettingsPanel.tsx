@@ -21,8 +21,8 @@ type SettingsView =
   | 'menu'
   | 'timer'
   | 'sound'
-  | 'notifications'
   | 'theme'
+  | 'notifications'
   | 'ai'
   | 'language'
 

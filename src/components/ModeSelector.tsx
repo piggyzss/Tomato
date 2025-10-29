@@ -9,7 +9,7 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
   return (
-    <div className="flex gap-3 mb-8 justify-center">
+    <div className="flex flex-col gap-2 mr-6">
       <button
         onClick={() => onModeChange('pomodoro')}
         className={clsx(

@@ -18,7 +18,8 @@
         "sidePanel",
         "alarms",
         "notifications",
-        "tabs"
+        "tabs",
+        "aiOriginTrial"
     ],
     "host_permissions": []
 }

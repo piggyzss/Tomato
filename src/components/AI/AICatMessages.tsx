@@ -1,200 +1,188 @@
-import { useSettingsStore } from '@/store/useSettingsStore'
-import { useTaskStore } from '@/store/useTaskStore'
-import { useTimerStore } from '@/store/useTimerStore'
-import { ArrowLeft, Sparkles, RefreshCw, Save, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { Send, Cat, User } from 'lucide-react'
+import { useAI } from './index'
 
-interface AICatMessagesProps {
-  onBack: () => void
-  aiWriter: any
-  isGenerating: boolean
-  generatedMessage: string
-  setIsGenerating: (value: boolean) => void
-  setGeneratedMessage: (value: string) => void
+interface Message {
+  id: string
+  type: 'user' | 'ai'
+  content: string
+  timestamp: Date
 }
 
-export default function AICatMessages({
-  onBack,
-  aiWriter,
-  isGenerating,
-  generatedMessage,
-  setIsGenerating,
-  setGeneratedMessage
-}: AICatMessagesProps) {
-  const { theme, aiMessages, updateSettings, language } = useSettingsStore()
-  const { status, remainingSeconds } = useTimerStore()
-  const { currentTaskId, tasks } = useTaskStore()
-  const [selectedMessageLanguage, setSelectedMessageLanguage] = useState<'zh-CN' | 'en-US' | 'ja-JP'>(language)
+export default function AICatMessages() {
+  const { service, isReady, error } = useAI()
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      type: 'ai',
+      content: 'Hello! 🐱 I\'m your AI productivity companion. How can I help you stay focused today?',
+      timestamp: new Date()
+    }
+  ])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const currentTask = tasks.find(t => t.id === currentTaskId)
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return
 
-  const generateCatMessage = async () => {
-    if (!aiWriter) {
-      alert('AI Writer not available. Please check Chrome flags.')
-      return
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: inputMessage,
+      timestamp: new Date()
     }
 
-    setIsGenerating(true)
-    setGeneratedMessage('')
+    setMessages(prev => [...prev, userMessage])
+    const messageToSend = inputMessage
+    setInputMessage('')
+    setIsLoading(true)
 
     try {
-      const taskContext = currentTask ? `working on "${currentTask.title}"` : 'ready to start'
-      const timeContext = status === 'running' 
-        ? `${Math.floor(remainingSeconds / 60)} minutes remaining`
-        : status === 'paused'
-        ? 'taking a break'
-        : 'ready to begin'
+      let aiResponseContent: string
 
-      const prompt = `You are a cute, encouraging cat companion for a Pomodoro timer app. 
-Generate a short, warm, and motivating message (1-2 sentences) for a user who is ${taskContext} and ${timeContext}.
-The message should be in ${selectedMessageLanguage === 'zh-CN' ? 'Chinese' : selectedMessageLanguage === 'ja-JP' ? 'Japanese' : 'English'}.
-Use cat-themed emojis like 🐱, 😺, 😸, 🎉, 💪, ✨.
-Keep it friendly, positive, and brief.`
+      if (!isReady || error) {
+        // Fallback when AI is not available
+        aiResponseContent = `I'm having trouble connecting to the AI service right now 😿 But I'm here to help! Try asking about productivity tips, time management strategies, or motivation techniques. Meanwhile, keep up the great work with your Pomodoro sessions! 🍅`
+      } else {
+        // Use actual AI service
+        aiResponseContent = await service.prompt(
+          `User message: "${messageToSend}"\n\nRespond as a helpful productivity companion cat. Keep it concise, encouraging, and use a cat emoji occasionally. Focus on productivity, time management, or motivation advice.`
+        )
+      }
 
-      const message = await aiWriter.write(prompt)
-      setGeneratedMessage(message)
-    } catch (error) {
-      console.error('Failed to generate message:', error)
-      setGeneratedMessage('Oops! Failed to generate message. Please try again. 🐱')
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: aiResponseContent,
+        timestamp: new Date()
+      }
+      
+      setMessages(prev => [...prev, aiResponse])
+    } catch (aiError) {
+      console.error('AI response error:', aiError)
+      
+      // Fallback response on error
+      const fallbackResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `Oops! I had a little cat-astrophe 😸 Let me try to help anyway! Could you tell me more about what you'd like assistance with regarding your productivity or focus sessions?`,
+        timestamp: new Date()
+      }
+      
+      setMessages(prev => [...prev, fallbackResponse])
     } finally {
-      setIsGenerating(false)
+      setIsLoading(false)
     }
   }
 
-  const saveMessage = () => {
-    if (!generatedMessage) return
-    
-    const newMessage = {
-      id: crypto.randomUUID(),
-      text: generatedMessage,
-      context: currentTask ? `Task: ${currentTask.title}` : 'General encouragement',
-      createdAt: Date.now()
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
     }
-    
-    const updatedMessages = [...(aiMessages || []), newMessage]
-    updateSettings({ aiMessages: updatedMessages })
-    setGeneratedMessage('')
-  }
-
-  const deleteMessage = (id: string) => {
-    const updatedMessages = (aiMessages || []).filter(msg => msg.id !== id)
-    updateSettings({ aiMessages: updatedMessages })
   }
 
   return (
-    <div>
-      {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
-        <div className="flex items-center gap-3 py-3">
-          <button
-            onClick={onBack}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Back"
+    <div className="flex flex-col h-full">
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-3 mb-4">
+        {messages.map(message => (
+          <div
+            key={message.id}
+            className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <ArrowLeft size={18} className="text-white/90" />
-          </button>
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">🐱 Cat Messages</h1>
-            <p className="text-white/70 text-xs">AI-generated encouragement</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-6 mt-4">
-        {/* Language Selection */}
-        <div className="bg-black/20 rounded-xl p-4">
-          <h3 className="font-semibold mb-3 text-sm text-white">🌍 Message Language</h3>
-          <select
-            value={selectedMessageLanguage}
-            onChange={(e) => setSelectedMessageLanguage(e.target.value as 'zh-CN' | 'en-US' | 'ja-JP')}
-            className="w-full p-2 rounded-lg bg-black/30 border border-white/20 text-white text-sm"
-          >
-            <option value="en-US">English</option>
-            <option value="zh-CN">中文</option>
-            <option value="ja-JP">日本語</option>
-          </select>
-        </div>
-
-        {/* Generate Button */}
-        <button
-          onClick={generateCatMessage}
-          disabled={isGenerating || !aiWriter}
-          className="w-full p-4 rounded-xl bg-black/20 hover:bg-black/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
-        >
-          <div className="flex items-center justify-center gap-3">
-            {isGenerating ? (
-              <RefreshCw size={20} className="text-white animate-spin" />
-            ) : (
-              <Sparkles size={20} className="text-white" />
+            {message.type === 'ai' && (
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                  <Cat size={16} className="text-white" />
+                </div>
+              </div>
             )}
-            <span className="font-semibold text-white">
-              {isGenerating ? 'Generating...' : 'Generate Cat Message'}
-            </span>
-          </div>
-        </button>
+            
+            <div
+              className={`max-w-[80%] px-3 py-2 rounded-lg ${
+                message.type === 'user'
+                  ? 'bg-white text-gray-800'
+                  : 'bg-black/20 text-white'
+              }`}
+            >
+              <p className="text-sm">{message.content}</p>
+              <p className="text-xs opacity-60 mt-1">
+                {message.timestamp.toLocaleTimeString([], { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </p>
+            </div>
 
-        {/* Generated Message Display */}
-        {generatedMessage && (
-          <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-            <div className="flex items-start justify-between mb-3">
-              <h3 className="font-semibold text-sm text-white">✨ Generated Message</h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={saveMessage}
-                  className="flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors"
-                >
-                  <Save size={14} />
-                  Save
-                </button>
-                <button
-                  onClick={() => setGeneratedMessage('')}
-                  className="flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-white/20 hover:bg-white/30 text-white transition-colors"
-                >
-                  Clear
-                </button>
+            {message.type === 'user' && (
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <User size={16} className="text-white" />
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex gap-3 justify-start">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                <Cat size={16} className="text-white" />
               </div>
             </div>
-            <p className="text-white leading-relaxed">{generatedMessage}</p>
-          </div>
-        )}
-
-        {/* Saved Messages */}
-        {aiMessages && aiMessages.length > 0 && (
-          <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-            <h3 className="font-semibold mb-3 text-sm text-white">💾 Saved Messages</h3>
-            <div className="space-y-3 max-h-64 overflow-y-auto">
-              {aiMessages.map((message) => (
-                <div key={message.id} className="bg-black/30 rounded-lg p-3 border border-white/10">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs text-white/60">
-                      {new Date(message.createdAt).toLocaleString()}
-                    </span>
-                    <button
-                      onClick={() => deleteMessage(message.id)}
-                      className="text-xs px-2 py-1 rounded text-red-400 hover:bg-red-900/20 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                  <p className="text-white text-sm">{message.text}</p>
-                  {message.context && (
-                    <p className="text-white/50 text-xs mt-1">{message.context}</p>
-                  )}
-                </div>
-              ))}
+            <div className="bg-black/20 text-white px-3 py-2 rounded-lg">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Help Text */}
-        <div className="mt-6 mb-3 text-center text-sm text-white/70">
-          💡 Tip: Messages are personalized based on your current task and timer status
+      {/* AI Status Indicator */}
+      {(!isReady || error) && (
+        <div className="mb-2 text-center text-xs">
+          {error ? (
+            <div className="bg-red-500/20 text-red-300 px-3 py-1.5 rounded-lg border border-red-500/30">
+              ⚠️ AI service unavailable - using fallback responses
+            </div>
+          ) : (
+            <div className="bg-yellow-500/20 text-yellow-300 px-3 py-1.5 rounded-lg border border-yellow-500/30">
+              🔄 AI service starting up...
+            </div>
+          )}
         </div>
+      )}
+
+      {/* Input Area */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Type your message..."
+          className="flex-1 px-3 py-2 bg-black/20 text-white placeholder-white/50 rounded-lg border border-white/20 focus:border-white/40 focus:outline-none text-sm"
+          disabled={isLoading}
+        />
+        <button
+          onClick={sendMessage}
+          disabled={!inputMessage.trim() || isLoading}
+          className="px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <Send size={16} />
+        </button>
+      </div>
+
+      {/* Help Text */}
+      <div className="mt-2 text-center text-xs text-white/60">
+        💡 Ask me about productivity tips, motivation, or time management
       </div>
     </div>
   )
 }
+
