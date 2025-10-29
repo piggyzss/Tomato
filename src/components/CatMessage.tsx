@@ -75,10 +75,10 @@ export function CatMessage() {
   }
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-xl px-5 py-3.5 shadow-md mb-5 transition-all hover:shadow-lg">
-      <div className="flex items-center gap-3">
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl px-4 sm:px-5 py-3.5 shadow-md mb-5 transition-all hover:shadow-lg max-w-full">
+      <div className="flex items-start gap-3">
         {/* Cat Icon */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 mt-0.5">
           <div className="w-10 h-10 bg-tomato/10 rounded-full flex items-center justify-center">
             <Cat size={24} className="text-tomato" strokeWidth={2.5} />
           </div>
@@ -86,12 +86,12 @@ export function CatMessage() {
 
         {/* Message */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="text-gray-700 font-medium text-sm leading-relaxed flex-1 truncate">
+          <div className="flex items-start gap-2">
+            <p className="text-gray-700 font-medium text-sm leading-relaxed flex-1 break-words whitespace-pre-wrap">
               {getMessage()}
             </p>
             {getAIMessage && (
-              <div className="flex-shrink-0" title="AI-generated message">
+              <div className="flex-shrink-0 mt-0.5" title="AI-generated message">
                 <Sparkles 
                   size={14} 
                   className="text-blue-500 animate-pulse" 
