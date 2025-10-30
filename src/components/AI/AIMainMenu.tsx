@@ -1,9 +1,9 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { MessageCircle, Calendar, X, ArrowLeft } from 'lucide-react'
+import { MessageCircle, Calendar, X, ArrowLeft, Sparkles, Settings } from 'lucide-react'
 
 interface AIMainMenuProps {
   onClose?: () => void
-  onNavigate: (view: 'catMessages' | 'dailySummary') => void
+  onNavigate: (view: 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings') => void
   apiStatus: {
     aiAvailable: boolean
     writerAvailable: boolean
@@ -15,6 +15,14 @@ export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMen
   const { theme } = useSettingsStore()
 
   const aiMenu = [
+    {
+      id: 'apiDemo' as const,
+      title: 'AI API',
+      description: '内置 AI / 云端 AI',
+      icon: Sparkles,
+      color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      badge: '推荐',
+    },
     {
       id: 'catMessages' as const,
       title: 'Cat Messages',
@@ -29,16 +37,22 @@ export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMen
       icon: Calendar,
       color: 'bg-blue-500',
     },
+    {
+      id: 'settings' as const,
+      title: 'AI 设置',
+      description: '配置 Gemini API Key',
+      icon: Settings,
+      color: 'bg-gray-600',
+    },
   ]
 
   return (
     <div>
       {/* Fixed Header with Close Button */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
+      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
           ? 'bg-gray-900'
           : 'bg-[#D84848]'
-      }`}>
+        }`}>
         <div className="flex items-center justify-between py-3">
           <div className="flex-1 text-left">
             <h1 className="text-base font-bold text-white mb-0.5">🤖 AI Assistant</h1>
@@ -94,14 +108,21 @@ export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMen
               <button
                 key={feature.id}
                 onClick={() => onNavigate(feature.id)}
-                className="w-full p-2.5 rounded-lg bg-black/20 hover:bg-black/30 transition-all"
+                className="w-full p-2.5 rounded-lg bg-black/20 hover:bg-black/30 transition-all relative"
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-md ${feature.color}`}>
                     <Icon size={18} color="white" />
                   </div>
                   <div className="text-left flex-1">
-                    <div className="font-semibold text-sm text-white">{feature.title}</div>
+                    <div className="font-semibold text-sm text-white flex items-center gap-2">
+                      {feature.title}
+                      {feature.badge && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-yellow-500/30 text-yellow-200 rounded">
+                          {feature.badge}
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-white/70">
                       {feature.description}
                     </div>

@@ -3,9 +3,13 @@ import { useState, useEffect } from 'react'
 import AIMainMenu from './AIMainMenu'
 import AICatMessages from './AICatMessages'
 import AIDailySummary from './AIDailySummary'
+import AIConfiguration from './AIConfiguration'
+import AISettings from './AISettings'
+import { aiService } from '@/services/aiService'
+import { getStorage } from '@/utils/storage'
 
 // AI view navigation type
-type AIView = 'menu' | 'catMessages' | 'dailySummary'
+type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
 
 // Types for Gemini Nano API
 interface AIWriter {
@@ -16,6 +20,15 @@ interface AISummarizer {
   summarize: (text: string) => Promise<string>
 }
 
+interface AILanguageModel {
+  prompt: (input: string) => Promise<string>
+  promptStreaming: (input: string) => ReadableStream
+}
+
+interface AILanguageModelCapabilities {
+  available: 'readily' | 'after-download' | 'no'
+}
+
 declare global {
   interface Window {
     ai?: {
@@ -24,6 +37,10 @@ declare global {
       }
       summarizer?: {
         create: () => Promise<AISummarizer>
+      }
+      languageModel?: {
+        capabilities: () => Promise<AILanguageModelCapabilities>
+        create: (options?: { systemPrompt?: string }) => Promise<AILanguageModel>
       }
     }
   }
@@ -38,6 +55,25 @@ export default function AI({ onClose }: AIProps) {
   
   // Navigation state
   const [currentView, setCurrentView] = useState<AIView>('menu')
+
+  // 加载保存的 API Key 和模式偏好
+  useEffect(() => {
+    const loadSettings = async () => {
+      const [savedKey, savedMode] = await Promise.all([
+        getStorage('geminiApiKey'),
+        getStorage('aiModePreference')
+      ])
+      
+      if (savedKey) {
+        aiService.setApiKey(savedKey)
+      }
+      
+      if (savedMode) {
+        aiService.setModePreference(savedMode)
+      }
+    }
+    loadSettings()
+  }, [])
 
   // API availability state
   const [apiStatus, setApiStatus] = useState({
@@ -140,6 +176,18 @@ export default function AI({ onClose }: AIProps) {
               summaryText={summaryText}
               setIsSummarizing={setIsSummarizing}
               setSummaryText={setSummaryText}
+            />
+          )}
+          {currentView === 'apiDemo' && (
+            <AIConfiguration
+              onBack={() => setCurrentView('menu')}
+              onOpenSettings={() => setCurrentView('settings')}
+            />
+          )}
+          {currentView === 'settings' && (
+            <AISettings
+              onBack={() => setCurrentView('menu')}
+              onApiKeySet={(apiKey) => aiService.setApiKey(apiKey)}
             />
           )}
         </div>

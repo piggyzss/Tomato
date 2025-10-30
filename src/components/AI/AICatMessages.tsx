@@ -1,8 +1,14 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { useTaskStore } from '@/store/useTaskStore'
-import { useTimerStore } from '@/store/useTimerStore'
-import { ArrowLeft, Sparkles, RefreshCw, Save, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowLeft, Cat, Laugh, Send, Loader2 } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { useAI } from '@/hooks/useAI'
+
+interface Message {
+  id: string
+  text: string
+  sender: 'user' | 'cat'
+  timestamp: number
+}
 
 interface AICatMessagesProps {
   onBack: () => void
@@ -15,80 +21,131 @@ interface AICatMessagesProps {
 
 export default function AICatMessages({
   onBack,
-  aiWriter,
-  isGenerating,
-  generatedMessage,
-  setIsGenerating,
-  setGeneratedMessage
 }: AICatMessagesProps) {
-  const { theme, aiMessages, updateSettings, language } = useSettingsStore()
-  const { status, remainingSeconds } = useTimerStore()
-  const { currentTaskId, tasks } = useTaskStore()
-  const [selectedMessageLanguage, setSelectedMessageLanguage] = useState<'zh-CN' | 'en-US' | 'ja-JP'>(language)
+  const { theme, language } = useSettingsStore()
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isInitializing, setIsInitializing] = useState(true)
+  const hasGeneratedWelcome = useRef(false)
 
-  const currentTask = tasks.find(t => t.id === currentTaskId)
+  // Use AI hook with cat personality
+  const {
+    status,
+    isLoading,
+    prompt,
+  } = useAI(true, {
+    systemPrompt: language === 'zh-CN'
+      ? '你是一只可爱、鼓励人心的番茄猫助手。用简短、温暖、友好的语气回答问题（1-2句话）。适当使用猫咪相关的表情符号如 🐱, 😺, 😸, 🎉, 💪, ✨。'
+      : language === 'ja-JP'
+        ? 'あなたは可愛くて励ましてくれるトマト猫のアシスタントです。短く、温かく、フレンドリーな口調で答えてください（1-2文）。猫に関連する絵文字を適度に使ってください 🐱, 😺, 😸, 🎉, 💪, ✨。'
+        : 'You are a cute, encouraging tomato cat assistant. Respond in a brief, warm, and friendly tone (1-2 sentences). Use cat-themed emojis appropriately like 🐱, 😺, 😸, 🎉, 💪, ✨.',
+  })
 
-  const generateCatMessage = async () => {
-    if (!aiWriter) {
-      alert('AI Writer not available. Please check Chrome flags.')
-      return
-    }
-
-    setIsGenerating(true)
-    setGeneratedMessage('')
-
-    try {
-      const taskContext = currentTask ? `working on "${currentTask.title}"` : 'ready to start'
-      const timeContext = status === 'running' 
-        ? `${Math.floor(remainingSeconds / 60)} minutes remaining`
-        : status === 'paused'
-        ? 'taking a break'
-        : 'ready to begin'
-
-      const prompt = `You are a cute, encouraging cat companion for a Pomodoro timer app. 
-Generate a short, warm, and motivating message (1-2 sentences) for a user who is ${taskContext} and ${timeContext}.
-The message should be in ${selectedMessageLanguage === 'zh-CN' ? 'Chinese' : selectedMessageLanguage === 'ja-JP' ? 'Japanese' : 'English'}.
-Use cat-themed emojis like 🐱, 😺, 😸, 🎉, 💪, ✨.
-Keep it friendly, positive, and brief.`
-
-      const message = await aiWriter.write(prompt)
-      setGeneratedMessage(message)
-    } catch (error) {
-      console.error('Failed to generate message:', error)
-      setGeneratedMessage('Oops! Failed to generate message. Please try again. 🐱')
-    } finally {
-      setIsGenerating(false)
-    }
-  }
-
-  const saveMessage = () => {
-    if (!generatedMessage) return
+  // Generate initial welcome message - only once
+  useEffect(() => {
+    if (hasGeneratedWelcome.current) return
     
-    const newMessage = {
+    const generateWelcome = async () => {
+      if (status !== 'ready') {
+        setIsInitializing(false)
+        return
+      }
+
+      hasGeneratedWelcome.current = true
+
+      try {
+        const welcomePrompt = language === 'zh-CN'
+          ? '生成一句简短的欢迎语，询问用户是否需要陪伴聊天（因为工作可能累了）'
+          : language === 'ja-JP'
+            ? '短い歓迎メッセージを生成してください。仕事で疲れているかもしれないので、チャットで付き添いが必要か尋ねてください'
+            : 'Generate a brief welcome message asking if the user needs company to chat (since they might be tired from work)'
+
+        const welcomeText = await prompt(welcomePrompt)
+
+        setMessages([{
+          id: '1',
+          text: welcomeText,
+          sender: 'cat',
+          timestamp: Date.now()
+        }])
+      } catch (error) {
+        console.error('Failed to generate welcome message:', error)
+        // Fallback welcome message
+        const fallbackMessage = language === 'zh-CN'
+          ? '😺 工作累了吧？需要我陪你聊天吗？'
+          : language === 'ja-JP'
+            ? '😺 仕事で疲れましたか？一緒にチャットしませんか？'
+            : '😺 Tired from work? Would you like me to chat with you?'
+
+        setMessages([{
+          id: '1',
+          text: fallbackMessage,
+          sender: 'cat',
+          timestamp: Date.now()
+        }])
+      } finally {
+        setIsInitializing(false)
+      }
+    }
+
+    generateWelcome()
+  }, [status, language, prompt])
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) return
+
+    // Add user message
+    const userMessage: Message = {
       id: crypto.randomUUID(),
-      text: generatedMessage,
-      context: currentTask ? `Task: ${currentTask.title}` : 'General encouragement',
-      createdAt: Date.now()
+      text: inputMessage,
+      sender: 'user',
+      timestamp: Date.now()
     }
-    
-    const updatedMessages = [...(aiMessages || []), newMessage]
-    updateSettings({ aiMessages: updatedMessages })
-    setGeneratedMessage('')
+    setMessages(prev => [...prev, userMessage])
+    const currentInput = inputMessage
+    setInputMessage('')
+
+    // Get AI response
+    try {
+      const response = await prompt(currentInput)
+
+      const catMessage: Message = {
+        id: crypto.randomUUID(),
+        text: response,
+        sender: 'cat',
+        timestamp: Date.now()
+      }
+      setMessages(prev => [...prev, catMessage])
+    } catch (error) {
+      console.error('Failed to generate response:', error)
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        text: language === 'zh-CN'
+          ? '😿 抱歉，我现在无法回复。请稍后再试。'
+          : language === 'ja-JP'
+            ? '😿 申し訳ありません、今は返信できません。後でもう一度お試しください。'
+            : '😿 Sorry, I can\'t respond right now. Please try again later.',
+        sender: 'cat',
+        timestamp: Date.now()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    }
   }
 
-  const deleteMessage = (id: string) => {
-    const updatedMessages = (aiMessages || []).filter(msg => msg.id !== id)
-    updateSettings({ aiMessages: updatedMessages })
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
+      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
+        ? 'bg-gray-900'
+        : 'bg-[#D84848]'
+        }`}>
         <div className="flex items-center gap-3 py-3">
           <button
             onClick={onBack}
@@ -98,101 +155,115 @@ Keep it friendly, positive, and brief.`
             <ArrowLeft size={18} className="text-white/90" />
           </button>
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">🐱 Cat Messages</h1>
-            <p className="text-white/70 text-xs">AI-generated encouragement</p>
+            <h1 className="text-base font-bold text-white mb-0.5">🐱 Cat Chat</h1>
+            <p className="text-white/70 text-xs">Chat with your AI companion</p>
           </div>
         </div>
       </div>
 
-      <div className="space-y-6 mt-4">
-        {/* Language Selection */}
-        <div className="bg-black/20 rounded-xl p-4">
-          <h3 className="font-semibold mb-3 text-sm text-white">🌍 Message Language</h3>
-          <select
-            value={selectedMessageLanguage}
-            onChange={(e) => setSelectedMessageLanguage(e.target.value as 'zh-CN' | 'en-US' | 'ja-JP')}
-            className="w-full p-2 rounded-lg bg-black/30 border border-white/20 text-white text-sm"
+      {/* Date Divider */}
+      <div className="text-center py-2">
+        <span className="text-xs text-white/70">Today</span>
+      </div>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex gap-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
           >
-            <option value="en-US">English</option>
-            <option value="zh-CN">中文</option>
-            <option value="ja-JP">日本語</option>
-          </select>
-        </div>
+            {/* Avatar */}
+            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${message.sender === 'cat'
+              ? 'bg-purple-200'
+              : 'bg-purple-400'
+              }`}>
+              {message.sender === 'cat' ? (
+                <Cat size={20} className="text-purple-600" />
+              ) : (
+                <Laugh size={20} className="text-white" />
+              )}
+            </div>
 
-        {/* Generate Button */}
-        <button
-          onClick={generateCatMessage}
-          disabled={isGenerating || !aiWriter}
-          className="w-full p-4 rounded-xl bg-black/20 hover:bg-black/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
-        >
-          <div className="flex items-center justify-center gap-3">
-            {isGenerating ? (
-              <RefreshCw size={20} className="text-white animate-spin" />
-            ) : (
-              <Sparkles size={20} className="text-white" />
-            )}
-            <span className="font-semibold text-white">
-              {isGenerating ? 'Generating...' : 'Generate Cat Message'}
-            </span>
+            {/* Message Bubble */}
+            <div className={`max-w-[70%] ${message.sender === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
+              <div className={`rounded-2xl px-4 py-3 ${message.sender === 'cat'
+                ? 'bg-pink-100 text-gray-800'
+                : 'bg-purple-400 text-white'
+                }`}>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+              </div>
+              <span className="text-xs text-white/70 mt-1 px-2">
+                {new Date(message.timestamp).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
           </div>
-        </button>
+        ))}
 
-        {/* Generated Message Display */}
-        {generatedMessage && (
-          <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-            <div className="flex items-start justify-between mb-3">
-              <h3 className="font-semibold text-sm text-white">✨ Generated Message</h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={saveMessage}
-                  className="flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors"
-                >
-                  <Save size={14} />
-                  Save
-                </button>
-                <button
-                  onClick={() => setGeneratedMessage('')}
-                  className="flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-white/20 hover:bg-white/30 text-white transition-colors"
-                >
-                  Clear
-                </button>
+        {/* Loading Indicator - only show when waiting for AI response, not during initialization */}
+        {isLoading && !isInitializing && messages.length > 0 && (
+          <div className="flex gap-2">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center">
+              <Cat size={20} className="text-purple-600" />
+            </div>
+            <div className="bg-pink-100 rounded-2xl px-4 py-3 flex items-center justify-center min-h-[44px]">
+              <div className="flex gap-1 items-center">
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
               </div>
             </div>
-            <p className="text-white leading-relaxed">{generatedMessage}</p>
           </div>
         )}
 
-        {/* Saved Messages */}
-        {aiMessages && aiMessages.length > 0 && (
-          <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-            <h3 className="font-semibold mb-3 text-sm text-white">💾 Saved Messages</h3>
-            <div className="space-y-3 max-h-64 overflow-y-auto">
-              {aiMessages.map((message) => (
-                <div key={message.id} className="bg-black/30 rounded-lg p-3 border border-white/10">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs text-white/60">
-                      {new Date(message.createdAt).toLocaleString()}
-                    </span>
-                    <button
-                      onClick={() => deleteMessage(message.id)}
-                      className="text-xs px-2 py-1 rounded text-red-400 hover:bg-red-900/20 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                  <p className="text-white text-sm">{message.text}</p>
-                  {message.context && (
-                    <p className="text-white/50 text-xs mt-1">{message.context}</p>
-                  )}
-                </div>
-              ))}
+        {/* Initial Loading - only show when initializing and no messages */}
+        {isInitializing && messages.length === 0 && (
+          <div className="flex gap-2">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center">
+              <Cat size={20} className="text-purple-600" />
+            </div>
+            <div className="bg-pink-100 rounded-2xl px-4 py-3 flex items-center justify-center min-h-[44px]">
+              <div className="flex gap-1 items-center">
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Help Text */}
-        <div className="mt-6 mb-3 text-center text-sm text-white/70">
-          💡 Tip: Messages are personalized based on your current task and timer status
+      {/* Input Area */}
+      <div className="border-t border-white/20 pt-4">
+        <div className="flex items-center gap-2">
+          {/* Input Field */}
+          <div className="flex-1 bg-gray-100 rounded-full px-4 py-2.5">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Enter your message"
+              disabled={isLoading}
+              className="w-full bg-transparent text-gray-800 placeholder-gray-400 outline-none text-sm"
+            />
+          </div>
+
+          {/* Send Button */}
+          <button
+            onClick={sendMessage}
+            disabled={!inputMessage.trim() || isLoading}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {isLoading ? (
+              <Loader2 size={20} className="text-white animate-spin" />
+            ) : (
+              <Send size={20} className="text-white" />
+            )}
+          </button>
         </div>
       </div>
     </div>

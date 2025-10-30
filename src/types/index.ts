@@ -87,4 +87,6 @@ export interface StorageData {
   pomodoroRecords: PomodoroRecord[]
   aiHistory: AIMessage[]
   currentTaskId?: string
+  geminiApiKey?: string
+  aiModePreference?: 'builtin' | 'cloud'
 }
