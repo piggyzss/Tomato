@@ -17,10 +17,13 @@ chrome.runtime.onInstalled.addListener(details => {
         longBreakDuration: 15,
         pomodorosUntilLongBreak: 4,
         soundEnabled: true,
+        soundType: 'ding',
         notificationEnabled: true,
         theme: 'light',
         language: 'zh-CN',
         aiEnabled: false,
+        aiMessages: [],
+        useAIMessages: false,
       },
     })
   }
@@ -77,14 +80,32 @@ function showNotification(title: string, message: string) {
   const iconDataUrl =
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI2NCIgY3k9IjY0IiByPSI2MCIgZmlsbD0iI0ZGNjM0NyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjM1ZW0iIGZvbnQtc2l6ZT0iNjAiPvCfkK88L3RleHQ+PC9zdmc+'
 
-  chrome.notifications.create({
+  const notificationId = 'tomato-timer-' + Date.now()
+
+  chrome.notifications.create(notificationId, {
     type: 'basic',
     iconUrl: iconDataUrl,
     title: title,
     message: message,
     priority: 2,
+    requireInteraction: true, // 通知不会自动消失，需要用户交互
   })
 }
+
+// 监听通知点击事件
+chrome.notifications.onClicked.addListener(async (notificationId) => {
+  console.log('通知被点击:', notificationId)
+
+  // 关闭通知
+  chrome.notifications.clear(notificationId)
+
+  // 获取当前活动的标签页
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+  if (tabs[0]?.id) {
+    // 打开侧边栏
+    await chrome.sidePanel.open({ tabId: tabs[0].id })
+  }
+})
 
 // 监听点击插件图标
 chrome.action.onClicked.addListener(async tab => {

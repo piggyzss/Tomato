@@ -7,12 +7,14 @@ interface TimerState {
   totalSeconds: number
   currentPomodoro: number
   mode: 'pomodoro' | 'shortBreak' | 'longBreak' // ← Add mode tracking
+  timerFinished: boolean // ← Add timer finished flag
 
   // Actions
   setStatus: (status: TimerStatus) => void
   setRemainingSeconds: (seconds: number) => void
   setTotalSeconds: (seconds: number) => void
   setMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void // ← Add mode setter
+  setTimerFinished: (finished: boolean) => void // ← Add timer finished setter
   tick: () => void
   reset: () => void
   incrementPomodoro: () => void
@@ -24,6 +26,7 @@ export const useTimerStore = create<TimerState>(set => ({
   totalSeconds: 25 * 60,
   currentPomodoro: 0,
   mode: 'pomodoro', // ← Default to pomodoro mode
+  timerFinished: false, // ← Default to false
 
   setStatus: status => set({ status }),
 
@@ -33,6 +36,8 @@ export const useTimerStore = create<TimerState>(set => ({
     set({ totalSeconds: seconds, remainingSeconds: seconds }),
 
   setMode: mode => set({ mode }), // ← Add mode setter
+
+  setTimerFinished: finished => set({ timerFinished: finished }), // ← Add timer finished setter
 
   tick: () =>
     set(state => {
@@ -46,6 +51,7 @@ export const useTimerStore = create<TimerState>(set => ({
     set(state => ({
       status: 'idle',
       remainingSeconds: state.totalSeconds,
+      timerFinished: false, // ← Reset timer finished flag
     })),
 
   incrementPomodoro: () =>

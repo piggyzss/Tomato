@@ -42,9 +42,16 @@ function App() {
     }
   }, [tasks])
 
-  // 设置默认番茄钟时长
+  // 设置默认番茄钟时长（只在初始化时设置，不覆盖恢复的状态）
   useEffect(() => {
-    setTotalSeconds(workDuration * 60)
+    // 检查是否有保存的计时器状态
+    chrome.storage.local.get(['timerState'], result => {
+      const savedState = result.timerState
+      // 只有在没有保存状态或状态为 idle 时才设置默认时长
+      if (!savedState || savedState.status === 'idle') {
+        setTotalSeconds(workDuration * 60)
+      }
+    })
   }, [workDuration, setTotalSeconds])
 
   const [activePanel, setActivePanel] = useState<'settings' | 'analysis' | 'ai' | null>(null)

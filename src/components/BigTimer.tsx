@@ -22,6 +22,7 @@ export function BigTimer() {
     tick,
     reset,
     setRemainingSeconds,
+    setTimerFinished,
   } = useTimerStore()
 
   const { currentTaskId, updateTask, tasks, setCurrentTask } = useTaskStore()
@@ -37,18 +38,21 @@ export function BigTimer() {
 
     chrome.storage.local.get(['timerState'], result => {
       const savedState = result.timerState as TimerPersistState | undefined
+      console.log('Loading timer state:', savedState)
 
       if (savedState && savedState.status === 'running') {
         // 计算经过的时间
         const elapsed = Math.floor((Date.now() - savedState.startTime) / 1000)
         const newRemaining = Math.max(0, savedState.remainingSeconds - elapsed)
 
+        console.log('Restoring running timer:', { elapsed, newRemaining })
         setRemainingSeconds(newRemaining)
         setStatus('running')
         if (savedState.currentTaskId) {
           setCurrentTask(savedState.currentTaskId)
         }
       } else if (savedState && savedState.status === 'paused') {
+        console.log('Restoring paused timer:', savedState.pausedTime)
         setRemainingSeconds(savedState.pausedTime)
         setStatus('paused')
         if (savedState.currentTaskId) {
@@ -56,7 +60,12 @@ export function BigTimer() {
         }
       }
     })
-  }, [])
+
+    // 清理函数：组件卸载时不重置 hasLoadedRef
+    return () => {
+      // hasLoadedRef 保持为 true，防止重新加载
+    }
+  }, [setRemainingSeconds, setStatus, setCurrentTask])
 
   // 保存状态到 chrome.storage
   const saveTimerState = (state: TimerPersistState) => {
@@ -92,6 +101,7 @@ export function BigTimer() {
 
       if (remainingSeconds <= 1) {
         setStatus('idle')
+        setTimerFinished(true) // ← 设置计时器完成标志
 
         // 番茄钟完成，增加计数
         if (currentTaskId) {
@@ -112,11 +122,11 @@ export function BigTimer() {
           currentTaskId: null,
         })
 
-        // 发送通知
+        // 发送通知到 background
         chrome.runtime.sendMessage({
           type: 'SHOW_NOTIFICATION',
-          title: "🍅 Time's up!",
-          body: 'Take a break~',
+          title: '🎉 时间到！',
+          body: 'Great job! Time to take a break and stretch~',
         })
       }
     }, 1000)

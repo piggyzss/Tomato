@@ -12,6 +12,7 @@ const defaultData: Partial<StorageData> = {
     longBreakDuration: 15,
     pomodorosUntilLongBreak: 4,
     soundEnabled: true,
+    soundType: 'ding',
     notificationEnabled: true,
     theme: 'light',
     language: 'zh-CN',

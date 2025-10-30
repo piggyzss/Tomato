@@ -13,6 +13,7 @@ const defaultSettings: UserSettings = {
   longBreakDuration: 15,
   pomodorosUntilLongBreak: 4,
   soundEnabled: true,
+  soundType: 'ding', // 默认音效类型
   notificationEnabled: true,
   theme: 'light',
   language: 'zh-CN',

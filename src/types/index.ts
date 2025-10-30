@@ -20,6 +20,9 @@ export interface Task {
   description?: string
 }
 
+// 音效类型
+export type SoundType = 'ding' | 'ding-dong' | 'chord' | 'victory' | 'soft' | 'water-drop' | 'knock'
+
 // 番茄钟配置
 export interface PomodoroConfig {
   workDuration: number // 工作时长（分钟）
@@ -27,6 +30,7 @@ export interface PomodoroConfig {
   longBreakDuration: number // 长休息时长（分钟）
   pomodorosUntilLongBreak: number // 几个番茄后长休息
   soundEnabled: boolean // 音效开关
+  soundType: SoundType // 音效类型
   notificationEnabled: boolean // 通知开关
 }
 
