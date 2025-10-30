@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Send, Cat, User } from "lucide-react";
+import { createChatSession, sendChatMessage } from "./service.ts";
 
 interface Message {
   id: string;
@@ -18,121 +19,59 @@ export default function ChatCat() {
       timestamp: new Date(),
     },
   ]);
-
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState<any | null>(null);
 
-  // ✅ Create Gemini Nano session once (after availability check)
+  // ✅ Initialize session once
   useEffect(() => {
-    const init = async () => {
+    const initSession = async () => {
       try {
-        const modelClass =
-          (window as any).LanguageModel || (window as any).ai?.languageModel;
-
-        if (!modelClass) throw new Error("LanguageModel API not found");
-
-        // Get model params for good defaults
-        const params = await modelClass.params();
-        console.log(params.defaultTemperature, params.defaultTopK);
-        const s = await modelClass.create({
-          expectedOutputs: [{ type: "text", languages: ["en"] }],
-          initialPrompts: [
-            {
-              role: "system",
-              content:
-                "You are Chat Cat 🐱, a warm, concise productivity companion who answers helpfully and keeps messages short.",
-            },
-            { role: 'user', content: 'Can you say something to motivate me?' },
-    { role: 'assistant', content: 'You work so hard! Good job!' },
-    { role: 'user', content: 'I am so tired' },
-    {
-      role: 'assistant',
-      content: 'Have a short break and stretch! Even cats need rest. 😸',
-    },
-          ],
-        //   temperature: params.defaultTemperature
-        //   topK: params.defaultTopK,
-        });
-        
-
-        console.log("✅ Gemini Nano session ready:", s);
+        const s = await createChatSession();
         setSession(s);
       } catch (err) {
-        console.error("Error creating session:", err);
+        console.error("Failed to initialize ChatCat:", err);
       }
     };
-
-    init();
+    initSession();
   }, []);
 
-  // 🚀 Send message to AI
-  const sendMessage = async () => {
+  // 🚀 Send message handler
+  const handleSend = async () => {
     if (!inputMessage.trim() || !session) return;
 
-    const userMessage: Message = {
+    const userMsg: Message = {
       id: Date.now().toString(),
       type: "user",
       content: inputMessage,
       timestamp: new Date(),
     };
-    setMessages((prev) => [...prev, userMessage]);
+
+    setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
 
-    try {
-      const promptResponse = await session.prompt([
-        { role: "user", content: inputMessage },
-      ]);
+    const aiReply = await sendChatMessage(session, inputMessage);
+    setMessages((prev) => [...prev, aiReply]);
 
-      console.log("Prompt response:", promptResponse);
-
-      const aiText =
-        promptResponse ||
-        "Hmm... something went wrong 🐾";
-        console.log("AI Response:", aiText);
-
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: "ai",
-        content: aiText,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
-    } catch (err) {
-      console.error("Prompt error:", err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 2).toString(),
-          type: "ai",
-          content: "😿 I ran into an error talking to my brain.",
-          timestamp: new Date(),
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-      setInputMessage("");
-    }
+    setIsLoading(false);
+    setInputMessage("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSend();
     }
   };
 
   return (
-    <div className="flex flex-col h-full max-h-96">
+    <div className="flex flex-col h-full">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-4 max-h-80">
+      <div className="flex-1 overflow-y-auto space-y-3 mb-4 ">
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`flex gap-3 ${
-              m.type === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex gap-3 ${m.type === "user" ? "justify-end" : "justify-start"}`}
           >
             {m.type === "ai" && (
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
@@ -141,9 +80,7 @@ export default function ChatCat() {
             )}
             <div
               className={`max-w-[80%] px-3 py-2 rounded-lg ${
-                m.type === "user"
-                  ? "bg-white text-gray-800"
-                  : "bg-black/20 text-white"
+                m.type === "user" ? "bg-white text-gray-800" : "bg-black/20 text-white"
               }`}
             >
               <p className="text-sm whitespace-pre-wrap">{m.content}</p>
@@ -190,7 +127,7 @@ export default function ChatCat() {
           disabled={isLoading}
         />
         <button
-          onClick={sendMessage}
+          onClick={handleSend}
           disabled={!inputMessage.trim() || isLoading || !session}
           className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
         >

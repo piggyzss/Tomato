@@ -1,52 +1,11 @@
-// 
+// components/AICatMessages.tsx
 import { useState } from "react";
+import { checkAvailability, createModel } from "./service.ts";
 
-// Define navigation type
-type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'chatCat'
+type AIView = "menu" | "catMessages" | "dailySummary" | "chatCat";
 
 interface AICatMessagesProps {
-  onNavigate?: (view: AIView) => void
-}
-
-async function checkAvailability(): Promise<string> {
-  try {
-    const avail =
-      (await (window as any).LanguageModel?.availability?.()) ??
-      (await (window as any).ai?.languageModel?.availability?.());
-
-    console.log("Gemini Nano availability:", avail);
-    return avail || "unavailable";
-  } catch (err) {
-    console.error("Error checking availability:", err);
-    return "error";
-  }
-}
-
-// 🔹 Function to create / download the model
-async function createModel(
-  onProgress: (percent: number) => void
-): Promise<any> {
-  try {
-    const modelClass =
-      (window as any).LanguageModel || (window as any).ai?.languageModel;
-    if (!modelClass) throw new Error("LanguageModel API not found");
-
-    const session = await modelClass.create({
-      monitor(monitor: any) {
-        monitor.addEventListener("downloadprogress", (e: any) => {
-          const percent = Math.round(e.loaded * 100);
-          console.log(`Downloaded ${percent}%`);
-          onProgress(percent);
-        });
-      },
-    });
-
-    console.log("✅ Gemini Nano model created successfully:", session);
-    return session;
-  } catch (err) {
-    console.error("Error creating model:", err);
-    throw err;
-  }
+  onNavigate?: (view: AIView) => void;
 }
 
 export default function AICatMessages({ onNavigate }: AICatMessagesProps) {
@@ -54,9 +13,7 @@ export default function AICatMessages({ onNavigate }: AICatMessagesProps) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any | null>(null);
-
 
   const handleCheck = async () => {
     setLoading(true);
@@ -82,7 +39,7 @@ export default function AICatMessages({ onNavigate }: AICatMessagesProps) {
     <div style={{ padding: "1rem", fontFamily: "sans-serif" }}>
       <h2>AICatMessages Component</h2>
 
-      {/* --- Check Availability Button --- */}
+      {/* --- Check Availability --- */}
       <button
         onClick={handleCheck}
         style={{
@@ -98,7 +55,7 @@ export default function AICatMessages({ onNavigate }: AICatMessagesProps) {
         {loading ? "Checking..." : "Check Gemini Nano Availability"}
       </button>
 
-      {/* --- Download / Create Model Button --- */}
+      {/* --- Download Model --- */}
       {goodStates.includes(availability || "") && !sessionReady && (
         <button
           onClick={handleDownload}
@@ -115,42 +72,42 @@ export default function AICatMessages({ onNavigate }: AICatMessagesProps) {
         </button>
       )}
 
+      {/* --- Status --- */}
       <div style={{ marginTop: "1rem" }}>
         {availability === null ? (
           <p>Click the button to check Gemini Nano availability.</p>
         ) : goodStates.includes(availability) ? (
-          <p>✅ Available state: <strong>{availability}</strong></p>
+          <p>
+            ✅ Available state: <strong>{availability}</strong>
+          </p>
         ) : (
           <p>❌ Not Available ({availability})</p>
         )}
 
-        {progress !== null && progress < 100 && (
-          <p>⬇️ Downloading Model: {progress}%</p>
-        )}
+        {progress !== null && progress < 100 && <p>⬇️ Downloading Model: {progress}%</p>}
 
-        {progress === 100 && !sessionReady && (
-          <p>🧠 Finishing initialization…</p>
-        )}
+        {progress === 100 && !sessionReady && <p>🧠 Finishing initialization…</p>}
 
         {sessionReady && <p>✅ Model is ready to use!</p>}
       </div>
 
-     {session && (
-       <button 
-         onClick={() => onNavigate?.('chatCat')}
-         style={{
-           padding: "0.5rem 1rem",
-           borderRadius: "8px",
-           cursor: "pointer",
-           backgroundColor: "#FF6B35",
-           color: "white",
-           border: "none",
-           marginTop: "1rem"
-         }}
-       >
-         Chat Now
-       </button>
-     )}
+      {/* --- Navigate to Chat --- */}
+      {session && (
+        <button
+          onClick={() => onNavigate?.("chatCat")}
+          style={{
+            padding: "0.5rem 1rem",
+            borderRadius: "8px",
+            cursor: "pointer",
+            backgroundColor: "#FF6B35",
+            color: "white",
+            border: "none",
+            marginTop: "1rem",
+          }}
+        >
+          Chat Now
+        </button>
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   Award,
   RefreshCw,
 } from 'lucide-react'
+import Summary from './Summary'
 
 interface DailySummaryData {
   date: string
@@ -221,6 +222,12 @@ export default function AIDailySummary() {
       <div className="text-center text-xs text-white/60 bg-black/20 rounded-lg p-3">
         💡 Tip: Your summary updates automatically after each session
       </div>
+ 
+      {/* AI Summary */}
+      <div className='w-full flex justify-center  bg-black/20 rounded-lg items-center min-h-[200px]'>
+        <Summary />
+      </div>
+
     </div>
   )
 }
