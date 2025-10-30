@@ -1,9 +1,10 @@
-import { useSettingsStore } from '@/store/useSettingsStore'
 import { useTaskStore } from '@/store/useTaskStore'
-import { ArrowLeft, Clock, Target } from 'lucide-react'
+import { useSettingsStore } from '@/store/useSettingsStore'
+import { Clock, Target } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { getDateRange, formatTime } from './utils'
 import type { TimeRange, TimeDisplayMode, TaskGrouping } from './types'
+import { ModalWithBack } from '@/components/Common'
 
 interface TotalTimeProps {
   onBack: () => void
@@ -78,28 +79,11 @@ export default function TotalTime({ onBack }: TotalTimeProps) {
   }, [tasks, timeRange, taskGrouping])
 
   return (
-    <div>
-      {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
-        <div className="flex items-center gap-3 py-3">
-          <button
-            onClick={onBack}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Back"
-          >
-            <ArrowLeft size={18} className="text-white/90" />
-          </button>
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">Total Time</h1>
-            <p className="text-white/70 text-xs">Analyze your time usage patterns</p>
-          </div>
-        </div>
-      </div>
-
+    <ModalWithBack
+      title={<>⏰ Total Time</>}
+      subtitle="Analyze your time usage patterns"
+      onBack={onBack}
+    >
       <div className="space-y-6 mt-4">
         {/* Filter Controls */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -289,6 +273,6 @@ export default function TotalTime({ onBack }: TotalTimeProps) {
           </div>
         )}
       </div>
-    </div>
+    </ModalWithBack>
   )
 }

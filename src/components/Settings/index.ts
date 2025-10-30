@@ -1,0 +1,6 @@
+export { default as TimerSettings } from './TimerSettings'
+export { default as SoundSettings } from './SoundSettings'
+export { default as ThemeSettings } from './ThemeSettings'
+export { default as LanguageSettings } from './LanguageSettings'
+export { default as SettingsPlaceholder } from './SettingsPlaceholder'
+export * from './types'

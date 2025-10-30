@@ -1,5 +1,5 @@
-import { useSettingsStore } from '@/store/useSettingsStore'
-import { ArrowLeft, CheckCircle, Clock, X } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Clock } from 'lucide-react'
+import { ModalWithClose } from '@/components/Common'
 import type { AnalysisView } from './index'
 
 interface AnalysisMainMenuProps {
@@ -8,7 +8,6 @@ interface AnalysisMainMenuProps {
 }
 
 export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMenuProps) {
-  const { theme } = useSettingsStore()
 
   // Analysis menu configuration
   const analysisMenu = [
@@ -29,28 +28,11 @@ export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMe
   ]
 
   return (
-    <div>
-      {/* Fixed Header with Close Button */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
-        <div className="flex items-center justify-between py-3">
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">📊 Analysis</h1>
-            <p className="text-white/70 text-xs">Insights into your productivity</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Close"
-          >
-            <X size={18} className="text-white/90" />
-          </button>
-        </div>
-      </div>
-
+    <ModalWithClose
+      title={<>📊 Analysis</>}
+      subtitle="Insights into your productivity"
+      onClose={onClose}
+    >
       {/* Analysis Grid */}
       <div className="grid gap-2.5">
         {analysisMenu.map(feature => {
@@ -79,6 +61,6 @@ export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMe
           )
         })}
       </div>
-    </div>
+    </ModalWithClose>
   )
 }

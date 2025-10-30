@@ -1,7 +1,8 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useTaskStore } from '@/store/useTaskStore'
-import { ArrowLeft, Sparkles, RefreshCw } from 'lucide-react'
+import { Sparkles, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import { ModalWithBack } from '@/components/Common'
 
 interface AIDailySummaryProps {
   onBack: () => void
@@ -18,9 +19,9 @@ export default function AIDailySummary({
   isSummarizing,
   summaryText,
   setIsSummarizing,
-  setSummaryText
+  setSummaryText,
 }: AIDailySummaryProps) {
-  const { theme, language } = useSettingsStore()
+  const { language } = useSettingsStore()
   const { tasks } = useTaskStore()
   const [selectedSummaryLanguage, setSelectedSummaryLanguage] = useState<'zh-CN' | 'en-US' | 'ja-JP'>(language)
 
@@ -83,28 +84,11 @@ Include:
   const totalTime = todayTasks.reduce((sum, task) => sum + (task.totalTimeSpent || 0), 0)
 
   return (
-    <div>
-      {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
-        <div className="flex items-center gap-3 py-3">
-          <button
-            onClick={onBack}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Back"
-          >
-            <ArrowLeft size={18} className="text-white/90" />
-          </button>
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">📅 Daily Summary</h1>
-            <p className="text-white/70 text-xs">AI productivity insights</p>
-          </div>
-        </div>
-      </div>
-
+    <ModalWithBack
+      title={<>📅 Daily Summary</>}
+      subtitle="AI productivity insights"
+      onBack={onBack}
+    >
       <div className="space-y-6 mt-4">
         {/* Today's Stats */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
@@ -183,6 +167,6 @@ Include:
           💡 Tip: Summary analyzes your completed tasks and focus time
         </div>
       </div>
-    </div>
+    </ModalWithBack>
   )
 }

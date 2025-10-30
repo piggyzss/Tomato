@@ -1,7 +1,8 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { ArrowLeft, Cat, Laugh, Send, Loader2 } from 'lucide-react'
+import { Cat, Laugh, Send, Loader2 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useAI } from '@/hooks/useAI'
+import { ModalWithBack } from '@/components/Common'
 
 interface Message {
   id: string
@@ -12,17 +13,12 @@ interface Message {
 
 interface AICatMessagesProps {
   onBack: () => void
-  aiWriter: any
-  isGenerating: boolean
-  generatedMessage: string
-  setIsGenerating: (value: boolean) => void
-  setGeneratedMessage: (value: string) => void
 }
 
 export default function AICatMessages({
   onBack,
 }: AICatMessagesProps) {
-  const { theme, language } = useSettingsStore()
+  const { language } = useSettingsStore()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isInitializing, setIsInitializing] = useState(true)
@@ -44,7 +40,7 @@ export default function AICatMessages({
   // Generate initial welcome message - only once
   useEffect(() => {
     if (hasGeneratedWelcome.current) return
-    
+
     const generateWelcome = async () => {
       if (status !== 'ready') {
         setIsInitializing(false)
@@ -141,33 +137,20 @@ export default function AICatMessages({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
-        <div className="flex items-center gap-3 py-3">
-          <button
-            onClick={onBack}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Back"
-          >
-            <ArrowLeft size={18} className="text-white/90" />
-          </button>
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">🐱 Cat Chat</h1>
-            <p className="text-white/70 text-xs">Chat with your AI companion</p>
-          </div>
+      {/* Header */}
+      <ModalWithBack
+        title={<>💬 Cat Chat</>}
+        subtitle="Chat with your AI companion"
+        onBack={onBack}
+      >
+        {/* Date Divider */}
+        <div className="text-center py-2">
+          <span className="text-xs text-white/70">Today</span>
         </div>
-      </div>
+      </ModalWithBack>
 
-      {/* Date Divider */}
-      <div className="text-center py-2">
-        <span className="text-xs text-white/70">Today</span>
-      </div>
-
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+      {/* Messages Area - 可滚动 */}
+      <div className="flex-1 overflow-y-auto space-y-4 pb-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -236,11 +219,11 @@ export default function AICatMessages({
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-white/20 pt-4">
+      {/* Input Area - 固定在底部 */}
+      <div className="flex-shrink-0 border-t border-white/20 p-4 bg-black/10">
         <div className="flex items-center gap-2">
           {/* Input Field */}
-          <div className="flex-1 bg-gray-100 rounded-full px-4 py-2.5">
+          <div className="flex-1 bg-white/90 rounded-full px-4 py-2.5">
             <input
               type="text"
               value={inputMessage}
@@ -256,7 +239,7 @@ export default function AICatMessages({
           <button
             onClick={sendMessage}
             disabled={!inputMessage.trim() || isLoading}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+            className="p-2.5 hover:bg-white/10 rounded-full transition-colors disabled:opacity-50 flex-shrink-0"
           >
             {isLoading ? (
               <Loader2 size={20} className="text-white animate-spin" />

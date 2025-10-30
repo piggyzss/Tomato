@@ -5,46 +5,8 @@ import AICatMessages from './AICatMessages'
 import AIDailySummary from './AIDailySummary'
 import AIConfiguration from './AIConfiguration'
 import AISettings from './AISettings'
-import { aiService } from '@/services/aiService'
-import { getStorage } from '@/utils/storage'
 
-// AI view navigation type
 type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
-
-// Types for Gemini Nano API
-interface AIWriter {
-  write: (prompt: string) => Promise<string>
-}
-
-interface AISummarizer {
-  summarize: (text: string) => Promise<string>
-}
-
-interface AILanguageModel {
-  prompt: (input: string) => Promise<string>
-  promptStreaming: (input: string) => ReadableStream
-}
-
-interface AILanguageModelCapabilities {
-  available: 'readily' | 'after-download' | 'no'
-}
-
-declare global {
-  interface Window {
-    ai?: {
-      writer?: {
-        create: () => Promise<AIWriter>
-      }
-      summarizer?: {
-        create: () => Promise<AISummarizer>
-      }
-      languageModel?: {
-        capabilities: () => Promise<AILanguageModelCapabilities>
-        create: (options?: { systemPrompt?: string }) => Promise<AILanguageModel>
-      }
-    }
-  }
-}
 
 interface AIProps {
   onClose?: () => void
@@ -52,145 +14,86 @@ interface AIProps {
 
 export default function AI({ onClose }: AIProps) {
   const { theme } = useSettingsStore()
-  
-  // Navigation state
   const [currentView, setCurrentView] = useState<AIView>('menu')
-
-  // 加载保存的 API Key 和模式偏好
-  useEffect(() => {
-    const loadSettings = async () => {
-      const [savedKey, savedMode] = await Promise.all([
-        getStorage('geminiApiKey'),
-        getStorage('aiModePreference')
-      ])
-      
-      if (savedKey) {
-        aiService.setApiKey(savedKey)
-      }
-      
-      if (savedMode) {
-        aiService.setModePreference(savedMode)
-      }
-    }
-    loadSettings()
-  }, [])
-
-  // API availability state
   const [apiStatus, setApiStatus] = useState({
     aiAvailable: false,
     writerAvailable: false,
     summarizerAvailable: false,
   })
 
-  // AI instances
-  const [aiWriter, setAIWriter] = useState<AIWriter | null>(null)
-  const [aiSummarizer, setAISummarizer] = useState<AISummarizer | null>(null)
-
-  // Cat Messages states
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedMessage, setGeneratedMessage] = useState('')
-
-  // Daily Summary states
+  // AI state for daily summary
+  const [aiSummarizer, setAiSummarizer] = useState<any>(null)
   const [isSummarizing, setIsSummarizing] = useState(false)
   const [summaryText, setSummaryText] = useState('')
 
-  // Check API availability and initialize
+  // Check AI API availability
   useEffect(() => {
-    const checkAPI = async () => {
-      const hasAI = typeof window !== 'undefined' && 'ai' in window && window.ai
-      
-      if (hasAI) {
-        try {
-          // Initialize Writer
-          if (window.ai?.writer) {
-            const writer = await window.ai.writer.create()
-            setAIWriter(writer)
-          }
-          
-          // Initialize Summarizer
-          if (window.ai?.summarizer) {
-            const summarizer = await window.ai.summarizer.create()
-            setAISummarizer(summarizer)
-          }
-
-          setApiStatus({
-            aiAvailable: true,
-            writerAvailable: !!window.ai?.writer,
-            summarizerAvailable: !!window.ai?.summarizer,
-          })
-        } catch (error) {
-          console.error('Failed to initialize AI:', error)
-          setApiStatus({
-            aiAvailable: false,
-            writerAvailable: false,
-            summarizerAvailable: false,
-          })
-        }
-      } else {
+    const checkAIAvailability = async () => {
+      try {
+        const ai = (window as any).ai
         setApiStatus({
-          aiAvailable: false,
-          writerAvailable: false,
-          summarizerAvailable: false,
+          aiAvailable: !!ai?.languageModel,
+          writerAvailable: !!ai?.writer,
+          summarizerAvailable: !!ai?.summarizer,
         })
+
+        // Initialize AI services
+        if (ai?.summarizer) {
+          setAiSummarizer(ai.summarizer)
+        }
+      } catch (error) {
+        console.error('Error checking AI availability:', error)
       }
     }
-    checkAPI()
+    checkAIAvailability()
   }, [])
 
   return (
     <div
       className={`rounded-xl shadow-2xl overflow-hidden relative ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
+        theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
       }`}
       style={{
         height: 'calc(100vh - 240px)',
-        maxHeight: '600px'
+        maxHeight: '600px',
       }}
     >
       <div className="max-w-md mx-auto h-full overflow-hidden text-white relative">
-        <div className="absolute inset-0 px-4 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-          {currentView === 'menu' && (
-            <AIMainMenu 
-              onClose={onClose}
-              onNavigate={setCurrentView}
-              apiStatus={apiStatus}
-            />
-          )}
-          {currentView === 'catMessages' && (
-            <AICatMessages
-              onBack={() => setCurrentView('menu')}
-              aiWriter={aiWriter}
-              isGenerating={isGenerating}
-              generatedMessage={generatedMessage}
-              setIsGenerating={setIsGenerating}
-              setGeneratedMessage={setGeneratedMessage}
-            />
-          )}
-          {currentView === 'dailySummary' && (
-            <AIDailySummary
-              onBack={() => setCurrentView('menu')}
-              aiSummarizer={aiSummarizer}
-              isSummarizing={isSummarizing}
-              summaryText={summaryText}
-              setIsSummarizing={setIsSummarizing}
-              setSummaryText={setSummaryText}
-            />
-          )}
-          {currentView === 'apiDemo' && (
-            <AIConfiguration
-              onBack={() => setCurrentView('menu')}
-              onOpenSettings={() => setCurrentView('settings')}
-            />
-          )}
-          {currentView === 'settings' && (
-            <AISettings
-              onBack={() => setCurrentView('menu')}
-              onApiKeySet={(apiKey) => aiService.setApiKey(apiKey)}
-            />
-          )}
-        </div>
+        {/* Cat Messages 需要特殊布局（固定底部输入框） */}
+        {currentView === 'catMessages' ? (
+          <div className="absolute inset-0 px-4 flex flex-col">
+            <AICatMessages onBack={() => setCurrentView('menu')} />
+          </div>
+        ) : (
+          <div className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+            {currentView === 'menu' && (
+              <AIMainMenu
+                onClose={onClose}
+                onNavigate={setCurrentView}
+                apiStatus={apiStatus}
+              />
+            )}
+            {currentView === 'dailySummary' && (
+              <AIDailySummary
+                onBack={() => setCurrentView('menu')}
+                aiSummarizer={aiSummarizer}
+                isSummarizing={isSummarizing}
+                summaryText={summaryText}
+                setIsSummarizing={setIsSummarizing}
+                setSummaryText={setSummaryText}
+              />
+            )}
+            {currentView === 'apiDemo' && (
+              <AIConfiguration 
+                onBack={() => setCurrentView('menu')} 
+                onOpenSettings={() => setCurrentView('settings')}
+              />
+            )}
+            {currentView === 'settings' && (
+              <AISettings onBack={() => setCurrentView('menu')} />
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

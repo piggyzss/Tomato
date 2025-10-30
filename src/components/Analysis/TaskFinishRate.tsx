@@ -1,9 +1,10 @@
-import { useSettingsStore } from '@/store/useSettingsStore'
 import { useTaskStore } from '@/store/useTaskStore'
-import { ArrowLeft, BarChart3, Target } from 'lucide-react'
+import { useSettingsStore } from '@/store/useSettingsStore'
+import { BarChart3, Target } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { getDateRange } from './utils'
 import type { TimeRange } from './types'
+import { ModalWithBack } from '@/components/Common'
 
 interface TaskFinishRateProps {
   onBack: () => void
@@ -54,28 +55,11 @@ export default function TaskFinishRate({ onBack }: TaskFinishRateProps) {
   }, [tasks, timeRange, selectedTaskIds])
 
   return (
-    <div>
-      {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
-        <div className="flex items-center gap-3 py-3">
-          <button
-            onClick={onBack}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Back"
-          >
-            <ArrowLeft size={18} className="text-white/90" />
-          </button>
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">Task Finish Rate</h1>
-            <p className="text-white/70 text-xs">Track your task completion performance</p>
-          </div>
-        </div>
-      </div>
-
+    <ModalWithBack
+      title={<>✅ Task Finish Rate</>}
+      subtitle="Track your task completion performance"
+      onBack={onBack}
+    >
       <div className="space-y-6 mt-4">
         {/* Time Range Selection */}
         <div className={`p-4 rounded-lg border ${
@@ -265,6 +249,6 @@ export default function TaskFinishRate({ onBack }: TaskFinishRateProps) {
           </div>
         </div>
       </div>
-    </div>
+    </ModalWithBack>
   )
 }

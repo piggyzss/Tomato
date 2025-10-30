@@ -70,12 +70,11 @@ export default function BuiltInAIConfiguration({ builtInAvailable }: BuiltInAICo
                     </div>
                 </div>
             </div>
+            {/* Availability Check Component */}
+            <AvailabilityCheck />
 
             {builtInAvailable === 'ready' && (
                 <>
-                    {/* Availability Check Component */}
-                    <AvailabilityCheck />
-
                     {/* Info */}
                     <div className="p-3 bg-white/5 rounded-lg text-xs opacity-80">
                         <div className="font-semibold mb-1">关于 Chrome 内置 AI：</div>

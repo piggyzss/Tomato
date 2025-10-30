@@ -30,7 +30,7 @@ export default function Analysis({ onClose }: AnalysisProps) {
       }}
     >
       <div className="max-w-md mx-auto h-full overflow-hidden text-white relative">
-        <div className="absolute inset-0 px-4 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+        <div className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
           {currentView === 'menu' && (
             <AnalysisMainMenu 
               onClose={onClose}

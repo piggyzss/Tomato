@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { useAI } from '@/hooks/useAI'
 import { aiService } from '@/services/aiService'
 import { getStorage, setStorage } from '@/utils/storage'
 import BuiltInAIConfiguration from './BuiltInAIConfiguration'
 import CloudAIConfiguration from './CloudAIConfiguration'
+import { ModalWithBack } from '@/components/Common'
 
 interface AIAPIDemoProps {
   onBack: () => void
@@ -67,69 +68,67 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          <Sparkles size={18} />
+    <ModalWithBack
+      title={
+        <>
+          <Sparkles size={18} className="inline mr-2" />
           AI API
-        </h2>
-      </div>
+        </>
+      }
+      subtitle="Configure AI providers"
+      onBack={onBack}
+    >
+      <div className="space-y-4 py-4">{/* Header removed - now in ModalWithBack */}
 
-      {/* Mode Selector */}
-      <div className="flex gap-2 p-1 bg-white/10 rounded-lg">
-        <button
-          onClick={() => handleModeChange('builtin')}
-          className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'builtin'
-            ? 'bg-white/20 text-white'
-            : 'text-white/70 hover:text-white'
-            }`}
-        >
-          Chrome 内置 AI
-        </button>
-        <button
-          onClick={() => handleModeChange('cloud')}
-          className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'cloud'
-            ? 'bg-white/20 text-white'
-            : 'text-white/70 hover:text-white'
-            }`}
-        >
-          Chrome 云端 AI
-        </button>
-      </div>
-
-      {/* Info - Always visible */}
-      <div className="p-3 bg-white/5 rounded-lg text-xs opacity-80">
-        <div className="font-semibold mb-1">💡 智能切换</div>
-        <div className="space-y-1">
-          <div>• 优先使用内置 AI（免费、快速、隐私）</div>
-          <div>• 自动降级到云端 AI（需要 API Key）</div>
-          <div>• 统一的接口，无缝切换</div>
+        {/* Mode Selector */}
+        <div className="flex gap-2 p-1 bg-white/10 rounded-lg">
+          <button
+            onClick={() => handleModeChange('builtin')}
+            className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'builtin'
+              ? 'bg-white/20 text-white'
+              : 'text-white/70 hover:text-white'
+              }`}
+          >
+            Chrome 内置 AI
+          </button>
+          <button
+            onClick={() => handleModeChange('cloud')}
+            className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'cloud'
+              ? 'bg-white/20 text-white'
+              : 'text-white/70 hover:text-white'
+              }`}
+          >
+            Chrome 云端 AI
+          </button>
         </div>
+
+        {/* Info - Always visible */}
+        <div className="p-3 bg-white/5 rounded-lg text-xs opacity-80">
+          <div className="font-semibold mb-1">💡 智能切换</div>
+          <div className="space-y-1">
+            <div>• 优先使用内置 AI（免费、快速、隐私）</div>
+            <div>• 自动降级到云端 AI（需要 API Key）</div>
+            <div>• 统一的接口，无缝切换</div>
+          </div>
+        </div>
+
+        {/* Built-in AI Mode */}
+        {mode === 'builtin' && (
+          <BuiltInAIConfiguration builtInAvailable={builtInAvailable} />
+        )}
+
+        {/* Cloud AI Mode */}
+        {mode === 'cloud' && (
+          <CloudAIConfiguration
+            status={status}
+            provider={provider}
+            error={error}
+            cloudAvailable={cloudAvailable}
+            builtInAvailable={builtInAvailable}
+            onOpenSettings={onOpenSettings}
+          />
+        )}
       </div>
-
-      {/* Built-in AI Mode */}
-      {mode === 'builtin' && (
-        <BuiltInAIConfiguration builtInAvailable={builtInAvailable} />
-      )}
-
-      {/* Cloud AI Mode */}
-      {mode === 'cloud' && (
-        <CloudAIConfiguration
-          status={status}
-          provider={provider}
-          error={error}
-          cloudAvailable={cloudAvailable}
-          builtInAvailable={builtInAvailable}
-          onOpenSettings={onOpenSettings}
-        />
-      )}
-    </div>
+    </ModalWithBack>
   )
 }

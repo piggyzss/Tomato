@@ -1,5 +1,5 @@
-import { useSettingsStore } from '@/store/useSettingsStore'
-import { MessageCircle, Calendar, X, ArrowLeft, Sparkles, Settings } from 'lucide-react'
+import { MessageCircle, Calendar, ArrowLeft, Sparkles, Settings } from 'lucide-react'
+import { ModalWithClose } from '@/components/Common'
 
 interface AIMainMenuProps {
   onClose?: () => void
@@ -12,7 +12,6 @@ interface AIMainMenuProps {
 }
 
 export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMenuProps) {
-  const { theme } = useSettingsStore()
 
   const aiMenu = [
     {
@@ -47,27 +46,11 @@ export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMen
   ]
 
   return (
-    <div>
-      {/* Fixed Header with Close Button */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-        }`}>
-        <div className="flex items-center justify-between py-3">
-          <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">🤖 AI Assistant</h1>
-            <p className="text-white/70 text-xs">Enhance your productivity with AI</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            title="Close"
-          >
-            <X size={18} className="text-white/90" />
-          </button>
-        </div>
-      </div>
-
+    <ModalWithClose
+      title={<>🤖 AI Assistant</>}
+      subtitle="Enhance your productivity with AI"
+      onClose={onClose}
+    >
       <div className="space-y-4 mt-4">
         {/* API Status Display */}
         {!apiStatus.aiAvailable && (
@@ -142,6 +125,6 @@ export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMen
           <div className="text-[10px]">On-device AI processing</div>
         </div>
       </div>
-    </div>
+    </ModalWithClose>
   )
 }
