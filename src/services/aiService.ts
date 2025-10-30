@@ -175,6 +175,23 @@ export class AIService {
     }
 
     /**
+     * 获取内置 AI 的详细可用性状态
+     */
+    async getBuiltInAvailabilityStatus(): Promise<string> {
+        try {
+            // Try both possible global references (depending on Chrome version)
+            const avail =
+                (await (window as any).ai?.languageModel?.availability?.()) ??
+                (await (window as any).LanguageModel?.availability?.())
+            console.log("Gemini Nano availability:", avail)
+            return avail || "unavailable"
+        } catch (err) {
+            console.error("Error checking availability:", err)
+            return "error"
+        }
+    }
+
+    /**
      * 检查云端 AI 是否可用
      */
     checkCloudAvailability(): boolean {

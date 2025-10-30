@@ -1,60 +1,10 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Sparkles, AlertCircle, Settings as SettingsIcon } from 'lucide-react'
+import { ArrowLeft, Sparkles } from 'lucide-react'
 import { useAI } from '@/hooks/useAI'
 import { aiService } from '@/services/aiService'
 import { getStorage, setStorage } from '@/utils/storage'
-
-// Chrome AI 可用性检查函数
-async function checkAvailability(): Promise<string> {
-  try {
-    // Try both possible global references (depending on Chrome version)
-    const avail =
-      (await (window as any).ai?.languageModel?.availability?.()) ??
-      (await (window as any).LanguageModel?.availability?.())
-    console.log("Gemini Nano availability:", avail)
-    return avail || "unavailable"
-  } catch (err) {
-    console.error("Error checking availability:", err)
-    return "error"
-  }
-}
-
-// 可用性检查组件
-function AvailabilityCheck() {
-  const [availability, setAvailability] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const handleCheck = async () => {
-    setLoading(true)
-    const result = await checkAvailability()
-    setAvailability(result)
-    setLoading(false)
-  }
-
-  const goodStates = ["readily", "after-download", "downloadable", "available", "downloading"]
-
-  return (
-    <div className="p-3 bg-white/5 rounded-lg">
-      <h3 className="text-sm font-semibold mb-2">🔍 检查 Gemini Nano 可用性</h3>
-      <button
-        onClick={handleCheck}
-        disabled={loading}
-        className="w-full py-2 px-4 rounded-lg bg-green-500/20 hover:bg-green-500/30 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? "检查中..." : "检查可用性"}
-      </button>
-      <div className="mt-3 text-sm">
-        {availability === null ? (
-          <p className="text-white/60">点击按钮检查 Gemini Nano 可用性</p>
-        ) : goodStates.includes(availability) ? (
-          <p className="text-green-300">✅ 可用 ({availability})</p>
-        ) : (
-          <p className="text-red-300">❌ 不可用 ({availability})</p>
-        )}
-      </div>
-    </div>
-  )
-}
+import BuiltInAIConfiguration from './BuiltInAIConfiguration'
+import CloudAIConfiguration from './CloudAIConfiguration'
 
 interface AIAPIDemoProps {
   onBack: () => void
@@ -91,14 +41,11 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
   // 检查内置 AI 可用性
   useEffect(() => {
     const checkBuiltIn = async () => {
-      if (!window.ai?.languageModel) {
-        setBuiltInAvailable('unavailable')
-        return
-      }
-
       try {
-        const capabilities = await window.ai.languageModel.capabilities()
-        if (capabilities.available === 'readily') {
+        const availability = await aiService.getBuiltInAvailabilityStatus()
+        const goodStates = ["readily", "after-download", "available"]
+
+        if (goodStates.includes(availability)) {
           setBuiltInAvailable('ready')
         } else {
           setBuiltInAvailable('unavailable')
@@ -169,155 +116,19 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
 
       {/* Built-in AI Mode */}
       {mode === 'builtin' && (
-        <>
-          {/* Status */}
-          <div className={`p-4 rounded-lg ${builtInAvailable === 'ready' ? 'bg-green-500/20' :
-            builtInAvailable === 'unavailable' ? 'bg-red-500/20' :
-              'bg-blue-500/20'
-            }`}>
-            <div className="flex items-start gap-2">
-              <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
-                {builtInAvailable === 'checking' && '正在检查 API 可用性...'}
-                {builtInAvailable === 'ready' && '✅ Chrome 内置 AI 已就绪！'}
-                {builtInAvailable === 'unavailable' && (
-                  <>
-                    <div className="font-semibold mb-1">❌ Chrome 内置 AI 不可用</div>
-                    <div className="text-xs opacity-90">
-                      请确保：
-                      <br />• 使用 Chrome 127+ 版本
-                      <br />• 启用实验性功能：chrome://flags/#optimization-guide-on-device-model
-                      <br />• 启用：chrome://flags/#prompt-api-for-gemini-nano
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {builtInAvailable === 'ready' && (
-            <>
-              {/* Availability Check Component */}
-              <AvailabilityCheck />
-
-              {/* Info */}
-              <div className="p-3 bg-white/5 rounded-lg text-xs opacity-80">
-                <div className="font-semibold mb-1">关于 Chrome 内置 AI：</div>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>使用 Gemini Nano 模型，完全在本地运行</li>
-                  <li>无需网络连接，保护隐私</li>
-                  <li>支持自定义系统提示词</li>
-                  <li>适合快速、轻量级的 AI 交互</li>
-                </ul>
-                <div className="mt-2 pt-2 border-t border-white/10">
-                  <a
-                    href="https://developer.chrome.com/docs/ai/built-in?hl=zh-cn"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-300 hover:text-blue-200 underline"
-                  >
-                    查看完整文档 →
-                  </a>
-                </div>
-              </div>
-            </>
-          )}
-
-        </>
+        <BuiltInAIConfiguration builtInAvailable={builtInAvailable} />
       )}
 
       {/* Cloud AI Mode */}
       {mode === 'cloud' && (
-        <>
-          {/* Status */}
-          {status === 'checking' && (
-            <div className="p-3 bg-blue-500/20 rounded-lg flex items-center gap-2 text-sm">
-              <Sparkles size={16} className="animate-pulse" />
-              正在检查 AI 可用性...
-            </div>
-          )}
-
-          {status === 'unavailable' && (
-            <div className="p-3 bg-red-500/20 rounded-lg text-sm">
-              <div className="font-semibold mb-2">❌ 云端 AI 不可用</div>
-              <div className="text-xs opacity-90 mb-3">
-                请配置 Gemini API Key 以使用云端 AI
-              </div>
-              <button
-                onClick={onOpenSettings}
-                className="flex items-center gap-2 text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded transition-colors"
-              >
-                <SettingsIcon size={14} />
-                前往设置
-              </button>
-            </div>
-          )}
-
-          {status === 'error' && error && (
-            <div className="p-3 bg-red-500/20 rounded-lg text-sm">
-              <div className="font-semibold mb-1">⚠️ 错误</div>
-              <div className="text-xs opacity-90">{error}</div>
-            </div>
-          )}
-
-          {status === 'ready' && (
-            <>
-              {/* Provider Info */}
-              <div className="p-3 bg-green-500/20 rounded-lg">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={16} />
-                    <span>使用云端 AI</span>
-                  </div>
-                  <div className="text-xs opacity-80">
-                    {provider === 'builtin' ? '本地运行' : 'Gemini API'}
-                  </div>
-                </div>
-              </div>
-
-              {/* Availability Status */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className={`p-2 rounded-lg ${builtInAvailable === 'ready' ? 'bg-green-500/20' : 'bg-gray-500/20'
-                  }`}>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <Sparkles size={14} />
-                    <span className="font-medium">内置 AI</span>
-                  </div>
-                  <div className="opacity-80">
-                    {builtInAvailable === 'ready' ? '✅ 可用' : '❌ 不可用'}
-                  </div>
-                </div>
-                <div className={`p-2 rounded-lg ${cloudAvailable ? 'bg-green-500/20' : 'bg-gray-500/20'
-                  }`}>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <Sparkles size={14} />
-                    <span className="font-medium">云端 AI</span>
-                  </div>
-                  <div className="opacity-80">
-                    {cloudAvailable ? '✅ 已配置' : '⚙️ 未配置'}
-                  </div>
-                </div>
-              </div>
-
-              {/* Settings Link */}
-              {!cloudAvailable && (
-                <div className="p-3 bg-yellow-500/20 rounded-lg text-sm">
-                  <div className="font-semibold mb-2">💡 提示</div>
-                  <div className="text-xs opacity-90 mb-3">
-                    配置 API Key 以使用云端 AI
-                  </div>
-                  <button
-                    onClick={onOpenSettings}
-                    className="flex items-center gap-2 text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded transition-colors"
-                  >
-                    <SettingsIcon size={14} />
-                    前往设置
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </>
+        <CloudAIConfiguration
+          status={status}
+          provider={provider}
+          error={error}
+          cloudAvailable={cloudAvailable}
+          builtInAvailable={builtInAvailable}
+          onOpenSettings={onOpenSettings}
+        />
       )}
     </div>
   )
