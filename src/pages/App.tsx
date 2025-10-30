@@ -89,7 +89,7 @@ function App() {
 
         {/* Timer Card - full width, no outer padding */}
         <div
-          className={`py-8 px-6 mb-5 transition-colors duration-300 ${theme === 'dark'
+          className={`py-5 px-6 mb-5 transition-colors duration-300 ${theme === 'dark'
             ? 'bg-gray-800/80 backdrop-blur border-y border-gray-700'
             : 'bg-tomato-light/30'
             }`}

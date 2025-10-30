@@ -35,10 +35,14 @@ export default function TimerPage() {
   }
 
   return (
-    <div className="w-full flex flex-col">
-      {/* Pass the function DOWN to child component */}
+    <div className="w-full flex items-center gap-8">
+      {/* Mode Selector - Left Side, Vertical */}
       <ModeSelector mode={currentMode} onModeChange={handleModeChange} />
-      <BigTimer />
+      
+      {/* Timer - Right Side, Centered */}
+      <div className="flex-1">
+        <BigTimer />
+      </div>
     </div>
   )
 }

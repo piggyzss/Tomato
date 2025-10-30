@@ -4,6 +4,58 @@ import { useAI } from '@/hooks/useAI'
 import { aiService } from '@/services/aiService'
 import { getStorage, setStorage } from '@/utils/storage'
 
+// Chrome AI 可用性检查函数
+async function checkAvailability(): Promise<string> {
+  try {
+    // Try both possible global references (depending on Chrome version)
+    const avail =
+      (await (window as any).ai?.languageModel?.availability?.()) ??
+      (await (window as any).LanguageModel?.availability?.())
+    console.log("Gemini Nano availability:", avail)
+    return avail || "unavailable"
+  } catch (err) {
+    console.error("Error checking availability:", err)
+    return "error"
+  }
+}
+
+// 可用性检查组件
+function AvailabilityCheck() {
+  const [availability, setAvailability] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleCheck = async () => {
+    setLoading(true)
+    const result = await checkAvailability()
+    setAvailability(result)
+    setLoading(false)
+  }
+
+  const goodStates = ["readily", "after-download", "downloadable", "available", "downloading"]
+
+  return (
+    <div className="p-3 bg-white/5 rounded-lg">
+      <h3 className="text-sm font-semibold mb-2">🔍 检查 Gemini Nano 可用性</h3>
+      <button
+        onClick={handleCheck}
+        disabled={loading}
+        className="w-full py-2 px-4 rounded-lg bg-green-500/20 hover:bg-green-500/30 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "检查中..." : "检查可用性"}
+      </button>
+      <div className="mt-3 text-sm">
+        {availability === null ? (
+          <p className="text-white/60">点击按钮检查 Gemini Nano 可用性</p>
+        ) : goodStates.includes(availability) ? (
+          <p className="text-green-300">✅ 可用 ({availability})</p>
+        ) : (
+          <p className="text-red-300">❌ 不可用 ({availability})</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 interface AIAPIDemoProps {
   onBack: () => void
   onOpenSettings: () => void
@@ -88,8 +140,8 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
         <button
           onClick={() => handleModeChange('builtin')}
           className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'builtin'
-              ? 'bg-white/20 text-white'
-              : 'text-white/70 hover:text-white'
+            ? 'bg-white/20 text-white'
+            : 'text-white/70 hover:text-white'
             }`}
         >
           Chrome 内置 AI
@@ -97,8 +149,8 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
         <button
           onClick={() => handleModeChange('cloud')}
           className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'cloud'
-              ? 'bg-white/20 text-white'
-              : 'text-white/70 hover:text-white'
+            ? 'bg-white/20 text-white'
+            : 'text-white/70 hover:text-white'
             }`}
         >
           Chrome 云端 AI
@@ -120,8 +172,8 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
         <>
           {/* Status */}
           <div className={`p-4 rounded-lg ${builtInAvailable === 'ready' ? 'bg-green-500/20' :
-              builtInAvailable === 'unavailable' ? 'bg-red-500/20' :
-                'bg-blue-500/20'
+            builtInAvailable === 'unavailable' ? 'bg-red-500/20' :
+              'bg-blue-500/20'
             }`}>
             <div className="flex items-start gap-2">
               <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
@@ -145,6 +197,9 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
 
           {builtInAvailable === 'ready' && (
             <>
+              {/* Availability Check Component */}
+              <AvailabilityCheck />
+
               {/* Info */}
               <div className="p-3 bg-white/5 rounded-lg text-xs opacity-80">
                 <div className="font-semibold mb-1">关于 Chrome 内置 AI：</div>

@@ -1,7 +1,7 @@
 import { useTaskStore } from '@/store/useTaskStore'
 import { useTimerStore } from '@/store/useTimerStore'
 import { formatTime } from '@/utils/time'
-import { TimerReset } from 'lucide-react'
+import { TimerReset, Play, Pause } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 // 定义计时器状态接口
@@ -190,7 +190,7 @@ export function BigTimer() {
   const showResetButton = status !== 'idle' || isTimeUp
 
   return (
-    <div className="w-full flex flex-col items-center relative">
+    <div className="w-full flex flex-col items-center justify-center relative">
       {/* Toast Notification */}
       {showNoTaskToast && (
         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-white text-tomato px-4 py-2 rounded-lg shadow-lg text-sm font-semibold animate-bounce z-50">
@@ -199,36 +199,38 @@ export function BigTimer() {
       )}
 
       {/* Timer Display */}
-      <div className="text-[80px] font-bold text-white leading-none mb-6 tracking-tight">
+      <div className="text-6xl font-bold text-white leading-none mb-4 tracking-tight">
         {formatTime(remainingSeconds)}
       </div>
 
       {/* Control Buttons */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {status === 'running' ? (
           <button
             onClick={handleStop}
-            className="px-14 py-3.5 bg-white text-tomato text-base font-bold rounded-lg hover:bg-white/90 active:scale-95 transition-all shadow-lg tracking-wide"
+            className="p-3 bg-white/20 hover:bg-white/30 rounded-full active:scale-95 transition-all"
+            title="Pause"
           >
-            PAUSE
+            <Pause size={28} className="text-white" fill="white" />
           </button>
         ) : (
           <button
             onClick={handleStart}
             disabled={isTimeUp}
-            className="px-14 py-3.5 bg-white text-tomato text-base font-bold rounded-lg hover:bg-white/90 active:scale-95 transition-all shadow-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:active:scale-100"
+            className="p-3 bg-white/20 hover:bg-white/30 rounded-full active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/20 disabled:active:scale-100"
+            title={status === 'paused' ? 'Resume' : 'Start'}
           >
-            {status === 'paused' ? 'RESUME' : 'START'}
+            <Play size={28} className="text-white" fill="white" />
           </button>
         )}
 
         {showResetButton && (
           <button
             onClick={handleReset}
-            className="p-3 text-white/70 hover:text-white transition-colors"
+            className="p-2 text-white hover:text-white/80 transition-colors"
             title="Reset"
           >
-            <TimerReset size={22} />
+            <TimerReset size={24} className="text-white" />
           </button>
         )}
       </div>
