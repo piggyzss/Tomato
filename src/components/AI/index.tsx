@@ -1,5 +1,11 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react'
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from 'react'
 import AIMainMenu from './AIMainMenu'
 
 // ============================================================================
@@ -23,7 +29,9 @@ interface LanguageModelParams {
 
 interface PromptMessage {
   role: 'system' | 'user' | 'assistant'
-  content: string | Array<{ type: 'text' | 'image' | 'audio'; value: string | File }>
+  content:
+    | string
+    | Array<{ type: 'text' | 'image' | 'audio'; value: string | File }>
   prefix?: boolean
 }
 
@@ -50,14 +58,23 @@ interface SessionOptions {
 }
 
 interface LanguageModelSession {
-  prompt: (input: string | PromptMessage[], options?: PromptOptions) => Promise<string>
-  promptStreaming: (input: string | PromptMessage[], options?: PromptOptions) => ReadableStream
+  prompt: (
+    input: string | PromptMessage[],
+    options?: PromptOptions
+  ) => Promise<string>
+  promptStreaming: (
+    input: string | PromptMessage[],
+    options?: PromptOptions
+  ) => ReadableStream
   append: (messages: PromptMessage[]) => Promise<void>
   clone: (options?: { signal?: AbortSignal }) => Promise<LanguageModelSession>
   destroy: () => void
   inputUsage: number
   inputQuota: number
-  measureInputUsage: (input: string | PromptMessage[], options?: PromptOptions) => Promise<number>
+  measureInputUsage: (
+    input: string | PromptMessage[],
+    options?: PromptOptions
+  ) => Promise<number>
 }
 
 interface LanguageModel {
@@ -74,6 +91,19 @@ declare global {
   }
 }
 
+// Add global LanguageModel interface
+declare global {
+  interface LanguageModel {
+    availability: (
+      options?: SessionOptions
+    ) => Promise<LanguageModelCapabilities>
+    params: () => Promise<LanguageModelParams>
+    create: (options?: SessionOptions) => Promise<LanguageModelSession>
+  }
+}
+
+declare const LanguageModel: LanguageModel
+
 // ============================================================================
 // AI Service Class - Core Gemini Nano Implementation
 // ============================================================================
@@ -87,14 +117,31 @@ export class GeminiNanoService {
 
   // Event handlers for download progress and status changes
   private onDownloadProgress?: (progress: number) => void
-  private onStatusChange?: (status: 'checking' | 'downloading' | 'ready' | 'error' | 'unavailable') => void
+  private onStatusChange?: (
+    status:
+      | 'checking'
+      | 'downloading'
+      | 'ready'
+      | 'error'
+      | 'unavailable'
+      | 'needs-download'
+  ) => void
 
   /**
-   * Initialize the Gemini Nano service
+   * Initialize the Gemini Nano service - CHECK ONLY, no auto-download
+   * Following official docs: user interaction required for download
    */
   async initialize(options?: {
     onDownloadProgress?: (progress: number) => void
-    onStatusChange?: (status: 'checking' | 'downloading' | 'ready' | 'error' | 'unavailable') => void
+    onStatusChange?: (
+      status:
+        | 'checking'
+        | 'downloading'
+        | 'ready'
+        | 'error'
+        | 'unavailable'
+        | 'needs-download'
+    ) => void
   }): Promise<boolean> {
     if (this.isInitialized) return true
     if (this.isInitializing) return false
@@ -105,32 +152,50 @@ export class GeminiNanoService {
 
     try {
       this.onStatusChange?.('checking')
-      
+
       // Check if the API is available
       if (!this.isApiAvailable()) {
-        console.error('❌ Gemini Nano API not available')
+        console.error('❌ LanguageModel API not available')
         this.onStatusChange?.('unavailable')
         return false
       }
 
-      // Get model capabilities and parameters
-      await this.loadCapabilitiesAndParams()
+      // Check model availability following official docs
+      const availability = await this.checkAvailability()
+      console.log('🔍 Availability check result:', availability)
 
-      // Check availability
-      if (this.capabilities?.available === 'no') {
+      if (!availability) {
+        console.log('❌ No availability response - setting unavailable')
+        this.onStatusChange?.('unavailable')
+        return false
+      }
+
+      this.capabilities = availability
+
+      // Following official docs: check availability response
+      console.log('📋 Availability status:', availability.available)
+
+      if (availability.available === 'no') {
         console.error('❌ Gemini Nano model not available on this device')
         this.onStatusChange?.('unavailable')
         return false
       }
 
-      // Create session
-      await this.createSession()
-      
-      this.isInitialized = true
-      this.onStatusChange?.('ready')
-      console.log('✅ Gemini Nano service initialized successfully')
-      return true
+      if (availability.available === 'readily') {
+        // Model is ready, can create session immediately
+        console.log('✅ Model is readily available - creating session')
+        return await this.downloadAndCreateSession()
+      }
 
+      if (availability.available === 'after-download') {
+        // Model needs download - require user interaction
+        console.log('📥 Model needs to be downloaded - showing download button')
+        this.onStatusChange?.('needs-download')
+        return false // Don't auto-download, wait for user action
+      }
+
+      console.log('❓ Unexpected availability status:', availability.available)
+      return false
     } catch (error) {
       console.error('❌ Failed to initialize Gemini Nano service:', error)
       this.onStatusChange?.('error')
@@ -142,89 +207,97 @@ export class GeminiNanoService {
 
   /**
    * Check if the Gemini Nano API is available in the browser
+   * Following official docs: Use LanguageModel.availability()
    */
   private isApiAvailable(): boolean {
-    return !!(
-      typeof window !== 'undefined' &&
-      window.ai?.languageModel
+    return !!(typeof window !== 'undefined' && window.ai?.languageModel)
+  }
+
+  /**
+   * Check model availability - follows official docs exactly
+   */
+  async checkAvailability(): Promise<LanguageModelCapabilities | null> {
+    console.log('🔍 Checking API availability...')
+    console.log('🔍 window.ai exists:', !!window.ai)
+    console.log(
+      '🔍 window.ai.languageModel exists:',
+      !!window.ai?.languageModel
     )
+
+    if (!this.isApiAvailable()) {
+      console.error('❌ LanguageModel API not available')
+      return null
+    }
+
+    try {
+      console.log('🔍 Calling languageModel.availability()...')
+      // Following official docs: const availability = await LanguageModel.availability();
+      const availability = await window.ai!.languageModel!.availability()
+      console.log('🔍 Model availability result:', availability)
+      return availability
+    } catch (error) {
+      console.error('❌ Failed to check availability:', error)
+      return null
+    }
   }
 
   /**
-   * Load model capabilities and parameters
+   * Download and create model session - requires user interaction
+   * Following official docs: const session = await LanguageModel.create({...});
    */
-  private async loadCapabilitiesAndParams(): Promise<void> {
-    if (!window.ai?.languageModel) {
-      throw new Error('LanguageModel API not available')
+  async downloadAndCreateSession(): Promise<boolean> {
+    if (!this.isApiAvailable()) {
+      this.onStatusChange?.('unavailable')
+      return false
     }
 
-    // Get capabilities and parameters in parallel
-    const [capabilities, params] = await Promise.all([
-      window.ai.languageModel.availability(),
-      window.ai.languageModel.params()
-    ])
-
-    this.capabilities = capabilities
-    this.params = params
-
-    console.log('🔍 Model capabilities:', capabilities)
-    console.log('🔧 Model parameters:', params)
-  }
-
-  /**
-   * Create a new AI session with optimal settings
-   */
-  private async createSession(): Promise<void> {
-    if (!window.ai?.languageModel || !this.params) {
-      throw new Error('LanguageModel API or params not available')
-    }
-
-    // Use slightly higher temperature for more creative responses
-    const sessionOptions: SessionOptions = {
-      temperature: Math.min(this.params.defaultTemperature * 1.2, this.params.maxTemperature),
-      topK: this.params.defaultTopK,
-      monitor: (monitor) => {
-        monitor.addEventListener('downloadprogress', (e: Event & { loaded?: number }) => {
-          const progress = Math.round((e.loaded || 0) * 100)
-          console.log(`📥 Download progress: ${progress}%`)
-          this.onDownloadProgress?.(progress)
-          
-          if (progress < 100) {
-            this.onStatusChange?.('downloading')
-          }
-        })
-      },
-      initialPrompts: [
-        {
-          role: 'system',
-          content: `You are a helpful AI assistant integrated into a Pomodoro timer app called "Tomato Cat". 
-          You help users with productivity, time management, and motivation. 
-          Keep responses concise, friendly, and encouraging. 
-          Use occasional cat-themed emojis (🐱, 😺, 😸) but don't overdo it.
-          Always be supportive and positive about the user's productivity journey.`
-        }
-      ],
-      expectedInputs: [
-        { type: 'text', languages: ['en', 'zh-CN', 'ja'] }
-      ],
-      expectedOutputs: [
-        { type: 'text', languages: ['en', 'zh-CN', 'ja'] }
-      ]
-    }
-
-    if (this.capabilities?.available === 'after-download') {
-      console.log('📥 Model needs to be downloaded...')
+    try {
       this.onStatusChange?.('downloading')
-    }
 
-    this.session = await window.ai.languageModel.create(sessionOptions)
-    console.log('✅ AI session created successfully')
+      // Following official docs exactly
+      const session = await window.ai!.languageModel!.create({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        monitor: (m: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          m.addEventListener('downloadprogress', (e: any) => {
+            const progress = Math.round((e.loaded || 0) * 100)
+            console.log(`📥 Downloaded ${progress}%`)
+            this.onDownloadProgress?.(progress)
+          })
+        },
+        temperature: 0.8,
+        topK: 3,
+        initialPrompts: [
+          {
+            role: 'system',
+            content: `You are a helpful AI assistant integrated into a Pomodoro timer app called "Tomato Cat". 
+            You help users with productivity, time management, and motivation. 
+            Keep responses concise, friendly, and encouraging. 
+            Use occasional cat-themed emojis (🐱, 😺, 😸) but don't overdo it.
+            Always be supportive and positive about the user's productivity journey.`,
+          },
+        ],
+      })
+
+      this.session = session
+      this.isInitialized = true
+      this.onStatusChange?.('ready')
+      console.log('✅ Model downloaded and session created successfully')
+      return true
+    } catch (error) {
+      console.error('❌ Failed to download/create session:', error)
+      this.onStatusChange?.('error')
+      return false
+    }
   }
 
   /**
    * Send a prompt to the AI and get a response
    */
-  async prompt(input: string | PromptMessage[], options?: PromptOptions): Promise<string> {
+  async prompt(
+    input: string | PromptMessage[],
+    options?: PromptOptions
+  ): Promise<string> {
     if (!this.session) {
       throw new Error('AI service not initialized. Call initialize() first.')
     }
@@ -240,7 +313,10 @@ export class GeminiNanoService {
   /**
    * Send a prompt and get a streaming response
    */
-  promptStreaming(input: string | PromptMessage[], options?: PromptOptions): ReadableStream {
+  promptStreaming(
+    input: string | PromptMessage[],
+    options?: PromptOptions
+  ): ReadableStream {
     if (!this.session) {
       throw new Error('AI service not initialized. Call initialize() first.')
     }
@@ -272,7 +348,9 @@ export class GeminiNanoService {
   /**
    * Clone the current session (preserves initial prompts, resets conversation)
    */
-  async cloneSession(options?: { signal?: AbortSignal }): Promise<LanguageModelSession> {
+  async cloneSession(options?: {
+    signal?: AbortSignal
+  }): Promise<LanguageModelSession> {
     if (!this.session) {
       throw new Error('AI service not initialized. Call initialize() first.')
     }
@@ -301,7 +379,10 @@ export class GeminiNanoService {
   /**
    * Measure how much input quota a prompt would use
    */
-  async measureInputUsage(input: string | PromptMessage[], options?: PromptOptions): Promise<number> {
+  async measureInputUsage(
+    input: string | PromptMessage[],
+    options?: PromptOptions
+  ): Promise<number> {
     if (!this.session) {
       throw new Error('AI service not initialized. Call initialize() first.')
     }
@@ -358,7 +439,7 @@ export class GeminiNanoService {
       capabilities: this.capabilities,
       params: this.params,
       usage: this.getUsage(),
-      apiAvailable: this.isApiAvailable()
+      apiAvailable: this.isApiAvailable(),
     }
   }
 }
@@ -373,7 +454,15 @@ interface AIContextType {
   isLoading: boolean
   error: string | null
   downloadProgress: number
-  status: 'checking' | 'downloading' | 'ready' | 'error' | 'unavailable' | 'idle'
+  status:
+    | 'checking'
+    | 'downloading'
+    | 'ready'
+    | 'error'
+    | 'unavailable'
+    | 'needs-download'
+    | 'idle'
+  downloadModel: () => Promise<boolean>
 }
 
 const AIContext = createContext<AIContextType | null>(null)
@@ -400,7 +489,36 @@ export function AIProvider({ children }: AIProviderProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [downloadProgress, setDownloadProgress] = useState(0)
-  const [status, setStatus] = useState<'checking' | 'downloading' | 'ready' | 'error' | 'unavailable' | 'idle'>('idle')
+  const [status, setStatus] = useState<
+    | 'checking'
+    | 'downloading'
+    | 'ready'
+    | 'error'
+    | 'unavailable'
+    | 'needs-download'
+    | 'idle'
+  >('idle')
+
+  // Function to download model - requires user interaction
+  const downloadModel = async (): Promise<boolean> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const success = await service.downloadAndCreateSession()
+      if (success) {
+        setIsReady(true)
+      }
+      return success
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to download model'
+      setError(errorMessage)
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
     let mounted = true
@@ -411,23 +529,27 @@ export function AIProvider({ children }: AIProviderProps) {
 
       try {
         const success = await service.initialize({
-          onDownloadProgress: (progress) => {
+          onDownloadProgress: progress => {
             if (mounted) setDownloadProgress(progress)
           },
-          onStatusChange: (newStatus) => {
+          onStatusChange: newStatus => {
             if (mounted) setStatus(newStatus)
-          }
+          },
         })
 
         if (mounted) {
           setIsReady(success)
           if (!success) {
-            setError('Failed to initialize AI service. Please check Chrome flags and requirements.')
+            setError(
+              'Failed to initialize AI service. Please check Chrome flags and requirements.'
+            )
           }
         }
       } catch (err) {
         if (mounted) {
-          setError(err instanceof Error ? err.message : 'Unknown error occurred')
+          setError(
+            err instanceof Error ? err.message : 'Unknown error occurred'
+          )
           setIsReady(false)
         }
       } finally {
@@ -451,13 +573,12 @@ export function AIProvider({ children }: AIProviderProps) {
     isLoading,
     error,
     downloadProgress,
-    status
+    status,
+    downloadModel,
   }
 
   return (
-    <AIContext.Provider value={contextValue}>
-      {children}
-    </AIContext.Provider>
+    <AIContext.Provider value={contextValue}>{children}</AIContext.Provider>
   )
 }
 
@@ -476,13 +597,11 @@ export default function AI({ onClose }: AIProps) {
     <AIProvider>
       <div
         className={`rounded-xl shadow-2xl overflow-hidden relative ${
-          theme === 'dark'
-            ? 'bg-gray-900'
-            : 'bg-[#D84848]'
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
         }`}
         style={{
           height: 'calc(100vh - 240px)',
-          maxHeight: '600px'
+          maxHeight: '600px',
         }}
       >
         <div className="max-w-md mx-auto h-full overflow-hidden text-white relative">
@@ -511,9 +630,9 @@ export function createSystemPrompt(context: {
   const { taskTitle, timerStatus, remainingMinutes, language = 'en' } = context
 
   const languageMap = {
-    'en': 'English',
+    en: 'English',
     'zh-CN': 'Chinese',
-    'ja': 'Japanese'
+    ja: 'Japanese',
   }
 
   let contextInfo = ''
@@ -543,25 +662,27 @@ export function checkChromeFlags(): {
   missingFlags: string[]
   recommendations: string[]
 } {
-  const isSupported = !!(window.ai?.languageModel)
-  
+  const isSupported = !!window.ai?.languageModel
+
   const recommendations = [
     'Use Chrome Canary 127+ or Chrome Dev 127+',
     'Enable chrome://flags/#optimization-guide-on-device-model',
     'Enable chrome://flags/#prompt-api-for-gemini-nano',
     'Restart Chrome after enabling flags',
     'Ensure you have 22GB free storage space',
-    'Ensure you have 4GB+ VRAM or 16GB+ RAM'
+    'Ensure you have 4GB+ VRAM or 16GB+ RAM',
   ]
 
-  const missingFlags = isSupported ? [] : [
-    'chrome://flags/#optimization-guide-on-device-model',
-    'chrome://flags/#prompt-api-for-gemini-nano'
-  ]
+  const missingFlags = isSupported
+    ? []
+    : [
+        'chrome://flags/#optimization-guide-on-device-model',
+        'chrome://flags/#prompt-api-for-gemini-nano',
+      ]
 
   return {
     isSupported,
     missingFlags,
-    recommendations
+    recommendations,
   }
 }

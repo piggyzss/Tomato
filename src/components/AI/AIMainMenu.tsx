@@ -1,8 +1,8 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { ArrowLeft, MessageCircle, BarChart3, X } from 'lucide-react'
 import { useState } from 'react'
-import AICatMessages from "./AICatMessages"
-import AIDailySummary from "./AIDailySummary"
+import AICatMessages from './AICatMessages'
+import AIDailySummary from './AIDailySummary'
 
 // AI feature menu type
 type AIView = 'menu' | 'catMessages' | 'dailySummary'
@@ -55,14 +55,19 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
   const renderMainMenu = () => (
     <div>
       {/* Fixed Header with Close Button */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center justify-between py-3">
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">🤖 AI Features</h1>
-            <p className="text-white/70 text-xs">Your AI-powered productivity assistant</p>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              🤖 AI Features
+            </h1>
+            <p className="text-white/70 text-xs">
+              Your AI-powered productivity assistant
+            </p>
           </div>
           {onClose && (
             <button
@@ -91,7 +96,9 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
                   <Icon size={18} color="white" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-semibold text-sm text-white">{feature.title}</div>
+                  <div className="font-semibold text-sm text-white">
+                    {feature.title}
+                  </div>
                   <div className="text-xs text-white/70">
                     {feature.description}
                   </div>
@@ -117,10 +124,11 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
   const renderCatMessages = () => (
     <div>
       {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center gap-3 py-3">
           <button
             onClick={() => handleViewChange('menu')}
@@ -130,8 +138,12 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
             <ArrowLeft size={18} className="text-white/90" />
           </button>
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">AI Cat Messages</h1>
-            <p className="text-white/70 text-xs">Chat with your productivity companion</p>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              AI Cat Messages
+            </h1>
+            <p className="text-white/70 text-xs">
+              Chat with your productivity companion
+            </p>
           </div>
         </div>
       </div>
@@ -146,10 +158,11 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
   const renderDailySummary = () => (
     <div>
       {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center gap-3 py-3">
           <button
             onClick={() => handleViewChange('menu')}
@@ -159,8 +172,12 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
             <ArrowLeft size={18} className="text-white/90" />
           </button>
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">Daily Summary</h1>
-            <p className="text-white/70 text-xs">AI-powered productivity insights</p>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              Daily Summary
+            </h1>
+            <p className="text-white/70 text-xs">
+              AI-powered productivity insights
+            </p>
           </div>
         </div>
       </div>
@@ -178,9 +195,10 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
         key={nextView || currentView}
         className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
         style={{
-          animation: nextView !== null
-            ? `slideInFrom${slideDirection === 'left' ? 'Right' : 'Left'} 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
-            : 'none'
+          animation:
+            nextView !== null
+              ? `slideInFrom${slideDirection === 'left' ? 'Right' : 'Left'} 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
+              : 'none',
         }}
       >
         {(nextView || currentView) === 'menu' && renderMainMenu()}

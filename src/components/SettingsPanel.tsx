@@ -11,7 +11,7 @@ import {
   Save,
   Timer,
   Volume2,
-  X
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { TimerMode } from './ModeSelector'
@@ -194,14 +194,19 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const renderMainMenu = () => (
     <div>
       {/* Fixed Header with Close Button */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center justify-between py-3">
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">⚙️ Settings</h1>
-            <p className="text-white/70 text-xs">Customize your Tomato experience</p>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              ⚙️ Settings
+            </h1>
+            <p className="text-white/70 text-xs">
+              Customize your Tomato experience
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -228,7 +233,9 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                   <Icon size={18} color="white" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-semibold text-sm text-white">{setting.title}</div>
+                  <div className="font-semibold text-sm text-white">
+                    {setting.title}
+                  </div>
                   <div className="text-xs text-white/70">
                     {setting.description}
                   </div>
@@ -245,7 +252,9 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
       {/* Footer Info */}
       <div className="mt-4 text-center text-xs text-white/60 bg-black/20 rounded-lg p-2.5">
         <div className="mb-1">🍅 Tomato Cat Timer v0.1.0</div>
-        <div className="text-[10px]">Built with React + TypeScript + Zustand</div>
+        <div className="text-[10px]">
+          Built with React + TypeScript + Zustand
+        </div>
       </div>
     </div>
   )
@@ -254,10 +263,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const renderTimerSettings = () => (
     <div>
       {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center gap-3 py-3">
           <button
             onClick={() => handleViewChange('menu')}
@@ -267,14 +277,17 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
             <ArrowLeft size={18} className="text-white/90" />
           </button>
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">Timer Settings</h1>
-            <p className="text-white/70 text-xs">Customize your Pomodoro durations</p>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              Timer Settings
+            </h1>
+            <p className="text-white/70 text-xs">
+              Customize your Pomodoro durations
+            </p>
           </div>
         </div>
       </div>
 
       <div className="space-y-6 mt-4">
-
         {/* Mode Selection */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Select Timer Mode</h2>
@@ -285,10 +298,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <button
                   key={mode.id}
                   onClick={() => setSelectedMode(mode.id)}
-                  className={`w-full p-4 rounded-xl transition-all ${selectedMode === mode.id
-                    ? 'bg-black/30'
-                    : 'bg-black/10 hover:bg-black/20'
-                    }`}
+                  className={`w-full p-4 rounded-xl transition-all ${
+                    selectedMode === mode.id
+                      ? 'bg-black/30'
+                      : 'bg-black/10 hover:bg-black/20'
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${mode.color}`}>
@@ -343,10 +357,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <button
                   key={duration}
                   onClick={() => handleDurationChange(duration)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${getCurrentDuration() === duration
-                    ? 'bg-white text-tomato'
-                    : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                    getCurrentDuration() === duration
+                      ? 'bg-white text-tomato'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
                 >
                   {duration}m
                 </button>
@@ -361,7 +376,9 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>🍅 Pomodoro:</span>
-              <span className="font-mono">{tempDurations.workDuration} min</span>
+              <span className="font-mono">
+                {tempDurations.workDuration} min
+              </span>
             </div>
             <div className="flex justify-between">
               <span>☕ Short Break:</span>
@@ -389,10 +406,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
 
           <button
             onClick={handleSave}
-            className={`flex-1 px-4 py-2 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${showSaved
-              ? 'bg-green-500 text-white'
-              : 'bg-white text-tomato hover:bg-white/90'
-              }`}
+            className={`flex-1 px-4 py-2 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${
+              showSaved
+                ? 'bg-green-500 text-white'
+                : 'bg-white text-tomato hover:bg-white/90'
+            }`}
           >
             {showSaved ? (
               <>✅ Saved!</>
@@ -448,10 +466,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
     return (
       <div>
         {/* Fixed Header */}
-        <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-          }`}>
+        <div
+          className={`sticky top-0 z-10 pb-3 ${
+            theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+          }`}
+        >
           <div className="flex items-center gap-3 py-3">
             <button
               onClick={() => handleViewChange('menu')}
@@ -461,14 +480,17 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               <ArrowLeft size={18} className="text-white/90" />
             </button>
             <div className="flex-1 text-left">
-              <h1 className="text-base font-bold text-white mb-0.5">Theme Settings</h1>
-              <p className="text-white/70 text-xs">Choose your visual experience</p>
+              <h1 className="text-base font-bold text-white mb-0.5">
+                Theme Settings
+              </h1>
+              <p className="text-white/70 text-xs">
+                Choose your visual experience
+              </p>
             </div>
           </div>
         </div>
 
         <div className="space-y-6 mt-4">
-
           {/* Theme Selection */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4">Select Theme</h2>
@@ -477,10 +499,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <button
                   key={themeOption.id}
                   onClick={() => handleThemeChange(themeOption.id)}
-                  className={`w-full p-4 rounded-xl transition-all ${theme === themeOption.id
-                    ? 'bg-black/30'
-                    : 'bg-black/10 hover:bg-black/20'
-                    }`}
+                  className={`w-full p-4 rounded-xl transition-all ${
+                    theme === themeOption.id
+                      ? 'bg-black/30'
+                      : 'bg-black/10 hover:bg-black/20'
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${themeOption.color}`}>
@@ -534,10 +557,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const renderPlaceholderPage = (title: string, icon: string) => (
     <div>
       {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center gap-3 py-3">
           <button
             onClick={() => handleViewChange('menu')}
@@ -570,38 +594,39 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
 
   return (
     <div
-      className={`rounded-xl shadow-2xl overflow-hidden relative ${theme === 'dark'
-        ? 'bg-gray-900'
-        : 'bg-[#D84848]'
-        }`}
+      className={`rounded-xl shadow-2xl overflow-hidden relative ${
+        theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+      }`}
       style={{
         height: 'calc(100vh - 240px)',
-        maxHeight: '600px'
+        maxHeight: '600px',
       }}
     >
-      <div
-        className="max-w-md mx-auto h-full overflow-hidden text-white relative"
-      >
+      <div className="max-w-md mx-auto h-full overflow-hidden text-white relative">
         {/* 只渲染一个视图，使用 key 强制重新挂载 */}
         <div
           key={nextView || currentView}
           className="absolute inset-0 px-4 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
           style={{
-            animation: nextView !== null
-              ? `slideInFrom${slideDirection === 'left' ? 'Right' : 'Left'} 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
-              : 'none'
+            animation:
+              nextView !== null
+                ? `slideInFrom${slideDirection === 'left' ? 'Right' : 'Left'} 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
+                : 'none',
           }}
         >
           {(nextView || currentView) === 'menu' && renderMainMenu()}
           {(nextView || currentView) === 'timer' && renderTimerSettings()}
-          {(nextView || currentView) === 'sound' && renderPlaceholderPage('Sound Settings', '🔊')}
-          {(nextView || currentView) === 'notifications' && renderPlaceholderPage('Notifications', '🔔')}
+          {(nextView || currentView) === 'sound' &&
+            renderPlaceholderPage('Sound Settings', '🔊')}
+          {(nextView || currentView) === 'notifications' &&
+            renderPlaceholderPage('Notifications', '🔔')}
           {(nextView || currentView) === 'theme' && renderThemeSettings()}
-          {(nextView || currentView) === 'ai' && renderPlaceholderPage('AI Features', '🤖')}
-          {(nextView || currentView) === 'language' && renderPlaceholderPage('Language', '🌍')}
+          {(nextView || currentView) === 'ai' &&
+            renderPlaceholderPage('AI Features', '🤖')}
+          {(nextView || currentView) === 'language' &&
+            renderPlaceholderPage('Language', '🌍')}
         </div>
       </div>
     </div>
   )
 }
-

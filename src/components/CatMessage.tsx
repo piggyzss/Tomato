@@ -12,27 +12,50 @@ export function CatMessage() {
   // 获取当前任务名称
   const currentTask = tasks.find(t => t.id === currentTaskId)
 
-
-
   // Find matching AI message based on context
   const getAIMessage = useMemo(() => {
     if (!useAIMessages || aiMessages.length === 0) return null
-    
+
     // Try to find a message with similar context
     const matchingMessage = aiMessages.find(msg => {
       const msgContext = msg.context.toLowerCase()
-      
+
       // Simple keyword matching
-      if (status === 'running' && mode === 'pomodoro' && msgContext.includes('working')) return true
-      if (status === 'running' && mode === 'shortBreak' && msgContext.includes('short break')) return true
-      if (status === 'running' && mode === 'longBreak' && msgContext.includes('long break')) return true
+      if (
+        status === 'running' &&
+        mode === 'pomodoro' &&
+        msgContext.includes('working')
+      )
+        return true
+      if (
+        status === 'running' &&
+        mode === 'shortBreak' &&
+        msgContext.includes('short break')
+      )
+        return true
+      if (
+        status === 'running' &&
+        mode === 'longBreak' &&
+        msgContext.includes('long break')
+      )
+        return true
       if (status === 'paused' && msgContext.includes('paused')) return true
-      if (status === 'idle' && remainingSeconds === 0 && msgContext.includes('finished')) return true
-      if (status === 'idle' && remainingSeconds > 0 && msgContext.includes('ready to start')) return true
-      
+      if (
+        status === 'idle' &&
+        remainingSeconds === 0 &&
+        msgContext.includes('finished')
+      )
+        return true
+      if (
+        status === 'idle' &&
+        remainingSeconds > 0 &&
+        msgContext.includes('ready to start')
+      )
+        return true
+
       return false
     })
-    
+
     // If no exact match, return a random recent message
     return matchingMessage || aiMessages[0] || null
   }, [useAIMessages, aiMessages, status, mode, remainingSeconds])
@@ -91,11 +114,11 @@ export function CatMessage() {
               {getMessage()}
             </p>
             {getAIMessage && (
-              <div className="flex-shrink-0 mt-0.5" title="AI-generated message">
-                <Sparkles 
-                  size={14} 
-                  className="text-blue-500 animate-pulse" 
-                />
+              <div
+                className="flex-shrink-0 mt-0.5"
+                title="AI-generated message"
+              >
+                <Sparkles size={14} className="text-blue-500 animate-pulse" />
               </div>
             )}
           </div>

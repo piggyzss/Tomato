@@ -32,12 +32,14 @@ export default function AICatMessages({
   isGenerating,
   generatedMessage: _generatedMessage,
   setIsGenerating,
-  setGeneratedMessage: _setGeneratedMessage
+  setGeneratedMessage: _setGeneratedMessage,
 }: AICatMessagesProps) {
   const { theme, language } = useSettingsStore()
   const { status, remainingSeconds } = useTimerStore()
   const { currentTaskId, tasks } = useTaskStore()
-  const [selectedMessageLanguage, setSelectedMessageLanguage] = useState<'zh-CN' | 'en-US' | 'ja-JP'>(language)
+  const [selectedMessageLanguage, setSelectedMessageLanguage] = useState<
+    'zh-CN' | 'en-US' | 'ja-JP'
+  >(language)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
   const [userInput, setUserInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -75,7 +77,9 @@ export default function AICatMessages({
     if (!userInput.trim() || isGenerating) return
 
     if (!aiSession) {
-      alert('AI Session not available. Please check:\n1. Chrome flags are enabled\n2. Using Chrome Canary 127+\n3. Extension has proper permissions')
+      alert(
+        'AI Session not available. Please check:\n1. Chrome flags are enabled\n2. Using Chrome Canary 127+\n3. Extension has proper permissions'
+      )
       return
     }
 
@@ -83,7 +87,7 @@ export default function AICatMessages({
       id: crypto.randomUUID(),
       role: 'user',
       content: userInput.trim(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
 
     // Add user message to chat
@@ -93,20 +97,22 @@ export default function AICatMessages({
 
     try {
       // Create context for AI
-      const taskContext = currentTask 
-        ? `The user is currently working on a task: "${currentTask.title}"` 
+      const taskContext = currentTask
+        ? `The user is currently working on a task: "${currentTask.title}"`
         : 'The user has no active task selected'
-      
-      const timerContext = status === 'running' 
-        ? `Timer is running with ${Math.floor(remainingSeconds / 60)} minutes remaining in this Pomodoro session`
-        : status === 'paused'
-        ? 'Timer is paused - the user is taking a break'
-        : 'Timer is idle - ready to start a new session'
+
+      const timerContext =
+        status === 'running'
+          ? `Timer is running with ${Math.floor(remainingSeconds / 60)} minutes remaining in this Pomodoro session`
+          : status === 'paused'
+            ? 'Timer is paused - the user is taking a break'
+            : 'Timer is idle - ready to start a new session'
 
       // Create conversation context from recent messages
-      const recentMessages = chatHistory.slice(-3).map(msg => 
-        `${msg.role}: ${msg.content}`
-      ).join('\n')
+      const recentMessages = chatHistory
+        .slice(-3)
+        .map(msg => `${msg.role}: ${msg.content}`)
+        .join('\n')
 
       const systemPrompt = `You are a cute, encouraging cat companion for a Pomodoro timer app. 
 Current context: ${taskContext}. ${timerContext}.
@@ -122,12 +128,12 @@ Be helpful with productivity advice, encourage breaks when needed, and maintain 
 Keep responses concise but meaningful.`
 
       const response = await aiSession.prompt(systemPrompt)
-      
+
       const aiMessage: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
         content: response,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
 
       setChatHistory(prev => [...prev, aiMessage])
@@ -136,8 +142,9 @@ Keep responses concise but meaningful.`
       const errorMessage: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'Oops! I had trouble understanding that. Could you try again? 🐱',
-        timestamp: Date.now()
+        content:
+          'Oops! I had trouble understanding that. Could you try again? 🐱',
+        timestamp: Date.now(),
       }
       setChatHistory(prev => [...prev, errorMessage])
     } finally {
@@ -160,11 +167,11 @@ Keep responses concise but meaningful.`
   return (
     <div className="flex flex-col h-full">
       {/* Fixed Header */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center gap-3 py-3">
           <button
             onClick={onBack}
@@ -174,7 +181,9 @@ Keep responses concise but meaningful.`
             <ArrowLeft size={18} className="text-white/90" />
           </button>
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">🐱 Chat with Cat</h1>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              🐱 Chat with Cat
+            </h1>
             <p className="text-white/70 text-xs">Your AI companion</p>
           </div>
           {chatHistory.length > 0 && (
@@ -192,7 +201,11 @@ Keep responses concise but meaningful.`
         <div className="bg-black/20 rounded-lg p-3 mb-3">
           <select
             value={selectedMessageLanguage}
-            onChange={(e) => setSelectedMessageLanguage(e.target.value as 'zh-CN' | 'en-US' | 'ja-JP')}
+            onChange={e =>
+              setSelectedMessageLanguage(
+                e.target.value as 'zh-CN' | 'en-US' | 'ja-JP'
+              )
+            }
             className="w-full p-2 rounded-md bg-black/30 border border-white/20 text-white text-xs"
           >
             <option value="en-US">🇺🇸 English</option>
@@ -207,13 +220,15 @@ Keep responses concise but meaningful.`
         {chatHistory.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-3">🐱</div>
-            <p className="text-white/70 text-sm mb-2">Hello! I'm your cat companion!</p>
+            <p className="text-white/70 text-sm mb-2">
+              Hello! I'm your cat companion!
+            </p>
             <p className="text-white/50 text-xs">
               Ask me anything about productivity, take breaks, or just chat!
             </p>
           </div>
         ) : (
-          chatHistory.map((message) => (
+          chatHistory.map(message => (
             <div
               key={message.id}
               className={`flex gap-3 ${
@@ -236,7 +251,7 @@ Keep responses concise but meaningful.`
                 <div className="text-xs opacity-60 mt-1">
                   {new Date(message.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
                   })}
                 </div>
               </div>
@@ -248,7 +263,7 @@ Keep responses concise but meaningful.`
             </div>
           ))
         )}
-        
+
         {/* Typing Indicator */}
         {isGenerating && (
           <div className="flex gap-3 justify-start">
@@ -258,13 +273,19 @@ Keep responses concise but meaningful.`
             <div className="bg-black/30 text-white border border-white/10 p-3 rounded-lg">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                <div
+                  className="w-2 h-2 bg-white/60 rounded-full animate-pulse"
+                  style={{ animationDelay: '0.2s' }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-white/60 rounded-full animate-pulse"
+                  style={{ animationDelay: '0.4s' }}
+                ></div>
               </div>
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -273,7 +294,7 @@ Keep responses concise but meaningful.`
         <div className="flex gap-2">
           <textarea
             value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
+            onChange={e => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
             disabled={isGenerating || !aiSession}
@@ -289,13 +310,13 @@ Keep responses concise but meaningful.`
             <Send size={18} />
           </button>
         </div>
-        
+
         {!aiSession && (
           <p className="text-xs text-red-400 mt-2">
             AI not available. Please check Chrome flags and permissions.
           </p>
         )}
-        
+
         <p className="text-xs text-white/50 mt-2">
           Press Enter to send • Shift+Enter for new line
         </p>

@@ -47,7 +47,9 @@ function App() {
     setTotalSeconds(workDuration * 60)
   }, [workDuration, setTotalSeconds])
 
-  const [activePanel, setActivePanel] = useState<'settings' | 'analysis' | 'ai' | null>(null)
+  const [activePanel, setActivePanel] = useState<
+    'settings' | 'analysis' | 'ai' | null
+  >(null)
   const [isClosing, setIsClosing] = useState(false)
 
   function setSettingsPanel(e: React.MouseEvent) {
@@ -75,10 +77,11 @@ function App() {
 
   return (
     <div
-      className={`h-screen flex flex-col transition-colors duration-300 ${theme === 'dark'
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800'
-        : 'bg-tomato'
-        }`}
+      className={`h-screen flex flex-col transition-colors duration-300 ${
+        theme === 'dark'
+          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
+          : 'bg-tomato'
+      }`}
     >
       {/* Fixed Top Section */}
       <div className="flex-shrink-0 max-w-2xl mx-auto w-full pt-6">
@@ -89,10 +92,11 @@ function App() {
 
         {/* Timer Card - full width, no outer padding */}
         <div
-          className={`py-8 px-6 mb-5 transition-colors duration-300 ${theme === 'dark'
-            ? 'bg-gray-800/80 backdrop-blur border-y border-gray-700'
-            : 'bg-tomato-light/30'
-            }`}
+          className={`py-8 px-6 mb-5 transition-colors duration-300 ${
+            theme === 'dark'
+              ? 'bg-gray-800/80 backdrop-blur border-y border-gray-700'
+              : 'bg-tomato-light/30'
+          }`}
         >
           {/* Timer Display */}
           <TimerPage />
@@ -112,30 +116,33 @@ function App() {
           <button
             onClick={setSettingsPanel}
             id="settings-button"
-            className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-tomato hover:bg-black/20 text-white'
-              }`}
+            className={`p-2 rounded-lg transition-all duration-300 ${
+              theme === 'dark'
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-tomato hover:bg-black/20 text-white'
+            }`}
           >
             <Settings size={20} />
           </button>
 
           <button
             onClick={setAnalysisPanel}
-            className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-tomato hover:bg-black/20 text-white'
-              }`}
+            className={`p-2 rounded-lg transition-all duration-300 ${
+              theme === 'dark'
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-tomato hover:bg-black/20 text-white'
+            }`}
           >
             <BarChart3 className="w-5 h-5" />
             {/* <span className="ml-2">分析</span> */}
           </button>
           <button
             onClick={setAIPanel}
-            className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-tomato hover:bg-black/20 text-white'
-              }`}
+            className={`p-2 rounded-lg transition-all duration-300 ${
+              theme === 'dark'
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-tomato hover:bg-black/20 text-white'
+            }`}
           >
             <Bot className="w-5 h-5" />
             {/* <span className="ml-2">分析</span> */}
@@ -144,8 +151,9 @@ function App() {
 
         {/* Footer */}
         <div
-          className={`text-center mt-6 mb-4 text-sm font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-white/50'
-            }`}
+          className={`text-center mt-6 mb-4 text-sm font-medium transition-colors duration-300 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-white/50'
+          }`}
         >
           Tomato Cat v0.1.0
         </div>
@@ -159,7 +167,7 @@ function App() {
             top: 'auto',
             bottom: '120px',
             height: 'calc(100vh - 220px)',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         >
           {/* Settings Panel */}
@@ -169,17 +177,19 @@ function App() {
               animation: isClosing
                 ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
                 : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              pointerEvents: 'auto'
+              pointerEvents: 'auto',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
-            <SettingsPanel onClose={() => {
-              setIsClosing(true)
-              setTimeout(() => {
-                setActivePanel(null)
-                setIsClosing(false)
-              }, 300)
-            }} />
+            <SettingsPanel
+              onClose={() => {
+                setIsClosing(true)
+                setTimeout(() => {
+                  setActivePanel(null)
+                  setIsClosing(false)
+                }, 300)
+              }}
+            />
           </div>
         </div>
       )}
@@ -192,7 +202,7 @@ function App() {
             top: 'auto',
             bottom: '120px',
             height: 'calc(100vh - 220px)',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         >
           {/* Analysis Panel */}
@@ -202,17 +212,19 @@ function App() {
               animation: isClosing
                 ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
                 : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              pointerEvents: 'auto'
+              pointerEvents: 'auto',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
-            <Analysis onClose={() => {
-              setIsClosing(true)
-              setTimeout(() => {
-                setActivePanel(null)
-                setIsClosing(false)
-              }, 300)
-            }} />
+            <Analysis
+              onClose={() => {
+                setIsClosing(true)
+                setTimeout(() => {
+                  setActivePanel(null)
+                  setIsClosing(false)
+                }, 300)
+              }}
+            />
           </div>
         </div>
       )}
@@ -225,7 +237,7 @@ function App() {
             top: 'auto',
             bottom: '120px',
             height: 'calc(100vh - 220px)',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         >
           {/* AI Panel */}
@@ -235,17 +247,19 @@ function App() {
               animation: isClosing
                 ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
                 : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              pointerEvents: 'auto'
+              pointerEvents: 'auto',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
-            <AI onClose={() => {
-              setIsClosing(true)
-              setTimeout(() => {
-                setActivePanel(null)
-                setIsClosing(false)
-              }, 300)
-            }} />
+            <AI
+              onClose={() => {
+                setIsClosing(true)
+                setTimeout(() => {
+                  setActivePanel(null)
+                  setIsClosing(false)
+                }, 300)
+              }}
+            />
           </div>
         </div>
       )}

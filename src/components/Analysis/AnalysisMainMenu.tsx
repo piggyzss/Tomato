@@ -7,7 +7,10 @@ interface AnalysisMainMenuProps {
   onNavigate: (view: AnalysisView) => void
 }
 
-export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMenuProps) {
+export default function AnalysisMainMenu({
+  onClose,
+  onNavigate,
+}: AnalysisMainMenuProps) {
   const { theme } = useSettingsStore()
 
   // Analysis menu configuration
@@ -31,15 +34,19 @@ export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMe
   return (
     <div>
       {/* Fixed Header with Close Button */}
-      <div className={`sticky top-0 z-10 pb-3 ${
-        theme === 'dark'
-          ? 'bg-gray-900'
-          : 'bg-[#D84848]'
-      }`}>
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
         <div className="flex items-center justify-between py-3">
           <div className="flex-1 text-left">
-            <h1 className="text-base font-bold text-white mb-0.5">📊 Analysis</h1>
-            <p className="text-white/70 text-xs">Insights into your productivity</p>
+            <h1 className="text-base font-bold text-white mb-0.5">
+              📊 Analysis
+            </h1>
+            <p className="text-white/70 text-xs">
+              Insights into your productivity
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -66,7 +73,9 @@ export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMe
                   <Icon size={18} color="white" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-semibold text-sm text-white">{feature.title}</div>
+                  <div className="font-semibold text-sm text-white">
+                    {feature.title}
+                  </div>
                   <div className="text-xs text-white/70">
                     {feature.description}
                   </div>
