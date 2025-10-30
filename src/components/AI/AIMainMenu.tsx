@@ -1,11 +1,12 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { ArrowLeft, MessageCircle, BarChart3, X } from 'lucide-react'
+import { ArrowLeft, MessageCircle, BarChart3, Cat, X } from 'lucide-react'
 import { useState } from 'react'
 import AICatMessages from './AICatMessages'
 import AIDailySummary from './AIDailySummary'
+import ChatCat from './ChatCat'
 
 // AI feature menu type
-type AIView = 'menu' | 'catMessages' | 'dailySummary'
+type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'chatCat'
 
 interface AIMainMenuProps {
   onClose?: () => void
@@ -18,6 +19,11 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
   const [currentView, setCurrentView] = useState<AIView>('menu')
   const [nextView, setNextView] = useState<AIView | null>(null)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left')
+
+  // Navigation function that can be passed to child components
+  const navigateToView = (view: AIView) => {
+    handleViewChange(view)
+  }
 
   const handleViewChange = (view: AIView) => {
     if (nextView !== null) return // 防止动画期间多次点击
@@ -48,6 +54,13 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
       description: 'AI-powered productivity insights',
       icon: BarChart3,
       color: 'bg-blue-500',
+    },
+    {
+      id: 'chatCat' as AIView,
+      title: 'Chat Cat',
+      description: 'Interactive AI chat companion',
+      icon: Cat,
+      color: 'bg-green-500',
     },
   ]
 
@@ -149,7 +162,7 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
       </div>
 
       <div className="mt-4">
-        <AICatMessages />
+        <AICatMessages onNavigate={navigateToView} />
       </div>
     </div>
   )
@@ -188,6 +201,40 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
     </div>
   )
 
+  // Render Chat Cat
+  const renderChatCat = () => (
+    <div>
+      {/* Fixed Header */}
+      <div
+        className={`sticky top-0 z-10 pb-3 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
+      >
+        <div className="flex items-center gap-3 py-3">
+          <button
+            onClick={() => handleViewChange('menu')}
+            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            title="Back"
+          >
+            <ArrowLeft size={18} className="text-white/90" />
+          </button>
+          <div className="flex-1 text-left">
+            <h1 className="text-base font-bold text-white mb-0.5">
+              Chat Cat
+            </h1>
+            <p className="text-white/70 text-xs">
+              Interactive AI chat companion
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <ChatCat />
+      </div>
+    </div>
+  )
+
   return (
     <div className="h-full overflow-hidden relative">
       {/* 只渲染一个视图，使用 key 强制重新挂载 */}
@@ -204,6 +251,7 @@ export default function AIMainMenu({ onClose }: AIMainMenuProps) {
         {(nextView || currentView) === 'menu' && renderMainMenu()}
         {(nextView || currentView) === 'catMessages' && renderCatMessages()}
         {(nextView || currentView) === 'dailySummary' && renderDailySummary()}
+        {(nextView || currentView) === 'chatCat' && renderChatCat()}
       </div>
     </div>
   )
