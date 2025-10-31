@@ -1,6 +1,6 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useTaskStore } from '@/store/useTaskStore'
-import { getStorage, onStorageChange, setStorage } from '@/utils/storage'
+import { onStorageChange, setStorage, getMultipleStorage } from '@/utils/storage'
 import { useEffect } from 'react'
 
 /**
@@ -14,9 +14,9 @@ export function useStorage() {
   // 初始化加载数据
   useEffect(() => {
     const loadData = async () => {
-      const [savedTasks, savedSettings] = await Promise.all([
-        getStorage('tasks'),
-        getStorage('settings'),
+      const { tasks: savedTasks, settings: savedSettings } = await getMultipleStorage([
+        'tasks',
+        'settings',
       ])
 
       if (savedTasks) {

@@ -69,6 +69,40 @@ export async function clearStorage(): Promise<void> {
   }
 }
 
+// 批量获取存储数据
+export async function getMultipleStorage<K extends keyof StorageData>(
+  keys: K[]
+): Promise<{ [P in K]: StorageData[P] | undefined }> {
+  try {
+    const results = await Promise.all(keys.map(key => getStorage(key)))
+    const resultObj = {} as { [P in K]: StorageData[P] | undefined }
+    keys.forEach((key, index) => {
+      resultObj[key] = results[index]
+    })
+    return resultObj
+  } catch (error) {
+    console.error('Error reading multiple storage keys:', error)
+    const resultObj = {} as { [P in K]: StorageData[P] | undefined }
+    keys.forEach(key => {
+      resultObj[key] = defaultData[key]
+    })
+    return resultObj
+  }
+}
+
+// 批量设置存储数据
+export async function setMultipleStorage(
+  data: Partial<StorageData>
+): Promise<void> {
+  try {
+    // chrome.storage.local.set 本身就支持一次性设置多个键值对
+    await chrome.storage.local.set(data)
+  } catch (error) {
+    console.error('Error writing multiple storage keys:', error)
+    throw error
+  }
+}
+
 // 监听存储变化
 export function onStorageChange(
   callback: (changes: { [key: string]: chrome.storage.StorageChange }) => void

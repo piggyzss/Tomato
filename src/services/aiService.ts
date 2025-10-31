@@ -1,9 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-
-/**
- * AI 提供商类型
- */
-export type AIProvider = 'builtin' | 'cloud'
+import type { AIProvider } from '@/types'
 
 /**
  * AI 会话配置
@@ -89,12 +85,12 @@ class CloudAISession implements IAISession {
             return response.text()
         } catch (error: any) {
             console.error('Cloud AI prompt error:', error)
-            
+
             // 提供更详细的错误信息
             if (error?.message?.includes('404') || error?.message?.includes('not found')) {
                 throw new Error('模型不可用。请检查：1) API Key 是否有效 2) 是否有权限访问 Gemini API 3) 建议使用 Chrome 内置 AI')
             }
-            
+
             throw new Error('云端 AI 生成失败：' + (error?.message || '未知错误'))
         }
     }

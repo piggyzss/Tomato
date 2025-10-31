@@ -5,8 +5,7 @@ import AICatMessages from './AICatMessages'
 import AIDailySummary from './AIDailySummary'
 import AIConfiguration from './AIConfiguration'
 import AISettings from './AISettings'
-
-type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
+import type { AIView } from '@/types'
 
 interface AIProps {
   onClose?: () => void
@@ -50,9 +49,8 @@ export default function AI({ onClose }: AIProps) {
 
   return (
     <div
-      className={`rounded-xl shadow-2xl overflow-hidden relative ${
-        theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
-      }`}
+      className={`rounded-xl shadow-2xl overflow-hidden relative ${theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
       style={{
         height: 'calc(100vh - 240px)',
         maxHeight: '600px',
@@ -84,8 +82,8 @@ export default function AI({ onClose }: AIProps) {
               />
             )}
             {currentView === 'apiDemo' && (
-              <AIConfiguration 
-                onBack={() => setCurrentView('menu')} 
+              <AIConfiguration
+                onBack={() => setCurrentView('menu')}
                 onOpenSettings={() => setCurrentView('settings')}
               />
             )}

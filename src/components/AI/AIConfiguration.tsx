@@ -6,17 +6,17 @@ import { getStorage, setStorage } from '@/utils/storage'
 import BuiltInAIConfiguration from './BuiltInAIConfiguration'
 import CloudAIConfiguration from './CloudAIConfiguration'
 import { ModalWithBack } from '@/components/Common'
+import type { AIMode, AIAvailability, AIProvider } from '@/types'
 
 interface AIAPIDemoProps {
   onBack: () => void
   onOpenSettings: () => void
 }
 
-type AIMode = 'builtin' | 'cloud'
-
 export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoProps) {
-  const [mode, setMode] = useState<AIMode>('builtin')
-  const [builtInAvailable, setBuiltInAvailable] = useState<'checking' | 'ready' | 'unavailable'>('checking')
+  const [mode, setMode] = useState<AIMode>('cloud')
+  const [builtInAvailable, setBuiltInAvailable] = useState<AIAvailability>('checking')
+  const [actualProvider, setActualProvider] = useState<AIProvider | null>(null)
 
   const {
     status,
@@ -34,7 +34,18 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
       if (savedMode) {
         setMode(savedMode)
         aiService.setModePreference(savedMode)
+      } else {
+        // 如果没有保存的偏好，使用默认值
+        const defaultMode = 'cloud'
+        setMode(defaultMode)
+        aiService.setModePreference(defaultMode)
+        await setStorage('aiModePreference', defaultMode)
       }
+      
+      // 检查实际可用的 provider
+      const available = await aiService.getAvailableProvider()
+      setActualProvider(available)
+      console.log('AI 模式偏好:', savedMode || 'cloud', '实际可用:', available)
     }
     loadPreference()
   }, [])
@@ -65,6 +76,11 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
     setMode(newMode)
     aiService.setModePreference(newMode)
     await setStorage('aiModePreference', newMode)
+    
+    // 重新检查实际可用的 provider
+    const available = await aiService.getAvailableProvider()
+    setActualProvider(available)
+    console.log('切换 AI 模式到:', newMode, '实际可用:', available)
   }
 
   return (
@@ -102,12 +118,46 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
           </button>
         </div>
 
-        {/* Info - Always visible */}
+        {/* Status Info */}
+        <div className="p-3 bg-white/5 rounded-lg text-xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold">当前状态</span>
+            {actualProvider && (
+              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                actualProvider === 'builtin' 
+                  ? 'bg-green-500/20 text-green-300'
+                  : 'bg-blue-500/20 text-blue-300'
+              }`}>
+                {actualProvider === 'builtin' ? '使用内置 AI' : '使用云端 AI'}
+              </span>
+            )}
+          </div>
+          <div className="space-y-1 opacity-80">
+            <div>• 偏好设置: {mode === 'builtin' ? 'Chrome 内置 AI' : 'Chrome 云端 AI'}</div>
+            <div>• 内置 AI: {builtInAvailable === 'ready' ? '✅ 可用' : builtInAvailable === 'checking' ? '⏳ 检查中' : '❌ 不可用'}</div>
+            <div>• 云端 AI: {cloudAvailable ? '✅ 已配置' : '❌ 未配置'}</div>
+          </div>
+        </div>
+        
+        {/* Warning if preference doesn't match actual */}
+        {actualProvider && actualProvider !== mode && (
+          <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs text-yellow-200">
+            <div className="font-semibold mb-1">⚠️ 自动降级</div>
+            <div>
+              {mode === 'builtin' 
+                ? '内置 AI 不可用，已自动切换到云端 AI'
+                : '云端 AI 未配置，已自动切换到内置 AI'
+              }
+            </div>
+          </div>
+        )}
+        
+        {/* Info */}
         <div className="p-3 bg-white/5 rounded-lg text-xs opacity-80">
           <div className="font-semibold mb-1">💡 智能切换</div>
           <div className="space-y-1">
-            <div>• 优先使用内置 AI（免费、快速、隐私）</div>
-            <div>• 自动降级到云端 AI（需要 API Key）</div>
+            <div>• 优先使用你选择的 AI 模式</div>
+            <div>• 如果不可用，自动降级到备用模式</div>
             <div>• 统一的接口，无缝切换</div>
           </div>
         </div>

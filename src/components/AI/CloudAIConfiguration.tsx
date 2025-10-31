@@ -1,11 +1,12 @@
 import { Sparkles, Settings as SettingsIcon } from 'lucide-react'
+import type { AIStatus, AIProvider, AIAvailability } from '@/types'
 
 interface CloudAIConfigurationProps {
-  status: 'checking' | 'ready' | 'unavailable' | 'error'
-  provider?: 'builtin' | 'cloud' | null
+  status: AIStatus
+  provider?: AIProvider | null
   error?: string | null
   cloudAvailable: boolean
-  builtInAvailable: 'checking' | 'ready' | 'unavailable'
+  builtInAvailable: AIAvailability
   onOpenSettings: () => void
 }
 
@@ -67,9 +68,8 @@ export default function CloudAIConfiguration({
 
           {/* Availability Status */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className={`p-2 rounded-lg ${
-              builtInAvailable === 'ready' ? 'bg-green-500/20' : 'bg-gray-500/20'
-            }`}>
+            <div className={`p-2 rounded-lg ${builtInAvailable === 'ready' ? 'bg-green-500/20' : 'bg-gray-500/20'
+              }`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles size={14} />
                 <span className="font-medium">内置 AI</span>
@@ -78,9 +78,8 @@ export default function CloudAIConfiguration({
                 {builtInAvailable === 'ready' ? '✅ 可用' : '❌ 不可用'}
               </div>
             </div>
-            <div className={`p-2 rounded-lg ${
-              cloudAvailable ? 'bg-green-500/20' : 'bg-gray-500/20'
-            }`}>
+            <div className={`p-2 rounded-lg ${cloudAvailable ? 'bg-green-500/20' : 'bg-gray-500/20'
+              }`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles size={14} />
                 <span className="font-medium">云端 AI</span>

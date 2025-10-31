@@ -3,9 +3,8 @@ import { useState } from 'react'
 import AnalysisMainMenu from './AnalysisMainMenu'
 import TaskFinishRate from './TaskFinishRate'
 import TotalTime from './TotalTime'
-
-// Analysis view navigation type
-export type AnalysisView = 'menu' | 'taskFinishRate' | 'totalTime'
+import HistoryView from './HistoryView'
+import type { AnalysisView } from '@/types'
 
 interface AnalysisProps {
   onClose?: () => void
@@ -44,6 +43,11 @@ export default function Analysis({ onClose }: AnalysisProps) {
           )}
           {currentView === 'totalTime' && (
             <TotalTime
+              onBack={() => setCurrentView('menu')}
+            />
+          )}
+          {currentView === 'history' && (
+            <HistoryView
               onBack={() => setCurrentView('menu')}
             />
           )}

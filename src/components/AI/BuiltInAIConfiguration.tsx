@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { aiService } from '@/services/aiService'
+import type { AIAvailability } from '@/types'
 
 // 可用性检查组件
 function AvailabilityCheck() {
@@ -40,7 +41,7 @@ function AvailabilityCheck() {
 }
 
 interface BuiltInAIConfigurationProps {
-    builtInAvailable: 'checking' | 'ready' | 'unavailable'
+    builtInAvailable: AIAvailability
 }
 
 export default function BuiltInAIConfiguration({ builtInAvailable }: BuiltInAIConfigurationProps) {

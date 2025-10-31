@@ -1,6 +1,7 @@
 import { useTaskStore } from '@/store/useTaskStore'
 import { useTimerStore } from '@/store/useTimerStore'
 import { formatTime } from '@/utils/time'
+import { getStorage, setStorage } from '@/utils/storage'
 import { TimerReset, Play, Pause } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -36,8 +37,8 @@ export function BigTimer() {
     if (hasLoadedRef.current) return
     hasLoadedRef.current = true
 
-    chrome.storage.local.get(['timerState'], result => {
-      const savedState = result.timerState as TimerPersistState | undefined
+    const loadTimerState = async () => {
+      const savedState = await getStorage('timerState') as TimerPersistState | undefined
       console.log('Loading timer state:', savedState)
 
       if (savedState && savedState.status === 'running') {
@@ -59,7 +60,9 @@ export function BigTimer() {
           setCurrentTask(savedState.currentTaskId)
         }
       }
-    })
+    }
+
+    loadTimerState()
 
     // 清理函数：组件卸载时不重置 hasLoadedRef
     return () => {
@@ -69,7 +72,7 @@ export function BigTimer() {
 
   // 保存状态到 chrome.storage
   const saveTimerState = (state: TimerPersistState) => {
-    chrome.storage.local.set({ timerState: state })
+    setStorage('timerState', state)
   }
 
   // 倒计时逻辑和任务时间记录

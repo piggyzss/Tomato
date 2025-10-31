@@ -1,5 +1,72 @@
 # 更新日志
 
+## v0.2.0 - 2024-10-31
+
+### 🎉 新功能
+
+#### 历史数据管理
+- ✅ 自动每日归档：每天零点自动归档当天数据并重置
+- ✅ 历史数据存储：保留最近 90 天的历史记录
+- ✅ 历史数据查看：在分析面板中查看过往表现
+- ✅ 跨天检测：启动时自动检测并处理跨天情况
+- ✅ 调试按钮：手动触发归档和重置（用于测试）
+- ✅ 计时器重置：归档时自动重置计时器状态到初始状态
+
+#### AI 模式管理优化
+- ✅ 修复 aiModePreference 值不正确的问题
+- ✅ 首次安装时智能设置默认 AI 模式
+- ✅ 启动时自动同步 AI 配置到服务
+- ✅ 显示实际使用的 AI provider
+- ✅ 自动降级提示和警告
+
+### 🔧 技术改进
+
+#### 数据结构
+- 新增 `DailyHistory` 类型定义
+- 扩展 `StorageData` 支持历史数据和重置日期
+- 添加 `unlimitedStorage` 权限支持更大存储
+- 优化 `DailyHistory` 结构，删除冗余的 `statistics.date` 字段
+- 为所有核心类型添加详细的 JSDoc 注释（Task, PomodoroRecord, Statistics 等）
+
+#### 核心模块
+- 新增 `historyManager.ts` 历史数据管理工具
+- 更新 `background/index.ts` 支持每日定时任务
+- 更新 `App.tsx` 支持跨天检测和 AI 初始化
+- 更新 `AIConfiguration.tsx` 显示实际 AI 状态
+
+#### 新组件
+- `HistoryView.tsx`: 历史数据查看组件
+- 更新 `AnalysisMainMenu.tsx`: 添加历史记录入口
+
+### 📝 文档
+- 新增 `HISTORY_MANAGEMENT.md`: 历史数据管理功能文档
+- 新增 `TYPE_DEFINITIONS.md`: 详细的类型定义文档
+- 新增 `DEBUG_RESET_ISSUE.md`: 重置功能调试指南
+- 新增 `TESTING_RESET.md`: 重置功能测试指南
+- 更新 `CHANGELOG.md`: 更新日志
+
+### 🐛 Bug 修复
+- 修复 AI 模式偏好设置不生效的问题
+- 修复 AI 模式与实际使用不一致的问题
+- 修复首次安装时缺少默认配置的问题
+
+### 🎨 UI 改进
+- 添加调试重置按钮（橙色，带旋转图标）
+- AI 配置页面显示当前状态和实际 provider
+- 历史记录页面美化，支持日期格式化
+
+---
+
+## v0.1.0 - 2024-10-30
+
+### 初始版本
+- 番茄钟计时器
+- 任务管理
+- AI 助手集成
+- 数据分析
+- 主题切换
+- 多语言支持
+
 所有重要的项目变更都会记录在这个文件中。
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，

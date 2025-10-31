@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { aiService, AIProvider, AISessionConfig, IAISession } from '@/services/aiService'
-
-/**
- * AI 状态
- */
-export type AIStatus = 'checking' | 'ready' | 'unavailable' | 'error'
+import { aiService, AISessionConfig, IAISession } from '@/services/aiService'
+import type { AIProvider, AIStatus } from '@/types'
 
 /**
  * useAI Hook 返回值

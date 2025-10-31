@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-
-export type TimerMode = 'pomodoro' | 'shortBreak' | 'longBreak'
+import type { TimerMode } from '@/types'
 
 interface ModeSelectorProps {
   mode: TimerMode
