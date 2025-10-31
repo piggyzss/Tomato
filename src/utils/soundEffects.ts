@@ -5,7 +5,8 @@ import type { SoundType } from '@/types'
  */
 export function playSoundEffect(type: SoundType): void {
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const audioContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)()
 
     switch (type) {
       case 'ding':
@@ -51,7 +52,10 @@ function playDing(audioContext: AudioContext): void {
   oscillator.type = 'sine'
 
   gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioContext.currentTime + 0.3
+  )
 
   oscillator.start(audioContext.currentTime)
   oscillator.stop(audioContext.currentTime + 0.3)
@@ -103,7 +107,10 @@ function playChord(audioContext: AudioContext): void {
     oscillator.type = 'sine'
 
     gainNode.gain.setValueAtTime(0.15, audioContext.currentTime)
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+    gainNode.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioContext.currentTime + 0.5
+    )
 
     oscillator.start(audioContext.currentTime)
     oscillator.stop(audioContext.currentTime + 0.5)
@@ -169,7 +176,10 @@ function playWaterDrop(audioContext: AudioContext): void {
   oscillator.type = 'sine'
 
   gainNode.gain.setValueAtTime(0.5, audioContext.currentTime)
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1)
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioContext.currentTime + 0.1
+  )
 
   oscillator.start(audioContext.currentTime)
   oscillator.stop(audioContext.currentTime + 0.1)
@@ -181,7 +191,11 @@ function playWaterDrop(audioContext: AudioContext): void {
 function playKnock(audioContext: AudioContext): void {
   // 使用短促的白噪声模拟敲击声
   const bufferSize = audioContext.sampleRate * 0.05
-  const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate)
+  const buffer = audioContext.createBuffer(
+    1,
+    bufferSize,
+    audioContext.sampleRate
+  )
   const data = buffer.getChannelData(0)
 
   // 生成白噪声

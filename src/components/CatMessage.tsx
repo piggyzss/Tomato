@@ -6,9 +6,11 @@ import { useMemo, useState, useEffect } from 'react'
 import { playSoundEffect } from '@/utils/soundEffects'
 
 export function CatMessage() {
-  const { status, remainingSeconds, mode, timerFinished, setTimerFinished } = useTimerStore()
+  const { status, remainingSeconds, mode, timerFinished, setTimerFinished } =
+    useTimerStore()
   const { currentTaskId, tasks } = useTaskStore()
-  const { useAIMessages, aiMessages, soundEnabled, soundType } = useSettingsStore()
+  const { useAIMessages, aiMessages, soundEnabled, soundType } =
+    useSettingsStore()
   const [isShaking, setIsShaking] = useState(false)
 
   // 获取当前任务名称
@@ -32,8 +34,6 @@ export function CatMessage() {
     }
   }, [timerFinished, setTimerFinished, soundEnabled, soundType])
 
-
-
   // Find matching AI message based on context
   const getAIMessage = useMemo(() => {
     if (!useAIMessages || aiMessages.length === 0) return null
@@ -43,12 +43,37 @@ export function CatMessage() {
       const msgContext = msg.context.toLowerCase()
 
       // Simple keyword matching
-      if (status === 'running' && mode === 'pomodoro' && msgContext.includes('working')) return true
-      if (status === 'running' && mode === 'shortBreak' && msgContext.includes('short break')) return true
-      if (status === 'running' && mode === 'longBreak' && msgContext.includes('long break')) return true
+      if (
+        status === 'running' &&
+        mode === 'pomodoro' &&
+        msgContext.includes('working')
+      )
+        return true
+      if (
+        status === 'running' &&
+        mode === 'shortBreak' &&
+        msgContext.includes('short break')
+      )
+        return true
+      if (
+        status === 'running' &&
+        mode === 'longBreak' &&
+        msgContext.includes('long break')
+      )
+        return true
       if (status === 'paused' && msgContext.includes('paused')) return true
-      if (status === 'idle' && remainingSeconds === 0 && msgContext.includes('finished')) return true
-      if (status === 'idle' && remainingSeconds > 0 && msgContext.includes('ready to start')) return true
+      if (
+        status === 'idle' &&
+        remainingSeconds === 0 &&
+        msgContext.includes('finished')
+      )
+        return true
+      if (
+        status === 'idle' &&
+        remainingSeconds > 0 &&
+        msgContext.includes('ready to start')
+      )
+        return true
 
       return false
     })
@@ -96,7 +121,8 @@ export function CatMessage() {
   }
 
   // 判断是否应该显示呼吸效果
-  const shouldBreathe = status === 'running' && (mode === 'shortBreak' || mode === 'longBreak')
+  const shouldBreathe =
+    status === 'running' && (mode === 'shortBreak' || mode === 'longBreak')
 
   return (
     <>
@@ -143,11 +169,11 @@ export function CatMessage() {
                 {getMessage()}
               </p>
               {getAIMessage && (
-                <div className="flex-shrink-0 mt-0.5" title="AI-generated message">
-                  <Sparkles
-                    size={14}
-                    className="text-blue-500 animate-pulse"
-                  />
+                <div
+                  className="flex-shrink-0 mt-0.5"
+                  title="AI-generated message"
+                >
+                  <Sparkles size={14} className="text-blue-500 animate-pulse" />
                 </div>
               )}
             </div>

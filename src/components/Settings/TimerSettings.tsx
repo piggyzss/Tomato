@@ -6,8 +6,12 @@ import type { SettingsPageProps } from './types'
 import type { TimerMode } from '@/types'
 
 export default function TimerSettings({ onBack }: SettingsPageProps) {
-  const { workDuration, shortBreakDuration, longBreakDuration, updateSettings } =
-    useSettingsStore()
+  const {
+    workDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    updateSettings,
+  } = useSettingsStore()
 
   // Local state for editing timer settings
   const [selectedMode, setSelectedMode] = useState<TimerMode>('pomodoro')
@@ -110,7 +114,9 @@ export default function TimerSettings({ onBack }: SettingsPageProps) {
                   key={mode.id}
                   onClick={() => setSelectedMode(mode.id)}
                   className={`w-full p-4 rounded-xl transition-all ${
-                    selectedMode === mode.id ? 'bg-black/30' : 'bg-black/10 hover:bg-black/20'
+                    selectedMode === mode.id
+                      ? 'bg-black/30'
+                      : 'bg-black/10 hover:bg-black/20'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -119,7 +125,9 @@ export default function TimerSettings({ onBack }: SettingsPageProps) {
                     </div>
                     <div className="text-left">
                       <div className="font-semibold">{mode.label}</div>
-                      <div className="text-sm text-white/70">{mode.description}</div>
+                      <div className="text-sm text-white/70">
+                        {mode.description}
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -133,7 +141,9 @@ export default function TimerSettings({ onBack }: SettingsPageProps) {
           <h2 className="text-lg font-semibold mb-4">Set Duration</h2>
           <div className="bg-black/20 rounded-xl p-6">
             <div className="text-center mb-4">
-              <div className="text-4xl font-bold font-mono mb-2">{getCurrentDuration()} min</div>
+              <div className="text-4xl font-bold font-mono mb-2">
+                {getCurrentDuration()} min
+              </div>
               <div className="text-white/70">
                 {modes.find(m => m.id === selectedMode)?.label} Duration
               </div>
@@ -181,15 +191,21 @@ export default function TimerSettings({ onBack }: SettingsPageProps) {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>🍅 Pomodoro:</span>
-              <span className="font-mono">{tempDurations.workDuration} min</span>
+              <span className="font-mono">
+                {tempDurations.workDuration} min
+              </span>
             </div>
             <div className="flex justify-between">
               <span>☕ Short Break:</span>
-              <span className="font-mono">{tempDurations.shortBreakDuration} min</span>
+              <span className="font-mono">
+                {tempDurations.shortBreakDuration} min
+              </span>
             </div>
             <div className="flex justify-between">
               <span>🔄 Long Break:</span>
-              <span className="font-mono">{tempDurations.longBreakDuration} min</span>
+              <span className="font-mono">
+                {tempDurations.longBreakDuration} min
+              </span>
             </div>
           </div>
         </div>
@@ -206,7 +222,9 @@ export default function TimerSettings({ onBack }: SettingsPageProps) {
           <button
             onClick={handleSave}
             className={`flex-1 px-4 py-2 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${
-              showSaved ? 'bg-green-500 text-white' : 'bg-white text-tomato hover:bg-white/90'
+              showSaved
+                ? 'bg-green-500 text-white'
+                : 'bg-white text-tomato hover:bg-white/90'
             }`}
           >
             {showSaved ? (

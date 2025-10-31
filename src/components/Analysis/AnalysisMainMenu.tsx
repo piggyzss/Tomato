@@ -7,8 +7,10 @@ interface AnalysisMainMenuProps {
   onNavigate: (view: AnalysisView) => void
 }
 
-export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMenuProps) {
-
+export default function AnalysisMainMenu({
+  onClose,
+  onNavigate,
+}: AnalysisMainMenuProps) {
   // Analysis menu configuration
   const analysisMenu = [
     {
@@ -55,7 +57,9 @@ export default function AnalysisMainMenu({ onClose, onNavigate }: AnalysisMainMe
                   <Icon size={18} color="white" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-semibold text-sm text-white">{feature.title}</div>
+                  <div className="font-semibold text-sm text-white">
+                    {feature.title}
+                  </div>
                   <div className="text-xs text-white/70">
                     {feature.description}
                   </div>

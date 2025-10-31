@@ -54,7 +54,9 @@ export default function ThemeSettings({ onBack }: SettingsPageProps) {
                 key={themeOption.id}
                 onClick={() => handleThemeChange(themeOption.id)}
                 className={`w-full p-4 rounded-xl transition-all ${
-                  theme === themeOption.id ? 'bg-black/30' : 'bg-black/10 hover:bg-black/20'
+                  theme === themeOption.id
+                    ? 'bg-black/30'
+                    : 'bg-black/10 hover:bg-black/20'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -63,7 +65,9 @@ export default function ThemeSettings({ onBack }: SettingsPageProps) {
                   </div>
                   <div className="text-left">
                     <div className="font-semibold">{themeOption.name}</div>
-                    <div className="text-sm text-white/70">{themeOption.description}</div>
+                    <div className="text-sm text-white/70">
+                      {themeOption.description}
+                    </div>
                   </div>
                 </div>
               </button>
@@ -75,8 +79,12 @@ export default function ThemeSettings({ onBack }: SettingsPageProps) {
         <div className="mb-6 bg-black/20 rounded-xl p-4">
           <h3 className="font-semibold mb-3 text-center">Current Theme</h3>
           <div className="text-center">
-            <div className="text-3xl mb-2">{themes.find(t => t.id === theme)?.icon}</div>
-            <div className="font-semibold">{themes.find(t => t.id === theme)?.name}</div>
+            <div className="text-3xl mb-2">
+              {themes.find(t => t.id === theme)?.icon}
+            </div>
+            <div className="font-semibold">
+              {themes.find(t => t.id === theme)?.name}
+            </div>
             <div className="text-sm text-white/70">
               {themes.find(t => t.id === theme)?.description}
             </div>

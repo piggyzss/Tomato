@@ -7,11 +7,19 @@ import { ModalWithBack } from '@/components/Common'
 export default function SoundSettings({ onBack }: SettingsPageProps) {
   const { soundEnabled, soundType, updateSettings } = useSettingsStore()
 
-  const soundTypes: Array<{ id: SoundType; name: string; description: string }> = [
+  const soundTypes: Array<{
+    id: SoundType
+    name: string
+    description: string
+  }> = [
     { id: 'ding', name: '叮', description: 'Clear single tone' },
     { id: 'ding-dong', name: '叮咚', description: 'Two-tone chime' },
     { id: 'chord', name: '三音和弦', description: 'Harmonious chord' },
-    { id: 'victory', name: '游戏胜利音效', description: 'Ascending victory tune' },
+    {
+      id: 'victory',
+      name: '游戏胜利音效',
+      description: 'Ascending victory tune',
+    },
     { id: 'soft', name: '柔和通知音效', description: 'Gentle notification' },
     { id: 'water-drop', name: '水滴声', description: 'Water drop sound' },
     { id: 'knock', name: '敲击声', description: 'Knock sound' },
@@ -41,8 +49,12 @@ export default function SoundSettings({ onBack }: SettingsPageProps) {
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h3 className="font-semibold text-sm text-white mb-1">🔊 Sound Notifications</h3>
-              <p className="text-xs text-white/70">Play sound when timer completes</p>
+              <h3 className="font-semibold text-sm text-white mb-1">
+                🔊 Sound Notifications
+              </h3>
+              <p className="text-xs text-white/70">
+                Play sound when timer completes
+              </p>
             </div>
             <button
               onClick={handleSoundEnabledToggle}
@@ -60,7 +72,9 @@ export default function SoundSettings({ onBack }: SettingsPageProps) {
         </div>
 
         {/* Sound Type Selection */}
-        <div className={`transition-opacity ${soundEnabled ? 'opacity-100' : 'opacity-50'}`}>
+        <div
+          className={`transition-opacity ${soundEnabled ? 'opacity-100' : 'opacity-50'}`}
+        >
           <h2 className="text-lg font-semibold mb-4">Select Sound Type</h2>
           <div className="space-y-2">
             {soundTypes.map(sound => (
@@ -77,9 +91,13 @@ export default function SoundSettings({ onBack }: SettingsPageProps) {
                 <div className="flex items-center justify-between">
                   <div className="text-left">
                     <div className="font-semibold text-white">{sound.name}</div>
-                    <div className="text-xs text-white/70">{sound.description}</div>
+                    <div className="text-xs text-white/70">
+                      {sound.description}
+                    </div>
                   </div>
-                  {soundType === sound.id && <div className="text-white">✓</div>}
+                  {soundType === sound.id && (
+                    <div className="text-white">✓</div>
+                  )}
                 </div>
               </button>
             ))}
@@ -88,7 +106,9 @@ export default function SoundSettings({ onBack }: SettingsPageProps) {
 
         {/* Current Settings Summary */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-          <h3 className="font-semibold mb-3 text-center text-sm text-white">Current Settings</h3>
+          <h3 className="font-semibold mb-3 text-center text-sm text-white">
+            Current Settings
+          </h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-white/70">Sound Enabled:</span>

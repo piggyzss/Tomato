@@ -15,21 +15,24 @@ export function CurrentTask() {
   if (!currentTask) {
     return (
       <div
-        className={`flex items-center justify-between py-3 px-4 mb-5 w-full max-w-2xl mx-auto rounded-xl transition-all duration-300 ${theme === 'dark'
-          ? 'bg-gray-800/50 backdrop-blur border border-gray-700'
-          : 'bg-white/10 backdrop-blur'
-          }`}
+        className={`flex items-center justify-between py-3 px-4 mb-5 w-full max-w-2xl mx-auto rounded-xl transition-all duration-300 ${
+          theme === 'dark'
+            ? 'bg-gray-800/50 backdrop-blur border border-gray-700'
+            : 'bg-white/10 backdrop-blur'
+        }`}
       >
         <div className="flex-1">
           <div
-            className={`text-xs uppercase tracking-wider font-semibold transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-white/70'
-              }`}
+            className={`text-xs uppercase tracking-wider font-semibold transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-white/70'
+            }`}
           >
             Working On
           </div>
           <div
-            className={`text-sm font-semibold mt-0.5 transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-white/80'
-              }`}
+            className={`text-sm font-semibold mt-0.5 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-white/80'
+            }`}
           >
             Select a task to start
           </div>
@@ -40,22 +43,25 @@ export function CurrentTask() {
 
   return (
     <div
-      className={`flex items-center justify-between py-3 px-4 mb-5 w-full max-w-2xl mx-auto rounded-xl transition-all duration-300 ${theme === 'dark'
-        ? 'bg-gray-800/50 backdrop-blur border border-gray-700'
-        : 'bg-white/10 backdrop-blur'
-        }`}
+      className={`flex items-center justify-between py-3 px-4 mb-5 w-full max-w-2xl mx-auto rounded-xl transition-all duration-300 ${
+        theme === 'dark'
+          ? 'bg-gray-800/50 backdrop-blur border border-gray-700'
+          : 'bg-white/10 backdrop-blur'
+      }`}
     >
       {/* Left Side - Working On */}
       <div className="flex-1 min-w-0">
         <div
-          className={`text-xs uppercase tracking-wider font-semibold transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-white/70'
-            }`}
+          className={`text-xs uppercase tracking-wider font-semibold transition-colors duration-300 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-white/70'
+          }`}
         >
           Working On
         </div>
         <div
-          className={`text-sm font-bold mt-0.5 transition-colors duration-300 truncate ${theme === 'dark' ? 'text-white' : 'text-white'
-            }`}
+          className={`text-sm font-bold mt-0.5 transition-colors duration-300 truncate ${
+            theme === 'dark' ? 'text-white' : 'text-white'
+          }`}
           title={currentTask.title}
         >
           {currentTask.title}
@@ -64,8 +70,9 @@ export function CurrentTask() {
 
       {/* Right Side - Progress Stats */}
       <div
-        className={`flex items-center gap-4 text-xs ml-4 ${theme === 'dark' ? 'text-gray-400' : 'text-white/70'
-          }`}
+        className={`flex items-center gap-4 text-xs ml-4 ${
+          theme === 'dark' ? 'text-gray-400' : 'text-white/70'
+        }`}
       >
         <span className="flex items-center gap-1 whitespace-nowrap font-semibold">
           🍅 {currentTask.pomodoroCount}

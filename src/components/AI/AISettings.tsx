@@ -32,7 +32,7 @@ export default function AISettings({ onBack, onApiKeySet }: AISettingsProps) {
 
     await setStorage('geminiApiKey', apiKey.trim())
     onApiKeySet?.(apiKey.trim())
-    
+
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
@@ -55,7 +55,8 @@ export default function AISettings({ onBack, onApiKeySet }: AISettingsProps) {
       subtitle="Configure API keys and preferences"
       onBack={onBack}
     >
-      <div className="space-y-4 py-4">{/* Header removed - now in ModalWithBack */}
+      <div className="space-y-4 py-4">
+        {/* Header removed - now in ModalWithBack */}
 
         {/* Info */}
         <div className="p-3 bg-blue-500/20 rounded-lg text-sm">
@@ -74,7 +75,7 @@ export default function AISettings({ onBack, onApiKeySet }: AISettingsProps) {
             <input
               type={showApiKey ? 'text' : 'password'}
               value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
+              onChange={e => setApiKey(e.target.value)}
               placeholder="输入你的 Gemini API Key"
               className="w-full p-3 pr-10 bg-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/30 placeholder-white/50 text-sm"
             />

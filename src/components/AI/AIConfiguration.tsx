@@ -14,17 +14,13 @@ interface AIAPIDemoProps {
 }
 
 export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoProps) {
-  const [mode, setMode] = useState<AIMode>('cloud')
+  const [mode, setMode] = useState<AIMode>('builtin')
   const [builtInAvailable, setBuiltInAvailable] = useState<AIAvailability>('checking')
   const [actualProvider, setActualProvider] = useState<AIProvider | null>(null)
 
-  const {
-    status,
-    provider,
-    error,
-    cloudAvailable,
-  } = useAI(mode === 'cloud', {
-    systemPrompt: '你是一只可爱的番茄猫助手，用简短、友好、鼓励的语气回答问题。',
+  const { status, provider, error, cloudAvailable } = useAI(mode === 'cloud', {
+    systemPrompt:
+      '你是一只可爱的番茄猫助手，用简短、友好、鼓励的语气回答问题。',
   })
 
   // 加载用户偏好
@@ -55,7 +51,7 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
     const checkBuiltIn = async () => {
       try {
         const availability = await aiService.getBuiltInAvailabilityStatus()
-        const goodStates = ["readily", "after-download", "available"]
+        const goodStates = ['readily', 'after-download', 'available']
 
         if (goodStates.includes(availability)) {
           setBuiltInAvailable('ready')
@@ -94,25 +90,28 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
       subtitle="Configure AI providers"
       onBack={onBack}
     >
-      <div className="space-y-4 py-4">{/* Header removed - now in ModalWithBack */}
+      <div className="space-y-4 py-4">
+        {/* Header removed - now in ModalWithBack */}
 
         {/* Mode Selector */}
         <div className="flex gap-2 p-1 bg-white/10 rounded-lg">
           <button
             onClick={() => handleModeChange('builtin')}
-            className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'builtin'
-              ? 'bg-white/20 text-white'
-              : 'text-white/70 hover:text-white'
-              }`}
+            className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${
+              mode === 'builtin'
+                ? 'bg-white/20 text-white'
+                : 'text-white/70 hover:text-white'
+            }`}
           >
             Chrome 内置 AI
           </button>
           <button
             onClick={() => handleModeChange('cloud')}
-            className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${mode === 'cloud'
-              ? 'bg-white/20 text-white'
-              : 'text-white/70 hover:text-white'
-              }`}
+            className={`flex-1 py-2 px-3 rounded-md transition-all text-sm font-medium ${
+              mode === 'cloud'
+                ? 'bg-white/20 text-white'
+                : 'text-white/70 hover:text-white'
+            }`}
           >
             Chrome 云端 AI
           </button>
