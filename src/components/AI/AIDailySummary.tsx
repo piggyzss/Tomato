@@ -23,13 +23,15 @@ export default function AIDailySummary({
 }: AIDailySummaryProps) {
   const { language } = useSettingsStore()
   const { tasks } = useTaskStore()
-  const [selectedSummaryLanguage, setSelectedSummaryLanguage] = useState<'zh-CN' | 'en-US' | 'ja-JP'>(language)
+  const [selectedSummaryLanguage, setSelectedSummaryLanguage] = useState<
+    'zh-CN' | 'en-US' | 'ja-JP'
+  >(language)
 
   const generateDailySummary = async () => {
     if (!aiSummarizer) {
       alert('AI Summarizer not available. Please check Chrome flags.')
-      return
     }
+    return
 
     setIsSummarizing(true)
     setSummaryText('')
@@ -40,9 +42,17 @@ export default function AIDailySummary({
       const todayTimestamp = today.getTime()
 
       const todayTasks = tasks.filter(task => task.createdAt >= todayTimestamp)
-      const completedTasks = todayTasks.filter(task => task.status === 'completed')
-      const totalPomodoros = todayTasks.reduce((sum, task) => sum + (task.pomodoroCount || 0), 0)
-      const totalTime = todayTasks.reduce((sum, task) => sum + (task.totalTimeSpent || 0), 0)
+      const completedTasks = todayTasks.filter(
+        task => task.status === 'completed'
+      )
+      const totalPomodoros = todayTasks.reduce(
+        (sum, task) => sum + (task.pomodoroCount || 0),
+        0
+      )
+      const totalTime = todayTasks.reduce(
+        (sum, task) => sum + (task.totalTimeSpent || 0),
+        0
+      )
 
       const summaryData = `
 Today's Productivity Summary:
@@ -80,8 +90,14 @@ Include:
   })
 
   const completedTasks = todayTasks.filter(task => task.status === 'completed')
-  const totalPomodoros = todayTasks.reduce((sum, task) => sum + (task.pomodoroCount || 0), 0)
-  const totalTime = todayTasks.reduce((sum, task) => sum + (task.totalTimeSpent || 0), 0)
+  const totalPomodoros = todayTasks.reduce(
+    (sum, task) => sum + (task.pomodoroCount || 0),
+    0
+  )
+  const totalTime = todayTasks.reduce(
+    (sum, task) => sum + (task.totalTimeSpent || 0),
+    0
+  )
 
   return (
     <ModalWithBack
@@ -92,22 +108,32 @@ Include:
       <div className="space-y-6 mt-4">
         {/* Today's Stats */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-          <h3 className="font-semibold mb-3 text-sm text-white">📊 Today's Statistics</h3>
+          <h3 className="font-semibold mb-3 text-sm text-white">
+            📊 Today's Statistics
+          </h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-black/30 rounded-lg p-3">
-              <div className="text-2xl font-bold text-white">{todayTasks.length}</div>
+              <div className="text-2xl font-bold text-white">
+                {todayTasks.length}
+              </div>
               <div className="text-xs text-white/70">Total Tasks</div>
             </div>
             <div className="bg-black/30 rounded-lg p-3">
-              <div className="text-2xl font-bold text-green-400">{completedTasks.length}</div>
+              <div className="text-2xl font-bold text-green-400">
+                {completedTasks.length}
+              </div>
               <div className="text-xs text-white/70">Completed</div>
             </div>
             <div className="bg-black/30 rounded-lg p-3">
-              <div className="text-2xl font-bold text-blue-400">{totalPomodoros}</div>
+              <div className="text-2xl font-bold text-blue-400">
+                {totalPomodoros}
+              </div>
               <div className="text-xs text-white/70">Pomodoros</div>
             </div>
             <div className="bg-black/30 rounded-lg p-3">
-              <div className="text-2xl font-bold text-purple-400">{Math.floor(totalTime / 60)}m</div>
+              <div className="text-2xl font-bold text-purple-400">
+                {Math.floor(totalTime / 60)}m
+              </div>
               <div className="text-xs text-white/70">Focus Time</div>
             </div>
           </div>
@@ -115,10 +141,16 @@ Include:
 
         {/* Language Selection */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-          <h3 className="font-semibold mb-3 text-sm text-white">🌍 Summary Language</h3>
+          <h3 className="font-semibold mb-3 text-sm text-white">
+            🌍 Summary Language
+          </h3>
           <select
             value={selectedSummaryLanguage}
-            onChange={(e) => setSelectedSummaryLanguage(e.target.value as 'zh-CN' | 'en-US' | 'ja-JP')}
+            onChange={e =>
+              setSelectedSummaryLanguage(
+                e.target.value as 'zh-CN' | 'en-US' | 'ja-JP'
+              )
+            }
             className="w-full p-2 rounded-lg bg-black/30 border border-white/20 text-white text-sm"
           >
             <option value="en-US">English</option>
@@ -140,7 +172,9 @@ Include:
               <Sparkles size={20} className="text-white" />
             )}
             <span className="font-semibold text-white">
-              {isSummarizing ? 'Generating Summary...' : 'Generate Daily Summary'}
+              {isSummarizing
+                ? 'Generating Summary...'
+                : 'Generate Daily Summary'}
             </span>
           </div>
         </button>
@@ -148,16 +182,22 @@ Include:
         {todayTasks.length === 0 && (
           <div className="text-center py-8 text-white/70">
             <p className="text-sm">No tasks recorded today yet.</p>
-            <p className="text-xs mt-2">Start working on tasks to generate a summary!</p>
+            <p className="text-xs mt-2">
+              Start working on tasks to generate a summary!
+            </p>
           </div>
         )}
 
         {/* Summary Display */}
         {summaryText && (
           <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-            <h3 className="font-semibold mb-3 text-sm text-white">✨ AI Summary</h3>
+            <h3 className="font-semibold mb-3 text-sm text-white">
+              ✨ AI Summary
+            </h3>
             <div className="prose prose-invert max-w-none">
-              <p className="text-white leading-relaxed whitespace-pre-wrap">{summaryText}</p>
+              <p className="text-white leading-relaxed whitespace-pre-wrap">
+                {summaryText}
+              </p>
             </div>
           </div>
         )}

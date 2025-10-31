@@ -1,10 +1,10 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { useState, useEffect } from 'react'
-import AIMainMenu from './AIMainMenu'
-import AICatMessages from './AICatMessages'
-import AIDailySummary from './AIDailySummary'
+import { useEffect, useState } from 'react'
 import AIConfiguration from './AIConfiguration'
+import AIMainMenu from './AIMainMenu'
 import AISettings from './AISettings'
+import BuiltInAIDailySummary from './BuitInAIDailySummary'
+import ChatCat from './ChatCat'
 
 type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
 
@@ -20,11 +20,13 @@ export default function AI({ onClose }: AIProps) {
     writerAvailable: false,
     summarizerAvailable: false,
   })
+  
+  // const {builtInAvailable} = useAI();
 
   // AI state for daily summary
-  const [aiSummarizer, setAiSummarizer] = useState<any>(null)
-  const [isSummarizing, setIsSummarizing] = useState(false)
-  const [summaryText, setSummaryText] = useState('')
+  // const [aiSummarizer, setAiSummarizer] = useState<any>(null)
+  // const [isSummarizing, setIsSummarizing] = useState(false)
+  // const [summaryText, setSummaryText] = useState('')
 
   // Check AI API availability
   useEffect(() => {
@@ -38,9 +40,9 @@ export default function AI({ onClose }: AIProps) {
         })
 
         // Initialize AI services
-        if (ai?.summarizer) {
-          setAiSummarizer(ai.summarizer)
-        }
+        // if (ai?.summarizer) {
+        //   setAiSummarizer(ai.summarizer)
+        // }
       } catch (error) {
         console.error('Error checking AI availability:', error)
       }
@@ -62,7 +64,11 @@ export default function AI({ onClose }: AIProps) {
         {/* Cat Messages 需要特殊布局（固定底部输入框） */}
         {currentView === 'catMessages' ? (
           <div className="absolute inset-0 px-4 flex flex-col">
-            <AICatMessages onBack={() => setCurrentView('menu')} />
+             {/* @panpan */}
+            {/* {builtInAvailable ? <ChatCat/> : <AICatMessages onBack={() => setCurrentView('menu')} />} */}
+            {/* <AICatMessages onBack={() => setCurrentView('menu')} /> */}
+           <ChatCat onBack={() => setCurrentView('menu')}/>
+            
           </div>
         ) : (
           <div className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
@@ -73,19 +79,23 @@ export default function AI({ onClose }: AIProps) {
                 apiStatus={apiStatus}
               />
             )}
+
+            {/* @panpan */}
             {currentView === 'dailySummary' && (
-              <AIDailySummary
-                onBack={() => setCurrentView('menu')}
-                aiSummarizer={aiSummarizer}
-                isSummarizing={isSummarizing}
-                summaryText={summaryText}
-                setIsSummarizing={setIsSummarizing}
-                setSummaryText={setSummaryText}
-              />
+              // <AIDailySummary
+              //   onBack={() => setCurrentView('menu')}
+              //   aiSummarizer={aiSummarizer}
+              //   isSummarizing={isSummarizing}
+              //   summaryText={summaryText}
+              //   setIsSummarizing={setIsSummarizing}
+              //   setSummaryText={setSummaryText}
+              // />
+              <BuiltInAIDailySummary/>
+               
             )}
             {currentView === 'apiDemo' && (
-              <AIConfiguration 
-                onBack={() => setCurrentView('menu')} 
+              <AIConfiguration
+                onBack={() => setCurrentView('menu')}
                 onOpenSettings={() => setCurrentView('settings')}
               />
             )}

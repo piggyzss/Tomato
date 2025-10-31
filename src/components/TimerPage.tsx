@@ -38,7 +38,7 @@ export default function TimerPage() {
     <div className="w-full flex items-center gap-8">
       {/* Mode Selector - Left Side, Vertical */}
       <ModeSelector mode={currentMode} onModeChange={handleModeChange} />
-      
+
       {/* Timer - Right Side, Centered */}
       <div className="flex-1">
         <BigTimer />

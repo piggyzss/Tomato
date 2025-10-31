@@ -24,8 +24,9 @@ export default function ModalWithBack({
     <div>
       {/* Fixed Header with Back Button */}
       <div
-        className={`sticky top-0 z-10 ${theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
-          }`}
+        className={`sticky top-0 z-10 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-[#D84848]'
+        }`}
       >
         <div className="flex items-center gap-3 py-3">
           <button

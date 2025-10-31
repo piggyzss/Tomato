@@ -21,7 +21,14 @@ export interface Task {
 }
 
 // 音效类型
-export type SoundType = 'ding' | 'ding-dong' | 'chord' | 'victory' | 'soft' | 'water-drop' | 'knock'
+export type SoundType =
+  | 'ding'
+  | 'ding-dong'
+  | 'chord'
+  | 'victory'
+  | 'soft'
+  | 'water-drop'
+  | 'knock'
 
 // 番茄钟配置
 export interface PomodoroConfig {

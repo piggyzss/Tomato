@@ -6,13 +6,13 @@ interface PlaceholderProps extends SettingsPageProps {
   icon: string
 }
 
-export default function SettingsPlaceholder({ onBack, title, icon }: PlaceholderProps) {
+export default function SettingsPlaceholder({
+  onBack,
+  title,
+  icon,
+}: PlaceholderProps) {
   return (
-    <ModalWithBack
-      title={title}
-      subtitle="Coming soon..."
-      onBack={onBack}
-    >
+    <ModalWithBack title={title} subtitle="Coming soon..." onBack={onBack}>
       {/* Placeholder Content */}
       <div className="text-center py-20">
         <div className="text-6xl mb-6">{icon}</div>
@@ -20,8 +20,8 @@ export default function SettingsPlaceholder({ onBack, title, icon }: Placeholder
         <p className="text-white/70 mb-8">This feature is under development</p>
         <div className="bg-black/20 rounded-xl p-6 max-w-sm mx-auto border border-white/20">
           <p className="text-sm text-white/80">
-            We're working on bringing you amazing {title.toLowerCase()} options. Stay tuned for
-            updates! 🚀
+            We're working on bringing you amazing {title.toLowerCase()} options.
+            Stay tuned for updates! 🚀
           </p>
         </div>
       </div>

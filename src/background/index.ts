@@ -93,7 +93,7 @@ function showNotification(title: string, message: string) {
 }
 
 // 监听通知点击事件
-chrome.notifications.onClicked.addListener(async (notificationId) => {
+chrome.notifications.onClicked.addListener(async notificationId => {
   console.log('通知被点击:', notificationId)
 
   // 关闭通知

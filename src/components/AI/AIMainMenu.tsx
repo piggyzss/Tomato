@@ -1,9 +1,17 @@
-import { MessageCircle, Calendar, ArrowLeft, Sparkles, Settings } from 'lucide-react'
+import {
+  MessageCircle,
+  Calendar,
+  ArrowLeft,
+  Sparkles,
+  Settings,
+} from 'lucide-react'
 import { ModalWithClose } from '@/components/Common'
 
 interface AIMainMenuProps {
   onClose?: () => void
-  onNavigate: (view: 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings') => void
+  onNavigate: (
+    view: 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
+  ) => void
   apiStatus: {
     aiAvailable: boolean
     writerAvailable: boolean
@@ -11,8 +19,11 @@ interface AIMainMenuProps {
   }
 }
 
-export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMenuProps) {
-
+export default function AIMainMenu({
+  onClose,
+  onNavigate,
+  apiStatus,
+}: AIMainMenuProps) {
   const aiMenu = [
     {
       id: 'apiDemo' as const,
@@ -62,7 +73,8 @@ export default function AIMainMenu({ onClose, onNavigate, apiStatus }: AIMainMen
               </span>
             </div>
             <p className="text-xs text-white/70 mb-2">
-              To use AI features, please use <strong>Chrome Canary</strong> with these flags enabled:
+              To use AI features, please use <strong>Chrome Canary</strong> with
+              these flags enabled:
             </p>
             <ul className="text-xs space-y-1 text-white/60">
               <li>• chrome://flags/#optimization-guide-on-device-model</li>

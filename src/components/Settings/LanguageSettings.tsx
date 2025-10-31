@@ -53,15 +53,17 @@ export default function LanguageSettings({ onBack }: SettingsPageProps) {
               选择语言将影响 AI 生成的消息语言
             </p>
             <p className="text-xs text-white/70 leading-relaxed">
-              包括猫咪鼓励消息、每日总结、任务分析等 AI 功能的输出语言。设置后，AI
-              将使用您选择的语言与您交流。
+              包括猫咪鼓励消息、每日总结、任务分析等 AI
+              功能的输出语言。设置后，AI 将使用您选择的语言与您交流。
             </p>
           </div>
         </div>
 
         {/* Language Selection Dropdown */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-          <h3 className="font-semibold mb-3 text-sm text-white">🌍 Message Language</h3>
+          <h3 className="font-semibold mb-3 text-sm text-white">
+            🌍 Message Language
+          </h3>
           <select
             value={selectedLanguage}
             onChange={e =>
@@ -93,9 +95,13 @@ export default function LanguageSettings({ onBack }: SettingsPageProps) {
 
         {/* Current Language Summary */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
-          <h3 className="font-semibold mb-3 text-center text-sm text-white">Current Language</h3>
+          <h3 className="font-semibold mb-3 text-center text-sm text-white">
+            Current Language
+          </h3>
           <div className="text-center">
-            <div className="text-3xl mb-2">{languages.find(l => l.id === language)?.icon}</div>
+            <div className="text-3xl mb-2">
+              {languages.find(l => l.id === language)?.icon}
+            </div>
             <div className="font-semibold text-white">
               {languages.find(l => l.id === language)?.nativeName}
             </div>

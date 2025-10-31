@@ -2,7 +2,15 @@ import { useSettingsStore } from '@/store/useSettingsStore'
 import { useTaskStore } from '@/store/useTaskStore'
 import { useTimerStore } from '@/store/useTimerStore'
 import clsx from 'clsx'
-import { Check, Coffee, Monitor, MonitorPlay, MonitorX, SquareMousePointer, X } from 'lucide-react'
+import {
+  Check,
+  Coffee,
+  Monitor,
+  MonitorPlay,
+  MonitorX,
+  SquareMousePointer,
+  X,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export function TaskListNew() {
@@ -76,7 +84,9 @@ export function TaskListNew() {
   return (
     <div
       className={`w-full max-w-2xl mx-auto rounded-xl p-5 shadow-lg transition-all duration-300 ${
-        theme === 'dark' ? 'bg-gray-800/80 backdrop-blur border border-gray-700' : 'bg-white'
+        theme === 'dark'
+          ? 'bg-gray-800/80 backdrop-blur border border-gray-700'
+          : 'bg-white'
       }`}
     >
       <div className="flex items-center justify-between mb-4">
