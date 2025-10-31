@@ -1,9 +1,9 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useState } from 'react'
-import AnalysisMainMenu from './AnalysisMainMenu'
-import TaskFinishRate from './TaskFinishRate'
-import TotalTime from './TotalTime'
-import HistoryView from './HistoryView'
+import AnalysisMainMenu from '@/components/Analysis/AnalysisMainMenu'
+import TaskFinishRate from '@/components/Analysis/TaskFinishRate'
+import TotalTime from '@/components/Analysis/TotalTime'
+import HistoryView from '@/components/Analysis/HistoryView'
 import type { AnalysisView } from '@/types'
 
 interface AnalysisProps {

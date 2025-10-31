@@ -47,7 +47,7 @@ function AvailabilityCheck() {
 }
 
 interface BuiltInAIConfigurationProps {
-    builtInAvailable: AIAvailability
+  builtInAvailable: AIAvailability
 }
 
 export default function BuiltInAIConfiguration({
@@ -57,13 +57,12 @@ export default function BuiltInAIConfiguration({
     <>
       {/* Status */}
       <div
-        className={`p-4 rounded-lg ${
-          builtInAvailable === 'ready'
+        className={`p-4 rounded-lg ${builtInAvailable === 'ready'
             ? 'bg-green-500/20'
             : builtInAvailable === 'unavailable'
               ? 'bg-red-500/20'
               : 'bg-blue-500/20'
-        }`}
+          }`}
       >
         <div className="flex items-start gap-2">
           <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />

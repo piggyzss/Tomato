@@ -114,7 +114,7 @@ class CloudAISession implements IAISession {
           yield chunkText
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Cloud AI prompt error:', error)
 
       // 提供更详细的错误信息

@@ -9,13 +9,13 @@ import {
   Volume2,
 } from 'lucide-react'
 import { useState } from 'react'
-import TimerSettings from './Settings/TimerSettings'
-import SoundSettings from './Settings/SoundSettings'
-import ThemeSettings from './Settings/ThemeSettings'
-import LanguageSettings from './Settings/LanguageSettings'
-import SettingsPlaceholder from './Settings/SettingsPlaceholder'
-import { ModalWithClose } from './Common'
-import type { SettingsView } from './Settings/types'
+import TimerSettings from '@/components/Settings/TimerSettings'
+import SoundSettings from '@/components/Settings/SoundSettings'
+import ThemeSettings from '@/components/Settings/ThemeSettings'
+import LanguageSettings from '@/components/Settings/LanguageSettings'
+import SettingsPlaceholder from '@/components/Settings/SettingsPlaceholder'
+import { ModalWithClose } from '@/components/Common'
+import type { SettingsView } from '@/components/Settings/types'
 
 interface SettingsPanelProps {
   onClose?: () => void

@@ -5,7 +5,7 @@
  * These are pure logic functions — no React hooks or state here.
  */
 
-import { AIAvailability } from './builtInSummaryService'
+import { AIAvailability } from '@/services/builtInSummaryService'
 
 export async function checkAvailability(): Promise<AIAvailability | 'error'> {
   try {

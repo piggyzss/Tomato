@@ -163,7 +163,6 @@ Gemini Nano 模型
 | **手动下载**<br>`chrome://components/` | • 可查看进度<br>• 可控制时机<br>• 失败易排查 | • 需手动操作 | ⭐⭐⭐⭐⭐ |
 | **自动下载**<br>`create()` 触发 | • 代码自动化 | • 阻塞执行<br>• 无进度显示<br>• 体验差 | ⭐⭐ |
 
-**结论：推荐使用手动下载方式**
 
 ---
 
@@ -240,9 +239,43 @@ if (status === 'readily') {
 ### Q: 显示 "更新错误" 怎么办？
 **A:** 
 1. 检查网络连接
-2. 确认 Flags 已正确启用
-3. 重启 Chrome 后重试
-4. 确保能访问 Google 服务器
+
+2. 手动触发模型下载
+访问： chrome://components/
+找到： "Optimization Guide On Device Model"
+点击： 该条目下的 "检查是否有更新" 按钮
+观察状态变化：
+应该从 "更新错误" 变为 "正在下载..."
+如果还是显示错误，继续下一步
+
+3. 确认 Flags 已正确启用
+检查并重新启用 Chrome Flags
+访问： chrome://flags/#optimization-guide-on-device-model
+设置为：Enabled BypassPerfRequirement
+访问： chrome://flags/#summarization-api-for-gemini-nano
+设置为：Enabled
+重启 Chrome
+再次访问 chrome://components/ 并点击 "检查是否有更新"
+
+4. 如果还是失败，尝试清理并重试
+在 Chrome 控制台（任意标签页 F12）执行：
+```
+// 清理可能的缓存问题
+chrome.storage.local.clear()
+// 然后重启 Chrome，再次尝试下载
+```
+
+5. 验证下载是否成功
+下载完成后，chrome://components/ 应该显示：
+
+Optimization Guide On Device Model
+版本：2024.xx.xx.xxxx  (不再是 0.0.0.0)
+状态：组件已更新
+然后在控制台测试：
+```
+window.ai.summarizer.availability().then(console.log)
+// 应该返回 "readily" 而不是 "downloadable"
+```
 
 ### Q: 下载需要多久？
 **A:** 模型约 1.5GB，通常 10-30 分钟（取决于网速）

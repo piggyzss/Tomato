@@ -1,4 +1,4 @@
-import type { TimeRange } from './types'
+import type { TimeRange } from '@/components/Analysis/types'
 
 // Helper function to get date range
 export const getDateRange = (range: TimeRange) => {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSettingsStore } from '@/store/useSettingsStore'
-import type { SettingsPageProps } from './types'
+import type { SettingsPageProps } from '@/components/Settings/types'
 import { ModalWithBack } from '@/components/Common'
 
 export default function ThemeSettings({ onBack }: SettingsPageProps) {

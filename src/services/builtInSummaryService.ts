@@ -73,7 +73,7 @@ export async function createSummarizer() {
 }
 
 /**
- * Generates a preset paragraph describing the user's focus stats.
+ * Generates a preset paragraph describing the user's focus stats for overall summary.
  */
 export function buildPresetSummaryText(summaryData: {
   date: string
@@ -95,6 +95,38 @@ ${summaryData.productivityScore >= 80
     }
 Here are your AI insights:
 ${summaryData.insights.map(i => `- ${i}`).join('\n')}
+`
+}
+
+/**
+ * Generates a prompt for actionable productivity recommendations.
+ */
+export function buildInsightsPrompt(summaryData: {
+  date: string
+  totalFocusTime: number
+  completedPomodoros: number
+  completedTasks: number
+  averageSessionLength: number
+  productivityScore: number
+}) {
+  return `
+Based on today's productivity data:
+- Tasks completed: ${summaryData.completedTasks}
+- Total focus time: ${summaryData.totalFocusTime} minutes
+- Pomodoro sessions: ${summaryData.completedPomodoros}
+- Average session length: ${summaryData.averageSessionLength} minutes
+- Productivity score: ${summaryData.productivityScore}/100
+
+Provide 3-4 specific, actionable recommendations to improve tomorrow's productivity.
+Focus on practical advice about:
+- Time management strategies
+- Task prioritization techniques
+- Break and rest optimization
+- Focus improvement methods
+- Energy management throughout the day
+
+Make each recommendation concise, specific, and immediately actionable.
+Format each recommendation as a single line starting with an emoji.
 `
 }
 
@@ -140,6 +172,27 @@ export async function generateSummary(presetText: string) {
     }),
     30000,
     'Summarization timeout. Please try with shorter text.'
+  )
+
+  return result
+}
+
+/**
+ * Generate actionable insights/recommendations using AI.
+ */
+export async function generateInsights(insightsPrompt: string) {
+  const summarizer = await withTimeout(
+    createSummarizer(),
+    60000,
+    'Summarizer creation timeout. The model might be initializing. Please try again.'
+  )
+
+  const result = await withTimeout(
+    summarizer.summarize(insightsPrompt, {
+      context: 'Provide specific, actionable productivity recommendations.',
+    }),
+    30000,
+    'Insights generation timeout. Please try again.'
   )
 
   return result

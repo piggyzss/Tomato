@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Send, Cat, Laugh, Loader2 } from 'lucide-react'
-import { createChatSession, sendChatMessage } from '../../services/buildInAiService.ts'
-import { useSettingsStore } from '@/store/useSettingsStore.ts'
+import { createChatSession, sendChatMessage } from '@/services/buildInAiService'
+import { useSettingsStore } from '@/store/useSettingsStore'
 import { ModalWithBack } from '@/components/Common'
 
 interface Message {

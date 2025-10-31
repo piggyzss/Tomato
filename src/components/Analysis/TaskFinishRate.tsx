@@ -2,8 +2,8 @@ import { useTaskStore } from '@/store/useTaskStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { BarChart3, Target } from 'lucide-react'
 import { useState, useMemo } from 'react'
-import { getDateRange } from './utils'
-import type { TimeRange } from './types'
+import { getDateRange } from '@/components/Analysis/utils'
+import type { TimeRange } from '@/components/Analysis/types'
 import { ModalWithBack } from '@/components/Common'
 
 interface TaskFinishRateProps {

@@ -1,5 +1,28 @@
 # 更新日志
 
+## v0.2.1 - 2024-10-31
+
+### 🎨 功能优化
+
+#### AI Insights 与 AI Summary 区分
+- ✅ **AI Recommendations（AI 建议）**：专注于生成可操作的生产力建议
+  - 提供时间管理策略
+  - 任务优先级技巧
+  - 休息和能量管理建议
+  - 专注力提升方法
+- ✅ **AI Summary（AI 总结）**：提供整体的激励性总结
+  - 全面回顾当天表现
+  - 包含统计数据和默认 insights
+  - 更详细的叙述性总结
+- ✅ 两个功能使用不同的 prompt，避免内容重复
+- ✅ 优化默认 insights 文案，引导用户使用 AI 功能
+
+### 🔧 技术改进
+- 新增 `buildInsightsPrompt()` 函数用于生成建议型 prompt
+- 新增 `generateInsights()` 函数专门处理建议生成
+- 保持 `buildPresetSummaryText()` 和 `generateSummary()` 用于总结功能
+- 更新组件标题从 "AI Insights" 改为 "AI Recommendations"
+
 ## v0.2.0 - 2024-10-31
 
 ### 🎉 新功能

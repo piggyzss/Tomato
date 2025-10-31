@@ -1,5 +1,5 @@
 import type { DailyHistory, Task, PomodoroRecord } from '@/types'
-import { getStorage, setStorage, getMultipleStorage, setMultipleStorage } from './storage'
+import { getStorage, setStorage, getMultipleStorage, setMultipleStorage } from '@/utils/storage'
 
 /**
  * 获取当前日期字符串 YYYY-MM-DD

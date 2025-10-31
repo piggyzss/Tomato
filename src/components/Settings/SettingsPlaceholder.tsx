@@ -1,4 +1,4 @@
-import type { SettingsPageProps } from './types'
+import type { SettingsPageProps } from '@/components/Settings/types'
 import { ModalWithBack } from '@/components/Common'
 
 interface PlaceholderProps extends SettingsPageProps {

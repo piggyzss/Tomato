@@ -2,7 +2,7 @@ import { Clock, Coffee, RefreshCw, Save } from 'lucide-react'
 import { useState } from 'react'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { ModalWithBack } from '@/components/Common'
-import type { SettingsPageProps } from './types'
+import type { SettingsPageProps } from '@/components/Settings/types'
 import type { TimerMode } from '@/types'
 
 export default function TimerSettings({ onBack }: SettingsPageProps) {

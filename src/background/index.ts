@@ -1,5 +1,5 @@
 // Background Service Worker for Chrome Extension
-import { setMultipleStorage, getMultipleStorage, setStorage } from '../utils/storage'
+import { setMultipleStorage, getMultipleStorage, setStorage } from '@/utils/storage'
 
 // 监听插件安装
 chrome.runtime.onInstalled.addListener(async details => {

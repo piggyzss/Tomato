@@ -10,6 +10,14 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import Summary from './Summary'
+import { 
+  buildInsightsPrompt,
+  generateInsights 
+} from '@/services/builtInSummaryService'
+import { getMultipleStorage } from '@/utils/storage'
+import { generateDefaultInsights, parseAISummaryToInsights } from '@/utils/insightsGenerator'
+import { calculateAllStatistics } from '@/utils/statisticsCalculator'
+import { ModalWithBack } from '@/components/Common'
 
 interface DailySummaryData {
   date: string
@@ -21,57 +29,90 @@ interface DailySummaryData {
   insights: string[]
 }
 
-export default function AIDailySummary() {
+interface AIDailySummaryProps {
+  onBack: () => void
+}
+
+export default function AIDailySummary({ onBack }: AIDailySummaryProps) {
   const [summaryData, setSummaryData] = useState<DailySummaryData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
 
-  // Simulate loading summary data
+  // Load real summary data from storage
   useEffect(() => {
     const loadSummaryData = async () => {
       setIsLoading(true)
 
-      // Simulate API call
-      setTimeout(() => {
+      try {
+        // Get today's data from storage
+        const { tasks, pomodoroRecords } = await getMultipleStorage([
+          'tasks',
+          'pomodoroRecords',
+        ])
+
+        const taskList = tasks || []
+        const recordList = pomodoroRecords || []
+
+        // Calculate all statistics
+        const stats = calculateAllStatistics(taskList, recordList)
+
+        // Generate default insights
+        const insights = generateDefaultInsights(stats)
+
         setSummaryData({
           date: new Date().toLocaleDateString(),
-          totalFocusTime: 120, // minutes
-          completedPomodoros: 4,
-          completedTasks: 3,
-          averageSessionLength: 25,
-          productivityScore: 85,
-          insights: [
-            'Great focus this morning! 🌟 Your longest streak was 2 hours.',
-            'Consider taking shorter breaks to maintain energy levels.',
-            'You completed 75% of your planned tasks - excellent progress!',
-            'Your productivity peaked between 10-12 AM today.',
-          ],
+          ...stats,
+          insights,
         })
+      } catch (error) {
+        console.error('Failed to load summary data:', error)
+        setSummaryData(null)
+      } finally {
         setIsLoading(false)
-      }, 1000)
+      }
     }
 
     loadSummaryData()
   }, [])
 
-  const generateNewSummary = async () => {
+  const generateNewInsights = async () => {
+    if (!summaryData) return
+
     setIsGenerating(true)
 
-    // Simulate AI generation
-    setTimeout(() => {
-      if (summaryData) {
+    try {
+      // Build the insights prompt focused on actionable recommendations
+      const insightsPrompt = buildInsightsPrompt(summaryData)
+
+      // Call the AI service to generate actionable insights
+      const aiInsights = await generateInsights(insightsPrompt)
+
+      console.log('AI Insights generated:', aiInsights)
+
+      // Parse the AI insights into individual recommendations
+      const newInsights = parseAISummaryToInsights(aiInsights, 4)
+
+      if (newInsights.length > 0) {
         setSummaryData({
           ...summaryData,
-          insights: [
-            'Updated analysis: Your focus patterns show improvement! 📈',
-            'Try the 52-17 technique for longer tasks tomorrow.',
-            'Your consistency this week deserves recognition 🏆',
-            'Consider adding a 5-minute meditation before work sessions.',
-          ],
+          insights: newInsights,
         })
       }
+    } catch (error) {
+      console.error('Failed to generate AI insights:', error)
+
+      // Show error message as insight
+      setSummaryData({
+        ...summaryData,
+        insights: [
+          '⚠️ Failed to generate AI insights.',
+          error instanceof Error ? error.message : 'Unknown error occurred.',
+          'Please check Chrome AI setup and try again.',
+        ],
+      })
+    } finally {
       setIsGenerating(false)
-    }, 2000)
+    }
   }
 
   const getProductivityColor = (score: number) => {
@@ -86,33 +127,35 @@ export default function AIDailySummary() {
     return '💪'
   }
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin w-8 h-8 border-2 border-white/20 border-t-white rounded-full mx-auto mb-4"></div>
-        <p className="text-white/70 text-sm">
-          Analyzing your productivity data...
-        </p>
-      </div>
-    )
-  }
-
-  if (!summaryData) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-4xl mb-4">📊</div>
-        <h3 className="text-lg font-semibold text-white mb-2">
-          No Data Available
-        </h3>
-        <p className="text-white/70 text-sm">
-          Start using the timer to see your daily summary!
-        </p>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-6">
+    <ModalWithBack
+      title={<>📅 Built-in AI Daily Summary</>}
+      subtitle="Chrome AI powered insights"
+      onBack={onBack}
+    >
+      {isLoading && (
+        <div className="text-center py-12">
+          <div className="animate-spin w-8 h-8 border-2 border-white/20 border-t-white rounded-full mx-auto mb-4"></div>
+          <p className="text-white/70 text-sm">
+            Analyzing your productivity data...
+          </p>
+        </div>
+      )}
+
+      {!isLoading && !summaryData && (
+        <div className="text-center py-12">
+          <div className="text-4xl mb-4">📊</div>
+          <h3 className="text-lg font-semibold text-white mb-2">
+            No Data Available
+          </h3>
+          <p className="text-white/70 text-sm">
+            Start using the timer to see your daily summary!
+          </p>
+        </div>
+      )}
+
+      {!isLoading && summaryData && (
+        <div className="space-y-6 mt-4">
       {/* Date Header */}
       <div className="flex items-center gap-2 text-center justify-center">
         <Calendar size={18} className="text-white/70" />
@@ -175,15 +218,15 @@ export default function AIDailySummary() {
         </div>
       </div>
 
-      {/* AI Insights */}
+      {/* AI Insights - Actionable Recommendations */}
       <div className="bg-black/20 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-white">AI Insights</h3>
+          <h3 className="text-sm font-semibold text-white">AI Recommendations</h3>
           <button
-            onClick={generateNewSummary}
+            onClick={generateNewInsights}
             disabled={isGenerating}
             className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
-            title="Generate New Insights"
+            title="Generate Actionable Recommendations"
           >
             <RefreshCw
               size={14}
@@ -205,7 +248,7 @@ export default function AIDailySummary() {
 
         {isGenerating && (
           <div className="mt-3 text-center text-xs text-white/60">
-            🧠 AI is analyzing your patterns...
+            🧠 AI is generating personalized recommendations...
           </div>
         )}
       </div>
@@ -224,13 +267,13 @@ export default function AIDailySummary() {
       <div className="text-center text-xs text-white/60 bg-black/20 rounded-lg p-3">
         💡 Tip: Your summary updates automatically after each session
       </div>
- 
-      {/* AI Summary */}
-      <div className='w-full flex justify-center bg-black/20 rounded-lg items-center min-h-[200px]'>
-        <Summary summaryData={summaryData} />
-      </div>
 
-
-    </div>
+          {/* AI Summary */}
+          <div className="w-full flex justify-center bg-black/20 rounded-lg items-center min-h-[200px]">
+            <Summary summaryData={summaryData} />
+          </div>
+        </div>
+      )}
+    </ModalWithBack>
   )
 }

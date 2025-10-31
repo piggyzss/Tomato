@@ -1,11 +1,11 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useEffect, useState } from 'react'
-import AIConfiguration from './AIConfiguration'
-import AIMainMenu from './AIMainMenu'
-import AISettings from './AISettings'
+import AIConfiguration from '@/components/AI/AIConfiguration'
+import AIMainMenu from '@/components/AI/AIMainMenu'
+import AISettings from '@/components/AI/AISettings'
 import type { AIView } from '@/types'
-import BuiltInAIDailySummary from './BuitInAIDailySummary'
-import ChatCat from './ChatCat'
+import BuiltInAIDailySummary from '@/components/AI/BuitInAIDailySummary'
+import ChatCat from '@/components/AI/ChatCat'
 
 interface AIProps {
   onClose?: () => void
@@ -80,16 +80,7 @@ export default function AI({ onClose }: AIProps) {
 
             {/* @panpan */}
             {currentView === 'dailySummary' && (
-              // <AIDailySummary
-              //   onBack={() => setCurrentView('menu')}
-              //   aiSummarizer={aiSummarizer}
-              //   isSummarizing={isSummarizing}
-              //   summaryText={summaryText}
-              //   setIsSummarizing={setIsSummarizing}
-              //   setSummaryText={setSummaryText}
-              // />
-              <BuiltInAIDailySummary/>
-               
+              <BuiltInAIDailySummary onBack={() => setCurrentView('menu')} />
             )}
             {currentView === 'apiDemo' && (
               <AIConfiguration

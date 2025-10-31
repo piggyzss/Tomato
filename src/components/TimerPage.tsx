@@ -1,8 +1,8 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useTimerStore } from '@/store/useTimerStore'
 import { useState } from 'react'
-import { BigTimer } from './BigTimer'
-import { ModeSelector } from './ModeSelector'
+import { BigTimer } from '@/components/BigTimer'
+import { ModeSelector } from '@/components/ModeSelector'
 import type { TimerMode } from '@/types'
 
 // Parent component - contains the logic
