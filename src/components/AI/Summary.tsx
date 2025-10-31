@@ -31,9 +31,8 @@ export default function Summary({ summaryData }: SummaryProps) {
     try {
       const presetText = buildPresetSummaryText(summaryData)
       const result = await generateSummary(presetText)
-      setSummaryText(result)
+      setSummaryText(result as string)
     } catch (err: any) {
-      console.error('Summarize failed:', err)
       setError(err.message || 'Summarization failed.')
     } finally {
       setIsSummarizing(false)

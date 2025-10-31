@@ -226,10 +226,9 @@ export default function AIDailySummary() {
       </div>
  
       {/* AI Summary */}
-     {/* AI Summary */}
-<div className='w-full flex justify-center bg-black/20 rounded-lg items-center min-h-[200px]'>
-  <Summary summaryData={summaryData} />
-</div>
+      <div className='w-full flex justify-center bg-black/20 rounded-lg items-center min-h-[200px]'>
+        <Summary summaryData={summaryData} />
+      </div>
 
 
     </div>

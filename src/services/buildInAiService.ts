@@ -5,14 +5,16 @@
  * These are pure logic functions — no React hooks or state here.
  */
 
-export async function checkAvailability(): Promise<string> {
+import { AIAvailability } from './builtInSummaryService'
+
+export async function checkAvailability(): Promise<AIAvailability | 'error'> {
   try {
     const avail =
       (await (window as any).LanguageModel?.availability?.()) ??
       (await (window as any).ai?.languageModel?.availability?.())
 
     console.log('Gemini Nano availability:', avail)
-    return avail || 'unavailable'
+    return (avail as AIAvailability) || AIAvailability.NO
   } catch (err) {
     console.error('Error checking availability:', err)
     return 'error'
