@@ -33,7 +33,7 @@ interface AIDailySummaryProps {
   onBack: () => void
 }
 
-export default function AIDailySummary({ onBack }: AIDailySummaryProps) {
+export default function DailySummary({ onBack }: AIDailySummaryProps) {
   const [summaryData, setSummaryData] = useState<DailySummaryData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -221,7 +221,7 @@ export default function AIDailySummary({ onBack }: AIDailySummaryProps) {
       {/* AI Insights - Actionable Recommendations */}
       <div className="bg-black/20 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-white">AI Recommendations</h3>
+          <h3 className="text-sm font-semibold text-white">AI Insights</h3>
           <button
             onClick={generateNewInsights}
             disabled={isGenerating}

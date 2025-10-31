@@ -12,7 +12,7 @@ import { useTimerStore } from '@/store/useTimerStore'
 import { getStorage, setStorage, getMultipleStorage } from '@/utils/storage'
 import { checkAndArchiveIfNeeded } from '@/utils/historyManager'
 import { aiService } from '@/services/aiService'
-import { BarChart3, Bot, Settings, RotateCcw } from 'lucide-react'
+import { BarChart3, Bot, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 function App() {
   const { tasks, setTasks } = useTaskStore()
@@ -29,27 +29,29 @@ function App() {
       await checkAndArchiveIfNeeded()
       
       // 2. 加载数据
-      const { tasks: savedTasks, settings: savedSettings, geminiApiKey, aiModePreference } = 
-        await getMultipleStorage(['tasks', 'settings', 'geminiApiKey', 'aiModePreference'])
+      const { tasks: savedTasks, settings: savedSettings, geminiApiKey } = 
+        await getMultipleStorage(['tasks', 'settings', 'geminiApiKey'])
 
       if (savedTasks) setTasks(savedTasks)
-      if (savedSettings) setSettings(savedSettings)
+      
+      // 加载设置（包含 aiProvider）
+      if (savedSettings) {
+        setSettings(savedSettings)
+        // 从设置中获取 AI 提供商偏好
+        const aiProvider = savedSettings.aiProvider || 'builtin'
+        aiService.setModePreference(aiProvider)
+        console.log('AI 模式偏好已从设置加载:', aiProvider)
+      } else {
+        // 如果没有设置，使用默认值
+        const defaultProvider = 'builtin'
+        aiService.setModePreference(defaultProvider)
+        console.log('使用默认 AI 模式:', defaultProvider)
+      }
       
       // 3. 初始化 AI 服务
       if (geminiApiKey) {
         aiService.setApiKey(geminiApiKey)
         console.log('AI API Key 已加载')
-      }
-      
-      if (aiModePreference) {
-        aiService.setModePreference(aiModePreference)
-        console.log('AI 模式偏好已加载:', aiModePreference)
-      } else {
-        // 如果没有设置，使用默认值并保存
-        const defaultMode = 'cloud'
-        aiService.setModePreference(defaultMode)
-        await setStorage('aiModePreference', defaultMode)
-        console.log('使用默认 AI 模式:', defaultMode)
       }
     }
 
@@ -80,7 +82,6 @@ function App() {
     'settings' | 'analysis' | 'ai' | null
   >(null)
   const [isClosing, setIsClosing] = useState(false)
-  const [showDebugButton] = useState(true) // 调试按钮开关
   
   // 监听每日重置消息
   useEffect(() => {
@@ -120,56 +121,27 @@ function App() {
 
   function setAnalysisPanel(e: React.MouseEvent) {
     e.preventDefault()
-    setActivePanel(activePanel === 'analysis' ? null : 'analysis')
+    if (activePanel === 'analysis') {
+      setIsClosing(true)
+      setTimeout(() => {
+        setActivePanel(null)
+        setIsClosing(false)
+      }, 300)
+    } else {
+      setActivePanel('analysis')
+    }
   }
 
   function setAIPanel(e: React.MouseEvent) {
     e.preventDefault()
-    setActivePanel(activePanel === 'ai' ? null : 'ai')
-  }
-  
-  // 调试：手动触发每日重置
-  async function handleDebugReset(e: React.MouseEvent) {
-    e.preventDefault()
-    if (!confirm('确定要模拟零点归档和重置吗？这将归档当前数据并清空任务列表。')) {
-      return
-    }
-    
-    try {
-      console.log('=== 开始手动触发每日重置 ===')
-      console.log('当前任务数:', tasks.length)
-      
-      // 发送消息到 background script
-      const response = await chrome.runtime.sendMessage({ type: 'TRIGGER_DAILY_RESET' })
-      console.log('Background 响应:', response)
-      
-      if (response && response.success) {
-        console.log('归档成功，开始重新加载数据')
-        
-        // 重新加载数据
-        const { tasks: newTasks, history } = await getMultipleStorage(['tasks', 'history'])
-        
-        console.log('重新加载后的任务数:', newTasks?.length || 0)
-        console.log('历史记录:', history)
-        
-        setTasks(newTasks || [])
-        
-        // 重置计时器状态
-        const { reset, setStatus, setTotalSeconds } = useTimerStore.getState()
-        reset()
-        setStatus('idle')
-        setTotalSeconds(workDuration * 60)
-        console.log('计时器已重置')
-        console.log('=== 重置完成 ===')
-        
-        alert('归档和重置成功！请查看控制台日志。')
-      } else {
-        console.error('归档失败:', response)
-        alert('归档和重置失败: ' + (response?.error || '未知错误'))
-      }
-    } catch (error) {
-      console.error('触发重置失败:', error)
-      alert('触发重置失败: ' + (error as Error).message)
+    if (activePanel === 'ai') {
+      setIsClosing(true)
+      setTimeout(() => {
+        setActivePanel(null)
+        setIsClosing(false)
+      }, 300)
+    } else {
+      setActivePanel('ai')
     }
   }
 
@@ -244,20 +216,6 @@ function App() {
           >
             <Bot className="w-5 h-5" />
           </button>
-          
-          {/* 调试按钮：手动触发每日重置 */}
-          {showDebugButton && (
-            <button
-              onClick={handleDebugReset}
-              title="调试：模拟零点归档和重置"
-              className={`p-2 rounded-lg transition-all duration-300 ${theme === 'dark'
-                ? 'bg-orange-700 hover:bg-orange-600 text-white'
-                : 'bg-orange-500 hover:bg-orange-600 text-white'
-                }`}
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
-          )}
         </div>
 
         {/* Footer */}
@@ -270,8 +228,8 @@ function App() {
         </div>
       </div>
 
-      {/* Settings Modal */}
-      {(activePanel === 'settings' || isClosing) && (
+      {/* Unified Modal Container */}
+      {activePanel && (
         <div
           className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
           style={{
@@ -281,7 +239,7 @@ function App() {
             pointerEvents: 'none',
           }}
         >
-          {/* Settings Panel */}
+          {/* Panel Container */}
           <div
             className="relative w-full max-w-md mb-4"
             style={{
@@ -292,85 +250,39 @@ function App() {
             }}
             onClick={e => e.stopPropagation()}
           >
-            <SettingsPanel
-              onClose={() => {
-                setIsClosing(true)
-                setTimeout(() => {
-                  setActivePanel(null)
-                  setIsClosing(false)
-                }, 300)
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Analysis Modal */}
-      {(activePanel === 'analysis' || isClosing) && (
-        <div
-          className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
-          style={{
-            top: 'auto',
-            bottom: '120px',
-            height: 'calc(100vh - 220px)',
-            pointerEvents: 'none',
-          }}
-        >
-          {/* Analysis Panel */}
-          <div
-            className="relative w-full max-w-md mb-4"
-            style={{
-              animation: isClosing
-                ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
-                : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              pointerEvents: 'auto',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <Analysis
-              onClose={() => {
-                setIsClosing(true)
-                setTimeout(() => {
-                  setActivePanel(null)
-                  setIsClosing(false)
-                }, 300)
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* AI Modal */}
-      {(activePanel === 'ai' || isClosing) && (
-        <div
-          className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
-          style={{
-            top: 'auto',
-            bottom: '120px',
-            height: 'calc(100vh - 220px)',
-            pointerEvents: 'none',
-          }}
-        >
-          {/* AI Panel */}
-          <div
-            className="relative w-full max-w-md mb-4"
-            style={{
-              animation: isClosing
-                ? 'slideDown 0.3s cubic-bezier(0.4, 0, 1, 1)'
-                : 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              pointerEvents: 'auto',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <AI
-              onClose={() => {
-                setIsClosing(true)
-                setTimeout(() => {
-                  setActivePanel(null)
-                  setIsClosing(false)
-                }, 300)
-              }}
-            />
+            {activePanel === 'settings' && (
+              <SettingsPanel
+                onClose={() => {
+                  setIsClosing(true)
+                  setTimeout(() => {
+                    setActivePanel(null)
+                    setIsClosing(false)
+                  }, 300)
+                }}
+              />
+            )}
+            {activePanel === 'analysis' && (
+              <Analysis
+                onClose={() => {
+                  setIsClosing(true)
+                  setTimeout(() => {
+                    setActivePanel(null)
+                    setIsClosing(false)
+                  }, 300)
+                }}
+              />
+            )}
+            {activePanel === 'ai' && (
+              <AI
+                onClose={() => {
+                  setIsClosing(true)
+                  setTimeout(() => {
+                    setActivePanel(null)
+                    setIsClosing(false)
+                  }, 300)
+                }}
+              />
+            )}
           </div>
         </div>
       )}

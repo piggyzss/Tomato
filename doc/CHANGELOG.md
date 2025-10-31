@@ -1,11 +1,33 @@
 # 更新日志
 
+## v0.2.2 - 2024-10-31
+
+### 🐛 Bug 修复
+
+#### Chat Cat 消息发送问题
+- ✅ 修复 `buildInAiService.ts` 中的 JSX 注释语法错误
+- ✅ 修复 `session.prompt()` 调用方式，改为直接传递字符串而非数组
+- ✅ 简化 `createChatSession()` 配置，使用标准的 `systemPrompt` 参数
+- ✅ 移除不必要的复杂配置（expectedOutputs, initialPrompts 等）
+
+### 🔧 架构优化
+
+#### AI 状态管理重构
+- ✅ 移除 AI/index.tsx 中未使用的 apiStatus 状态和 useEffect
+- ✅ 添加加载状态显示，提升用户体验
+- ✅ 导出 `AIAPIStatus` 类型供其他组件使用
+
+#### 代码规范优化
+- ✅ 统一所有相对路径导入为 `@/` 绝对路径（共 20 个文件）
+- ✅ 提升代码可维护性和可读性
+- ✅ 遵循单一职责原则，服务层负责数据获取
+
 ## v0.2.1 - 2024-10-31
 
 ### 🎨 功能优化
 
 #### AI Insights 与 AI Summary 区分
-- ✅ **AI Recommendations（AI 建议）**：专注于生成可操作的生产力建议
+- ✅ **AI Insights（AI 建议）**：专注于生成可操作的生产力建议
   - 提供时间管理策略
   - 任务优先级技巧
   - 休息和能量管理建议
@@ -21,7 +43,6 @@
 - 新增 `buildInsightsPrompt()` 函数用于生成建议型 prompt
 - 新增 `generateInsights()` 函数专门处理建议生成
 - 保持 `buildPresetSummaryText()` 和 `generateSummary()` 用于总结功能
-- 更新组件标题从 "AI Insights" 改为 "AI Recommendations"
 
 ## v0.2.0 - 2024-10-31
 
@@ -32,7 +53,6 @@
 - ✅ 历史数据存储：保留最近 90 天的历史记录
 - ✅ 历史数据查看：在分析面板中查看过往表现
 - ✅ 跨天检测：启动时自动检测并处理跨天情况
-- ✅ 调试按钮：手动触发归档和重置（用于测试）
 - ✅ 计时器重置：归档时自动重置计时器状态到初始状态
 
 #### AI 模式管理优化
@@ -74,7 +94,6 @@
 - 修复首次安装时缺少默认配置的问题
 
 ### 🎨 UI 改进
-- 添加调试重置按钮（橙色，带旋转图标）
 - AI 配置页面显示当前状态和实际 provider
 - 历史记录页面美化，支持日期格式化
 

@@ -1,8 +1,6 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
 import {
   ArrowLeft,
-  Bell,
-  Bot,
   Globe,
   Palette,
   Timer,
@@ -59,26 +57,19 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
       icon: Volume2,
       color: 'bg-blue-500',
     },
-    {
-      id: 'notifications' as SettingsView,
-      title: 'Notifications',
-      description: 'Manage alert preferences',
-      icon: Bell,
-      color: 'bg-green-500',
-    },
+    // {
+    //   id: 'notifications' as SettingsView,
+    //   title: 'Notifications',
+    //   description: 'Manage alert preferences',
+    //   icon: Bell,
+    //   color: 'bg-green-500',
+    // },
     {
       id: 'theme' as SettingsView,
       title: 'Theme Settings',
       description: 'Light/dark mode selection',
       icon: Palette,
       color: 'bg-purple-500',
-    },
-    {
-      id: 'ai' as SettingsView,
-      title: 'AI Features',
-      description: 'AI assistant settings',
-      icon: Bot,
-      color: 'bg-pink-500',
     },
     {
       id: 'language' as SettingsView,
@@ -163,10 +154,6 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
             title="Notifications"
             icon="🔔"
           />
-        )
-      case 'ai':
-        return (
-          <SettingsPlaceholder {...commonProps} title="AI Features" icon="🤖" />
         )
       default:
         return renderMainMenu()

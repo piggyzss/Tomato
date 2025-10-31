@@ -48,7 +48,7 @@ export type SettingsView =
 export type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
 
 // 分析视图类型
-export type AnalysisView = 'menu' | 'taskFinishRate' | 'totalTime' | 'history'
+export type AnalysisView = 'menu' | 'taskFinishRate' | 'totalTime'
 
 // ============================================
 // 分析相关类型
@@ -138,6 +138,7 @@ export interface UserSettings extends PomodoroConfig {
   aiEnabled: boolean // 是否启用 AI 功能
   aiMessages: GeneratedAIMessage[] // AI 生成的消息列表
   useAIMessages: boolean // 是否使用 AI 消息替代默认消息
+  aiProvider: AIProvider // AI 提供商偏好：builtin 或 cloud
 }
 
 // 猫咪状态

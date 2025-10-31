@@ -1,6 +1,6 @@
 # AI 功能使用指南
 
-TODO: @shanshan 
+TODO: @shanshan - 重写
 
 ## 📖 目录
 

@@ -3,7 +3,6 @@ import { useState } from 'react'
 import AnalysisMainMenu from '@/components/Analysis/AnalysisMainMenu'
 import TaskFinishRate from '@/components/Analysis/TaskFinishRate'
 import TotalTime from '@/components/Analysis/TotalTime'
-import HistoryView from '@/components/Analysis/HistoryView'
 import type { AnalysisView } from '@/types'
 
 interface AnalysisProps {
@@ -15,6 +14,38 @@ export default function Analysis({ onClose }: AnalysisProps) {
 
   // Navigation state
   const [currentView, setCurrentView] = useState<AnalysisView>('menu')
+  const [nextView, setNextView] = useState<AnalysisView | null>(null)
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left')
+
+  const handleViewChange = (view: AnalysisView) => {
+    if (nextView !== null) return // 防止动画期间多次点击
+
+    const direction = view === 'menu' ? 'right' : 'left'
+    setSlideDirection(direction)
+    setNextView(view)
+
+    // 300ms 后完成切换
+    setTimeout(() => {
+      setCurrentView(view)
+      setNextView(null)
+    }, 300)
+  }
+
+  // Render current view
+  const renderCurrentView = () => {
+    const view = nextView || currentView
+
+    switch (view) {
+      case 'menu':
+        return <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+      case 'taskFinishRate':
+        return <TaskFinishRate onBack={() => handleViewChange('menu')} />
+      case 'totalTime':
+        return <TotalTime onBack={() => handleViewChange('menu')} />
+      default:
+        return <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+    }
+  }
 
   return (
     <div
@@ -27,21 +58,18 @@ export default function Analysis({ onClose }: AnalysisProps) {
       }}
     >
       <div className="max-w-md mx-auto h-full overflow-hidden text-white relative">
-        <div className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-          {currentView === 'menu' && (
-            <AnalysisMainMenu onClose={onClose} onNavigate={setCurrentView} />
-          )}
-          {currentView === 'taskFinishRate' && (
-            <TaskFinishRate onBack={() => setCurrentView('menu')} />
-          )}
-          {currentView === 'totalTime' && (
-            <TotalTime onBack={() => setCurrentView('menu')} />
-          )}
-          {currentView === 'history' && (
-            <HistoryView
-              onBack={() => setCurrentView('menu')}
-            />
-          )}
+        {/* 只渲染一个视图，使用 key 强制重新挂载 */}
+        <div
+          key={nextView || currentView}
+          className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+          style={{
+            animation:
+              nextView !== null
+                ? `slideInFrom${slideDirection === 'left' ? 'Right' : 'Left'} 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
+                : 'none',
+          }}
+        >
+          {renderCurrentView()}
         </div>
       </div>
     </div>

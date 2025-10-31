@@ -17,7 +17,7 @@ chrome.runtime.onInstalled.addListener(async details => {
       aiHistory: [],
       history: {},
       lastResetDate: today,
-      aiModePreference: 'cloud', // 默认使用云端 AI（更稳定）
+      aiModePreference: 'builtin', // 默认使用内置 AI
       settings: {
         workDuration: 10 / 60, // 10秒，方便调试
         shortBreakDuration: 5,
@@ -31,10 +31,11 @@ chrome.runtime.onInstalled.addListener(async details => {
         aiEnabled: false,
         aiMessages: [],
         useAIMessages: false,
+        aiProvider: 'builtin', // 默认使用内置 AI
       },
     })
     
-    console.log('初始化完成，默认 AI 模式: cloud')
+    console.log('初始化完成，默认 AI 模式: builtin')
   }
   
   // 设置每日零点定时任务
@@ -55,14 +56,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     case 'SHOW_NOTIFICATION':
       showNotification(message.title, message.body)
       break
-    case 'TRIGGER_DAILY_RESET':
-      // 手动触发每日重置（用于调试）
-      handleDailyReset(true).then(() => {
-        sendResponse({ success: true })
-      }).catch(error => {
-        sendResponse({ success: false, error: error.message })
-      })
-      return true // 保持消息通道开启
     default:
       console.warn('未知消息类型:', message.type)
   }

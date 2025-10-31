@@ -19,6 +19,7 @@ const defaultData: Partial<StorageData> = {
     aiEnabled: false,
     aiMessages: [],
     useAIMessages: false,
+    aiProvider: 'builtin', // 默认使用内置 AI
   },
 }
 

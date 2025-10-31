@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle, Clock, Calendar } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Clock } from 'lucide-react'
 import { ModalWithClose } from '@/components/Common'
 import type { AnalysisView } from '@/types'
 
@@ -26,13 +26,6 @@ export default function AnalysisMainMenu({
       description: 'Analyze working time with flexible filtering options',
       icon: Clock,
       color: 'bg-blue-500',
-    },
-    {
-      id: 'history' as AnalysisView,
-      title: 'History',
-      description: 'View your past daily performance and archived data',
-      icon: Calendar,
-      color: 'bg-purple-500',
     },
   ]
 

@@ -20,6 +20,7 @@ const defaultSettings: UserSettings = {
   aiEnabled: false,
   aiMessages: [], // Add support for custom AI messages
   useAIMessages: false, // Toggle to use AI messages instead of default ones
+  aiProvider: 'builtin', // AI 提供商偏好：builtin 或 cloud
 }
 
 export const useSettingsStore = create<SettingsState>(set => ({
