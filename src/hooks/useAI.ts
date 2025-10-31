@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import {
-  aiService,
-  AISessionConfig,
-  IAISession,
-} from '@/services/aiService'
+import { aiService, AISessionConfig, IAISession } from '@/services/aiService'
 import type { AIProvider, AIStatus } from '@/types'
-
 
 /**
  * useAI Hook 返回值
@@ -73,39 +68,47 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
 
   // 自动初始化会话
   useEffect(() => {
-    if (autoInit && status === 'ready' && !session && (builtInAvailable || cloudAvailable)) {
+    if (
+      autoInit &&
+      status === 'ready' &&
+      !session &&
+      (builtInAvailable || cloudAvailable)
+    ) {
       createSession(config)
     }
   }, [autoInit, status, session, builtInAvailable, cloudAvailable])
 
   // 创建会话
-  const createSession = useCallback(async (sessionConfig?: AISessionConfig) => {
-    // 检查是否有可用的 AI
-    if (!builtInAvailable && !cloudAvailable) {
-      const errorMsg = '没有可用的 AI 提供商，请配置云端 AI 或启用内置 AI'
-      setError(errorMsg)
-      setStatus('unavailable')
-      return
-    }
+  const createSession = useCallback(
+    async (sessionConfig?: AISessionConfig) => {
+      // 检查是否有可用的 AI
+      if (!builtInAvailable && !cloudAvailable) {
+        const errorMsg = '没有可用的 AI 提供商，请配置云端 AI 或启用内置 AI'
+        setError(errorMsg)
+        setStatus('unavailable')
+        return
+      }
 
-    setIsLoading(true)
-    setError(null)
+      setIsLoading(true)
+      setError(null)
 
-    try {
-      const { session: newSession, provider: usedProvider } =
-        await aiService.createSession(sessionConfig)
+      try {
+        const { session: newSession, provider: usedProvider } =
+          await aiService.createSession(sessionConfig)
 
-      setSession(newSession)
-      setProvider(usedProvider)
-      setStatus('ready')
-    } catch (err) {
-      console.error('Create session error:', err)
-      setStatus('error')
-      setError(err instanceof Error ? err.message : '创建会话失败')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [builtInAvailable, cloudAvailable])
+        setSession(newSession)
+        setProvider(usedProvider)
+        setStatus('ready')
+      } catch (err) {
+        console.error('Create session error:', err)
+        setStatus('error')
+        setError(err instanceof Error ? err.message : '创建会话失败')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [builtInAvailable, cloudAvailable]
+  )
 
   // 发送提示词（使用现有会话）
   const prompt = useCallback(

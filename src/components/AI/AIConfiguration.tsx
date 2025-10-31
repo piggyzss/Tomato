@@ -13,86 +13,100 @@ interface AIAPIDemoProps {
   onOpenSettings: () => void
 }
 
-export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoProps) {
+export default function AIConfiguration({
+  onBack,
+  onOpenSettings,
+}: AIAPIDemoProps) {
   const { aiProvider, updateSettings } = useSettingsStore()
-  const [builtInAvailable, setBuiltInAvailable] = useState<AIAvailability>('checking')
+  const [builtInAvailable, setBuiltInAvailable] =
+    useState<AIAvailability>('checking')
   const [actualProvider, setActualProvider] = useState<AIProvider | null>(null)
 
   const { status, error, cloudAvailable } = useAI(false, {
     systemPrompt:
-      '你是一只可爱的番茄猫助手，用简短、友好、鼓励的语气回答问题。',
+      'You are a cute tomato cat assistant, answer questions with a brief, friendly, and encouraging tone.',
   })
 
-  // 初始化：从全局状态加载并同步到 aiService
+  // Initialize: Load from global state and sync to aiService
   useEffect(() => {
     aiService.setModePreference(aiProvider)
-    
-    // 统一检查所有可用性
+
+    // Check all availability uniformly
     const checkAvailability = async () => {
-      // 1. 检查内置 AI
+      // 1. Check built-in AI
       try {
         const availability = await aiService.getBuiltInAvailabilityStatus()
         const goodStates = ['readily', 'after-download', 'available']
-        
+
         console.log('🔍 Built-in AI status:', availability)
-        
+
         if (goodStates.includes(availability)) {
           setBuiltInAvailable('ready')
         } else {
           setBuiltInAvailable('unavailable')
         }
       } catch (error) {
-        console.error('检查内置 AI 失败:', error)
+        console.error('Failed to check built-in AI:', error)
         setBuiltInAvailable('unavailable')
       }
-      
-      // 2. 检查实际可用的 provider
+
+      // 2. Check actual available provider
       const available = await aiService.getAvailableProvider()
       setActualProvider(available)
-      console.log('🔍 AI 模式偏好:', aiProvider, '实际可用:', available)
+      console.log(
+        '🔍 AI mode preference:',
+        aiProvider,
+        'actually available:',
+        available
+      )
     }
-    
+
     checkAvailability()
   }, [aiProvider])
 
-  // 切换 provider 时立即生效
+  // Take effect immediately when switching provider
   const handleProviderChange = async (provider: AIProvider) => {
-    // 更新全局状态
+    // Update global state
     updateSettings({ aiProvider: provider })
-    
-    // 同步到 aiService
+
+    // Sync to aiService
     aiService.setModePreference(provider)
-    
-    // 重新检查内置 AI 可用性
+
+    // Re-check built-in AI availability
     try {
       const availability = await aiService.getBuiltInAvailabilityStatus()
       const goodStates = ['readily', 'after-download', 'available']
-      
+
       if (goodStates.includes(availability)) {
         setBuiltInAvailable('ready')
       } else {
         setBuiltInAvailable('unavailable')
       }
     } catch (error) {
-      console.error('检查内置 AI 失败:', error)
+      console.error('Failed to check built-in AI:', error)
       setBuiltInAvailable('unavailable')
     }
-    
-    // 重新检查实际可用的 provider
+
+    // Re-check actual available provider
     const available = await aiService.getAvailableProvider()
     setActualProvider(available)
-    
-    console.log('💾 切换 AI 模式:', provider, '实际可用:', available)
+
+    console.log(
+      '💾 Switching AI mode:',
+      provider,
+      'actually available:',
+      available
+    )
   }
 
-  // AI Provider 配置
+  // AI Provider configuration
   const providers = [
     {
       id: 'builtin' as AIProvider,
       label: 'Chrome Built-in AI',
       icon: Chrome,
       color: 'bg-green-500',
-      description: 'Use Chrome\'s built-in Gemini Nano',
+      description: "Use Chrome's built-in Gemini Nano",
       available: builtInAvailable === 'ready',
     },
     {
@@ -174,18 +188,28 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
             </div>
             <div className="flex justify-between">
               <span>Actual Provider:</span>
-              <span className={`font-mono ${
-                actualProvider === aiProvider 
-                  ? 'text-green-300' 
-                  : 'text-yellow-300'
-              }`}>
-                {actualProvider === 'builtin' ? 'Built-in AI' : actualProvider === 'cloud' ? 'Cloud AI' : 'Checking...'}
+              <span
+                className={`font-mono ${
+                  actualProvider === aiProvider
+                    ? 'text-green-300'
+                    : 'text-yellow-300'
+                }`}
+              >
+                {actualProvider === 'builtin'
+                  ? 'Built-in AI'
+                  : actualProvider === 'cloud'
+                    ? 'Cloud AI'
+                    : 'Checking...'}
               </span>
             </div>
             <div className="flex justify-between">
               <span>Built-in AI:</span>
               <span className="font-mono">
-                {builtInAvailable === 'ready' ? '✅ Ready' : builtInAvailable === 'checking' ? '⏳ Checking' : '❌ Unavailable'}
+                {builtInAvailable === 'ready'
+                  ? '✅ Ready'
+                  : builtInAvailable === 'checking'
+                    ? '⏳ Checking'
+                    : '❌ Unavailable'}
               </span>
             </div>
             <div className="flex justify-between">
@@ -198,22 +222,23 @@ export default function AIConfiguration({ onBack, onOpenSettings }: AIAPIDemoPro
         </div>
 
         {/* Warning if preference doesn't match actual */}
-        {actualProvider && actualProvider !== aiProvider && builtInAvailable !== 'checking' && (
-          <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs text-yellow-200">
-            <div className="font-semibold mb-1">⚠️ Auto Fallback</div>
-            <div>
-              {aiProvider === 'builtin' 
-                ? 'Built-in AI is unavailable, will automatically switch to Cloud AI when needed'
-                : 'Cloud AI is not configured, will automatically switch to Built-in AI when needed'
-              }
+        {actualProvider &&
+          actualProvider !== aiProvider &&
+          builtInAvailable !== 'checking' && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs text-yellow-200">
+              <div className="font-semibold mb-1">⚠️ Auto Fallback</div>
+              <div>
+                {aiProvider === 'builtin'
+                  ? 'Built-in AI is unavailable, will automatically switch to Cloud AI when needed'
+                  : 'Cloud AI is not configured, will automatically switch to Built-in AI when needed'}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Configuration Details */}
         <div className="mb-6">
           <h3 className="font-semibold mb-3">Configuration</h3>
-          
+
           {/* Built-in AI Mode */}
           {aiProvider === 'builtin' && (
             <BuiltInAIConfiguration builtInAvailable={builtInAvailable} />

@@ -1,4 +1,3 @@
-
 // @panpan
 import { useState } from 'react'
 import { Brain, RefreshCw } from 'lucide-react'
@@ -77,9 +76,7 @@ export default function Summary({ summaryData }: SummaryProps) {
         {!isSummarizing && summaryText && <p>{summaryText}</p>}
 
         {error && (
-          <p className="text-red-400 text-xs mt-2 text-center">
-            ⚠️ {error}
-          </p>
+          <p className="text-red-400 text-xs mt-2 text-center">⚠️ {error}</p>
         )}
       </div>
     </div>

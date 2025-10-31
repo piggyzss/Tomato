@@ -1,11 +1,5 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import {
-  ArrowLeft,
-  Globe,
-  Palette,
-  Timer,
-  Volume2,
-} from 'lucide-react'
+import { ArrowLeft, Globe, Palette, Timer, Volume2 } from 'lucide-react'
 import { useState } from 'react'
 import TimerSettings from '@/components/Settings/TimerSettings'
 import SoundSettings from '@/components/Settings/SoundSettings'

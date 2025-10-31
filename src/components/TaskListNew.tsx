@@ -126,141 +126,145 @@ export function TaskListNew() {
         ) : (
           <div className="space-y-2">
             {tasks.map(task => {
-            const isActive = currentTaskId === task.id
+              const isActive = currentTaskId === task.id
 
-            return (
-              <div
-                key={task.id}
-                className={clsx(
-                  'rounded-lg overflow-visible transition-all relative',
-                  isActive
-                    ? theme === 'dark'
-                      ? 'border-l-4 border-l-tomato bg-gray-700/50'
-                      : 'border-l-4 border-l-tomato bg-gray-100'
-                    : theme === 'dark'
-                      ? 'bg-gray-800/50'
-                      : 'bg-white'
-                )}
-              >
-                <div className="px-1.5 py-3 flex items-center gap-1">
-                  {/* Checkbox */}
-                  <button
-                    onClick={e => handleToggleComplete(task.id, e)}
-                    className={clsx(
-                      'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all',
-                      task.status === 'completed'
-                        ? theme === 'dark'
-                          ? 'bg-green-600 border-green-600'
-                          : 'bg-[#3d2b2b] border-[#3d2b2b]'
-                        : theme === 'dark'
-                          ? 'border-gray-500 hover:border-gray-400'
-                          : 'border-gray-300 hover:border-gray-400'
-                    )}
-                  >
-                    {task.status === 'completed' && (
-                      <Check size={14} className="text-white" strokeWidth={3} />
-                    )}
-                  </button>
-
-                  {/* Task Info */}
-                  <div className="flex-1 min-w-0">
-                    <div
+              return (
+                <div
+                  key={task.id}
+                  className={clsx(
+                    'rounded-lg overflow-visible transition-all relative',
+                    isActive
+                      ? theme === 'dark'
+                        ? 'border-l-4 border-l-tomato bg-gray-700/50'
+                        : 'border-l-4 border-l-tomato bg-gray-100'
+                      : theme === 'dark'
+                        ? 'bg-gray-800/50'
+                        : 'bg-white'
+                  )}
+                >
+                  <div className="px-1.5 py-3 flex items-center gap-1">
+                    {/* Checkbox */}
+                    <button
+                      onClick={e => handleToggleComplete(task.id, e)}
                       className={clsx(
-                        'font-semibold text-sm transition-colors duration-300 truncate',
+                        'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all',
                         task.status === 'completed'
                           ? theme === 'dark'
-                            ? 'line-through text-gray-500'
-                            : 'line-through text-gray-400'
+                            ? 'bg-green-600 border-green-600'
+                            : 'bg-[#3d2b2b] border-[#3d2b2b]'
                           : theme === 'dark'
-                            ? 'text-white'
-                            : 'text-[#3d2b2b]'
+                            ? 'border-gray-500 hover:border-gray-400'
+                            : 'border-gray-300 hover:border-gray-400'
                       )}
-                      title={task.title}
                     >
-                      {task.title}
-                    </div>
-                  </div>
-
-                  {/* Status Display or Select Button */}
-                  {task.status !== 'completed' && (
-                    <>
-                      {isActive ? (
-                        <div
-                          className={clsx(
-                            'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
-                            theme === 'dark'
-                              ? 'bg-tomato/20 text-tomato'
-                              : 'bg-tomato/10 text-tomato'
-                          )}
-                        >
-                          {mode === 'shortBreak' || mode === 'longBreak' ? (
-                            // During break modes
-                            <>
-                              <Coffee size={12} />
-                              In Break
-                            </>
-                          ) : status === 'running' ? (
-                            // Timer running in pomodoro mode
-                            <>
-                              <Monitor size={12} />
-                              Working
-                            </>
-                          ) : status === 'paused' ? (
-                            // Timer paused in pomodoro mode
-                            <>
-                              <MonitorX size={12} />
-                              Paused
-                            </>
-                          ) : (
-                            // Timer idle in pomodoro mode
-                            <>
-                              <MonitorPlay size={12} />
-                              Ready
-                            </>
-                          )}
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleSelectTask(task.id)}
-                          className={clsx(
-                            'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
-                            theme === 'dark'
-                              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          )}
-                        >
-                          <SquareMousePointer size={12} />
-                          Select
-                        </button>
+                      {task.status === 'completed' && (
+                        <Check
+                          size={14}
+                          className="text-white"
+                          strokeWidth={3}
+                        />
                       )}
-                    </>
-                  )}
+                    </button>
 
-                  {/* Time Spent */}
-                  <div
-                    className={`text-xs font-bold min-w-[42px] text-right transition-colors duration-300 ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`}
-                  >
-                    {formatTime(task.totalTimeSpent)}
+                    {/* Task Info */}
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={clsx(
+                          'font-semibold text-sm transition-colors duration-300 truncate',
+                          task.status === 'completed'
+                            ? theme === 'dark'
+                              ? 'line-through text-gray-500'
+                              : 'line-through text-gray-400'
+                            : theme === 'dark'
+                              ? 'text-white'
+                              : 'text-[#3d2b2b]'
+                        )}
+                        title={task.title}
+                      >
+                        {task.title}
+                      </div>
+                    </div>
+
+                    {/* Status Display or Select Button */}
+                    {task.status !== 'completed' && (
+                      <>
+                        {isActive ? (
+                          <div
+                            className={clsx(
+                              'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
+                              theme === 'dark'
+                                ? 'bg-tomato/20 text-tomato'
+                                : 'bg-tomato/10 text-tomato'
+                            )}
+                          >
+                            {mode === 'shortBreak' || mode === 'longBreak' ? (
+                              // During break modes
+                              <>
+                                <Coffee size={12} />
+                                In Break
+                              </>
+                            ) : status === 'running' ? (
+                              // Timer running in pomodoro mode
+                              <>
+                                <Monitor size={12} />
+                                Working
+                              </>
+                            ) : status === 'paused' ? (
+                              // Timer paused in pomodoro mode
+                              <>
+                                <MonitorX size={12} />
+                                Paused
+                              </>
+                            ) : (
+                              // Timer idle in pomodoro mode
+                              <>
+                                <MonitorPlay size={12} />
+                                Ready
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleSelectTask(task.id)}
+                            className={clsx(
+                              'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
+                              theme === 'dark'
+                                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            )}
+                          >
+                            <SquareMousePointer size={12} />
+                            Select
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* Time Spent */}
+                    <div
+                      className={`text-xs font-bold min-w-[42px] text-right transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}
+                    >
+                      {formatTime(task.totalTimeSpent)}
+                    </div>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => handleDeleteTask(task.id)}
+                      className={`p-0.5 rounded-lg transition-colors duration-200 ${
+                        theme === 'dark'
+                          ? 'hover:bg-red-600/20 text-gray-400 hover:text-red-400'
+                          : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
+                      }`}
+                      title="Delete task"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
-
-                  {/* Delete Button */}
-                  <button
-                    onClick={() => handleDeleteTask(task.id)}
-                    className={`p-0.5 rounded-lg transition-colors duration-200 ${
-                      theme === 'dark'
-                        ? 'hover:bg-red-600/20 text-gray-400 hover:text-red-400'
-                        : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
-                    }`}
-                    title="Delete task"
-                  >
-                    <X size={16} />
-                  </button>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
           </div>
         )}
       </div>

@@ -38,7 +38,9 @@ export function BigTimer() {
     hasLoadedRef.current = true
 
     const loadTimerState = async () => {
-      const savedState = await getStorage('timerState') as TimerPersistState | undefined
+      const savedState = (await getStorage('timerState')) as
+        | TimerPersistState
+        | undefined
       console.log('Loading timer state:', savedState)
 
       if (savedState && savedState.status === 'running') {

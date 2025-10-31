@@ -1,5 +1,9 @@
 // Background Service Worker for Chrome Extension
-import { setMultipleStorage, getMultipleStorage, setStorage } from '@/utils/storage'
+import {
+  setMultipleStorage,
+  getMultipleStorage,
+  setStorage,
+} from '@/utils/storage'
 
 // 监听插件安装
 chrome.runtime.onInstalled.addListener(async details => {
@@ -8,7 +12,7 @@ chrome.runtime.onInstalled.addListener(async details => {
   if (details.reason === 'install') {
     // 获取当前日期
     const today = new Date().toISOString().split('T')[0]
-    
+
     // 首次安装，初始化默认数据
     await setMultipleStorage({
       tasks: [],
@@ -34,10 +38,10 @@ chrome.runtime.onInstalled.addListener(async details => {
         aiProvider: 'builtin', // 默认使用内置 AI
       },
     })
-    
+
     console.log('初始化完成，默认 AI 模式: builtin')
   }
-  
+
   // 设置每日零点定时任务
   setupDailyResetAlarm()
 })
@@ -99,16 +103,18 @@ function setupDailyResetAlarm() {
     const tomorrow = new Date(now)
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(0, 0, 0, 0)
-    
+
     const delayInMinutes = (tomorrow.getTime() - now.getTime()) / (1000 * 60)
-    
+
     // 创建定时任务，每24小时重复一次
     chrome.alarms.create('dailyReset', {
       delayInMinutes: delayInMinutes,
       periodInMinutes: 24 * 60, // 每24小时
     })
-    
-    console.log(`每日重置定时任务已设置，将在 ${delayInMinutes.toFixed(2)} 分钟后首次触发`)
+
+    console.log(
+      `每日重置定时任务已设置，将在 ${delayInMinutes.toFixed(2)} 分钟后首次触发`
+    )
   })
 }
 
@@ -116,41 +122,46 @@ function setupDailyResetAlarm() {
 async function handleDailyReset(forceArchive = false) {
   try {
     console.log('开始执行每日重置', forceArchive ? '(强制归档)' : '')
-    
+
     const today = new Date().toISOString().split('T')[0]
-    
-    const { tasks, pomodoroRecords, history, lastResetDate } = await getMultipleStorage([
-      'tasks',
-      'pomodoroRecords',
-      'history',
-      'lastResetDate',
-    ])
-    
+
+    const { tasks, pomodoroRecords, history, lastResetDate } =
+      await getMultipleStorage([
+        'tasks',
+        'pomodoroRecords',
+        'history',
+        'lastResetDate',
+      ])
+
     // 如果已经重置过了，跳过（除非强制归档）
     if (!forceArchive && lastResetDate === today) {
       console.log('今天已经重置过了，跳过')
       return
     }
-    
+
     // 归档数据
     const tasksList = tasks || []
     const recordsList = pomodoroRecords || []
-    
+
     // 只有在有数据时才归档
     if (tasksList.length > 0 || recordsList.length > 0) {
       const historyData = history || {}
-      
+
       // 决定使用哪个日期作为归档 key
       // 如果是强制归档，使用今天；否则使用 lastResetDate
-      const archiveDate = forceArchive ? today : (lastResetDate || today)
-      
+      const archiveDate = forceArchive ? today : lastResetDate || today
+
       // 计算统计数据
-      const completedPomodoros = recordsList.filter((r: any) => r.completed).length
+      const completedPomodoros = recordsList.filter(
+        (r: any) => r.completed
+      ).length
       const totalFocusTime = recordsList.reduce((sum: number, r: any) => {
-        return r.completed ? sum + (r.duration / 60) : sum
+        return r.completed ? sum + r.duration / 60 : sum
       }, 0)
-      const completedTasks = tasksList.filter((t: any) => t.status === 'completed').length
-      
+      const completedTasks = tasksList.filter(
+        (t: any) => t.status === 'completed'
+      ).length
+
       // 创建历史记录
       historyData[archiveDate] = {
         date: archiveDate,
@@ -160,28 +171,32 @@ async function handleDailyReset(forceArchive = false) {
         totalFocusTime,
         completedTasks,
       }
-      
+
       console.log('归档数据到日期:', archiveDate, '任务数:', tasksList.length)
-      
+
       // 清理超过90天的数据
       const cutoffDate = new Date()
       cutoffDate.setDate(cutoffDate.getDate() - 90)
       const cutoffDateString = cutoffDate.toISOString().split('T')[0]
-      
+
       const cleanedHistory: any = {}
       for (const [date, data] of Object.entries(historyData)) {
         if (date >= cutoffDateString) {
           cleanedHistory[date] = data
         }
       }
-      
+
       // 保存历史记录
       await setStorage('history', cleanedHistory)
-      console.log('历史记录已保存，共', Object.keys(cleanedHistory).length, '天')
+      console.log(
+        '历史记录已保存，共',
+        Object.keys(cleanedHistory).length,
+        '天'
+      )
     } else {
       console.log('没有数据需要归档')
     }
-    
+
     // 重置当天数据
     console.log('开始清空当天数据...')
     await setMultipleStorage({
@@ -191,14 +206,19 @@ async function handleDailyReset(forceArchive = false) {
       timerState: undefined, // 清除计时器状态
       lastResetDate: today,
     })
-    
+
     // 验证数据已清空
-    const { tasks: verifyTasks, history: verifyHistory } = await getMultipleStorage(['tasks', 'history'])
+    const { tasks: verifyTasks, history: verifyHistory } =
+      await getMultipleStorage(['tasks', 'history'])
     console.log('重置后验证 - 任务数:', verifyTasks?.length || 0)
-    console.log('重置后验证 - 历史记录:', Object.keys(verifyHistory || {}).length, '天')
-    
+    console.log(
+      '重置后验证 - 历史记录:',
+      Object.keys(verifyHistory || {}).length,
+      '天'
+    )
+
     console.log('=== 每日重置完成 ===')
-    
+
     // 通知所有打开的页面
     chrome.runtime.sendMessage({ type: 'DAILY_RESET' }).catch(() => {
       // 忽略错误（可能没有页面在监听）

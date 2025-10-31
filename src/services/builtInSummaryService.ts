@@ -26,8 +26,8 @@ export async function createSummarizer() {
   if (!summarizerClass) {
     throw new Error(
       'Summarizer API not found. Try enabling Chrome flags:\n' +
-      'chrome://flags/#prompt-api-for-gemini-nano\n' +
-      'chrome://flags/#summarization-api-for-gemini-nano'
+        'chrome://flags/#prompt-api-for-gemini-nano\n' +
+        'chrome://flags/#summarization-api-for-gemini-nano'
     )
   }
 
@@ -40,19 +40,19 @@ export async function createSummarizer() {
   if (availability === AIAvailability.AFTER_DOWNLOAD) {
     throw new Error(
       'Summarizer model is downloading. Please wait and try again later.\n' +
-      'Check progress at: chrome://components/'
+        'Check progress at: chrome://components/'
     )
   }
 
   if (availability === AIAvailability.DOWNLOADABLE) {
     throw new Error(
       'Gemini Nano model needs to be downloaded first (about 1.5GB).\n\n' +
-      'To download:\n' +
-      '1. Visit: chrome://components/\n' +
-      '2. Find "Optimization Guide On Device Model"\n' +
-      '3. Click "Check for update"\n' +
-      '4. Wait for download to complete (10-30 minutes)\n' +
-      '5. Return and try again'
+        'To download:\n' +
+        '1. Visit: chrome://components/\n' +
+        '2. Find "Optimization Guide On Device Model"\n' +
+        '3. Click "Check for update"\n' +
+        '4. Wait for download to complete (10-30 minutes)\n' +
+        '5. Return and try again'
     )
   }
 
@@ -89,10 +89,11 @@ Today (${summaryData.date}), you completed ${summaryData.completedTasks} tasks
 and focused for ${summaryData.totalFocusTime} minutes across ${summaryData.completedPomodoros} pomodoro sessions. 
 Your average session length was ${summaryData.averageSessionLength} minutes, 
 earning a productivity score of ${summaryData.productivityScore} out of 100.
-${summaryData.productivityScore >= 80
-      ? 'You maintained excellent consistency and focus throughout the day! 🎯'
-      : 'There is room for improvement — try optimizing your break intervals for better energy flow. ⚡'
-    }
+${
+  summaryData.productivityScore >= 80
+    ? 'You maintained excellent consistency and focus throughout the day! 🎯'
+    : 'There is room for improvement — try optimizing your break intervals for better energy flow. ⚡'
+}
 Here are your AI insights:
 ${summaryData.insights.map(i => `- ${i}`).join('\n')}
 `

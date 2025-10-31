@@ -1,5 +1,10 @@
 import type { DailyHistory, Task, PomodoroRecord } from '@/types'
-import { getStorage, setStorage, getMultipleStorage, setMultipleStorage } from '@/utils/storage'
+import {
+  getStorage,
+  setStorage,
+  getMultipleStorage,
+  setMultipleStorage,
+} from '@/utils/storage'
 
 /**
  * 获取当前日期字符串 YYYY-MM-DD
@@ -25,11 +30,14 @@ export async function archiveTodayData(): Promise<void> {
     ])
 
     // 计算统计数据
-    const completedPomodoros = pomodoroRecords?.filter((r: PomodoroRecord) => r.completed).length || 0
-    const totalFocusTime = pomodoroRecords?.reduce((sum: number, r: PomodoroRecord) => {
-      return r.completed ? sum + (r.duration / 60) : sum
-    }, 0) || 0
-    const completedTasks = tasks?.filter((t: Task) => t.status === 'completed').length || 0
+    const completedPomodoros =
+      pomodoroRecords?.filter((r: PomodoroRecord) => r.completed).length || 0
+    const totalFocusTime =
+      pomodoroRecords?.reduce((sum: number, r: PomodoroRecord) => {
+        return r.completed ? sum + r.duration / 60 : sum
+      }, 0) || 0
+    const completedTasks =
+      tasks?.filter((t: Task) => t.status === 'completed').length || 0
 
     // 创建今日历史记录
     const todayHistory: DailyHistory = {
@@ -96,7 +104,7 @@ export async function checkAndArchiveIfNeeded(): Promise<boolean> {
     // 如果是首次运行或者日期不同，需要归档
     if (!lastResetDate || lastResetDate !== today) {
       console.log('检测到跨天，开始归档和重置')
-      
+
       // 只有在有上次重置日期时才归档（避免首次运行归档空数据）
       if (lastResetDate) {
         await archiveTodayData()
@@ -104,7 +112,7 @@ export async function checkAndArchiveIfNeeded(): Promise<boolean> {
         // 首次运行，只设置日期
         await setStorage('lastResetDate', today)
       }
-      
+
       await resetTodayData()
       return true
     }
@@ -151,7 +159,9 @@ export async function getHistory(): Promise<Record<string, DailyHistory>> {
 /**
  * 获取指定日期的历史数据
  */
-export async function getHistoryByDate(date: string): Promise<DailyHistory | null> {
+export async function getHistoryByDate(
+  date: string
+): Promise<DailyHistory | null> {
   const history = await getHistory()
   return history[date] || null
 }

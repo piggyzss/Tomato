@@ -11,7 +11,13 @@ export function generateDefaultInsights(stats: {
   productivityScore: number
   totalTasks: number
 }): string[] {
-  const { completedPomodoros, completedTasks, totalFocusTime, productivityScore, totalTasks } = stats
+  const {
+    completedPomodoros,
+    completedTasks,
+    totalFocusTime,
+    productivityScore,
+    totalTasks,
+  } = stats
   const insights: string[] = []
 
   // Pomodoro completion insight
@@ -23,7 +29,9 @@ export function generateDefaultInsights(stats: {
 
   // Task completion insight
   if (completedTasks > 0) {
-    insights.push(`✅ ${completedTasks} task${completedTasks > 1 ? 's' : ''} completed - great progress!`)
+    insights.push(
+      `✅ ${completedTasks} task${completedTasks > 1 ? 's' : ''} completed - great progress!`
+    )
   }
 
   // Focus time insight
@@ -41,7 +49,9 @@ export function generateDefaultInsights(stats: {
   } else if (productivityScore >= 60) {
     insights.push('👍 Good work today, keep it up!')
   } else if (totalTasks === 0 && completedPomodoros === 0) {
-    insights.push('💡 Click the refresh button above to get AI-powered recommendations!')
+    insights.push(
+      '💡 Click the refresh button above to get AI-powered recommendations!'
+    )
   }
 
   // Ensure at least one insight
@@ -63,7 +73,7 @@ export function parseAISummaryToInsights(
   maxInsights: number = 4
 ): string[] {
   const summaryText = String(aiSummary)
-  
+
   const insights = summaryText
     .split('\n')
     .filter((line: string) => line.trim().length > 0)

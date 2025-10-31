@@ -16,10 +16,7 @@ interface AIMainMenuProps {
   ) => void
 }
 
-export default function AIMainMenu({
-  onClose,
-  onNavigate,
-}: AIMainMenuProps) {
+export default function AIMainMenu({ onClose, onNavigate }: AIMainMenuProps) {
   const [aiAvailable, setAiAvailable] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -37,10 +34,10 @@ export default function AIMainMenu({
     {
       id: 'apiDemo' as const,
       title: 'AI API',
-      description: '内置 AI / 云端 AI',
+      description: 'Built-in AI / Cloud AI',
       icon: Sparkles,
       color: 'bg-gradient-to-r from-purple-500 to-pink-500',
-      badge: '推荐',
+      badge: 'Recommended',
     },
     {
       id: 'catMessages' as const,
@@ -58,8 +55,8 @@ export default function AIMainMenu({
     },
     {
       id: 'settings' as const,
-      title: 'AI 设置',
-      description: '配置 Gemini API Key',
+      title: 'AI Settings',
+      description: 'Configure Gemini API Key',
       icon: Settings,
       color: 'bg-gray-600',
     },
@@ -77,7 +74,9 @@ export default function AIMainMenu({
           <div className="p-4 rounded-lg bg-black/20 border border-white/20">
             <div className="flex items-center gap-2">
               <div className="animate-spin w-4 h-4 border-2 border-white/20 border-t-white rounded-full"></div>
-              <span className="text-sm text-white/70">Checking AI availability...</span>
+              <span className="text-sm text-white/70">
+                Checking AI availability...
+              </span>
             </div>
           </div>
         )}

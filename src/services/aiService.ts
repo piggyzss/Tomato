@@ -118,8 +118,13 @@ class CloudAISession implements IAISession {
       console.error('Cloud AI prompt error:', error)
 
       // 提供更详细的错误信息
-      if (error?.message?.includes('404') || error?.message?.includes('not found')) {
-          throw new Error('模型不可用。请检查：1) API Key 是否有效 2) 是否有权限访问 Gemini API 3) 建议使用 Chrome 内置 AI')
+      if (
+        error?.message?.includes('404') ||
+        error?.message?.includes('not found')
+      ) {
+        throw new Error(
+          '模型不可用。请检查：1) API Key 是否有效 2) 是否有权限访问 Gemini API 3) 建议使用 Chrome 内置 AI'
+        )
       }
 
       throw new Error('云端 AI 生成失败：' + (error?.message || '未知错误'))
@@ -200,9 +205,9 @@ export class AIService {
   async checkBuiltInAvailability(): Promise<boolean> {
     try {
       // 尝试两种可能的全局引用
-      const LanguageModel = 
+      const LanguageModel =
         (window as any).LanguageModel || (window as any).ai?.languageModel
-      
+
       if (!LanguageModel) {
         console.log('Built-in AI: LanguageModel API not found')
         return false
@@ -212,20 +217,20 @@ export class AIService {
       if (typeof LanguageModel.capabilities === 'function') {
         const capabilities = await LanguageModel.capabilities()
         console.log('Built-in AI capabilities:', capabilities)
-        
+
         const availableStates = ['readily', 'after-download', 'available']
         return availableStates.includes(capabilities.available)
       }
-      
+
       // 降级使用 availability() 方法（旧 API）
       if (typeof LanguageModel.availability === 'function') {
         const availability = await LanguageModel.availability()
         console.log('Built-in AI availability:', availability)
-        
+
         const availableStates = ['readily', 'after-download', 'available']
         return availableStates.includes(availability)
       }
-      
+
       // 如果两个方法都不存在，返回 false
       console.log('Built-in AI: No availability check method found')
       return false
@@ -245,7 +250,7 @@ export class AIService {
       const avail =
         (await (window as any).ai?.languageModel?.availability?.()) ??
         (await (window as any).LanguageModel?.availability?.())
-      
+
       console.log('Gemini Nano availability:', avail)
       return avail || 'unavailable'
     } catch (err) {
@@ -265,14 +270,17 @@ export class AIService {
    * 获取可用的 AI 提供商
    */
   async getAvailableProvider(): Promise<AIProvider | null> {
-    console.log('🔍 getAvailableProvider - modePreference:', this.modePreference)
-    
+    console.log(
+      '🔍 getAvailableProvider - modePreference:',
+      this.modePreference
+    )
+
     // 根据用户偏好选择
     let result: AIProvider | null = null
     if (this.modePreference === 'builtin') {
       const builtInAvailable = await this.checkBuiltInAvailability()
       console.log('🔍 Built-in available:', builtInAvailable)
-      
+
       if (builtInAvailable) {
         result = 'builtin'
       }
@@ -285,14 +293,17 @@ export class AIService {
       // 用户偏好云端，优先使用云端
       const cloudAvailable = this.checkCloudAvailability()
       console.log('🔍 Cloud available:', cloudAvailable)
-      
+
       if (cloudAvailable) {
         result = 'cloud'
       }
       // 如果云端不可用，降级到内置
       if (!result) {
         const builtInAvailable = await this.checkBuiltInAvailability()
-        console.log('⚠️ Cloud unavailable, fallback to built-in:', builtInAvailable)
+        console.log(
+          '⚠️ Cloud unavailable, fallback to built-in:',
+          builtInAvailable
+        )
         if (builtInAvailable) {
           result = 'builtin'
         }
@@ -311,14 +322,17 @@ export class AIService {
     config?: AISessionConfig,
     preferredProvider?: AIProvider
   ): Promise<{ session: IAISession; provider: AIProvider }> {
-    console.log('🔧 createSession called with preferredProvider:', preferredProvider)
-    
+    console.log(
+      '🔧 createSession called with preferredProvider:',
+      preferredProvider
+    )
+
     // 如果指定了提供商，尝试使用指定的
     if (preferredProvider === 'builtin') {
       console.log('🔍 Checking built-in availability...')
       const builtInAvailable = await this.checkBuiltInAvailability()
       console.log('🔍 Built-in available:', builtInAvailable)
-      
+
       if (builtInAvailable) {
         console.log('✅ Creating built-in session...')
         const session = await this.createBuiltInSession(config)
@@ -330,7 +344,7 @@ export class AIService {
       console.log('🔍 Checking cloud availability...')
       const cloudAvailable = this.checkCloudAvailability()
       console.log('🔍 Cloud available:', cloudAvailable)
-      
+
       if (cloudAvailable) {
         console.log('✅ Creating cloud session...')
         const session = await this.createCloudSession(config)
@@ -339,7 +353,10 @@ export class AIService {
     }
 
     // 自动选择可用的提供商
-    console.log('🔄 Auto-selecting provider based on preference:', this.modePreference)
+    console.log(
+      '🔄 Auto-selecting provider based on preference:',
+      this.modePreference
+    )
     const provider = await this.getAvailableProvider()
     console.log('✅ Selected provider:', provider)
 
@@ -365,7 +382,7 @@ export class AIService {
   ): Promise<IAISession> {
     try {
       // 尝试两种可能的全局引用（取决于 Chrome 版本）
-      const LanguageModel = 
+      const LanguageModel =
         (window as any).LanguageModel || (window as any).ai?.languageModel
 
       if (!LanguageModel) {
@@ -380,7 +397,10 @@ export class AIService {
       return new BuiltInAISession(session)
     } catch (error) {
       console.error('Create built-in session error:', error)
-      throw new Error('创建内置 AI 会话失败: ' + (error instanceof Error ? error.message : '未知错误'))
+      throw new Error(
+        '创建内置 AI 会话失败: ' +
+          (error instanceof Error ? error.message : '未知错误')
+      )
     }
   }
 

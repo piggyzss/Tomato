@@ -37,13 +37,17 @@ export default function Analysis({ onClose }: AnalysisProps) {
 
     switch (view) {
       case 'menu':
-        return <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        return (
+          <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        )
       case 'taskFinishRate':
         return <TaskFinishRate onBack={() => handleViewChange('menu')} />
       case 'totalTime':
         return <TotalTime onBack={() => handleViewChange('menu')} />
       default:
-        return <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        return (
+          <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        )
     }
   }
 
