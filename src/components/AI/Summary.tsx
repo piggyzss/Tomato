@@ -1,5 +1,11 @@
+
+// @panpan
 import { useState } from 'react'
 import { Brain, RefreshCw } from 'lucide-react'
+import {
+  buildPresetSummaryText,
+  generateSummary,
+} from '@/services/builtInSummaryService'
 
 interface SummaryProps {
   summaryData: {
@@ -14,59 +20,17 @@ interface SummaryProps {
 }
 
 export default function Summary({ summaryData }: SummaryProps) {
-  const [summaryText, setSummaryText] = useState<string>('')
+  const [summaryText, setSummaryText] = useState('')
   const [isSummarizing, setIsSummarizing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 🧩 Step 1: Create a preset paragraph based on stats
-  const presetParagraph = `
-Today (${summaryData.date}), you completed ${summaryData.completedTasks} tasks 
-and focused for ${summaryData.totalFocusTime} minutes across ${summaryData.completedPomodoros} pomodoro sessions. 
-Your average session length was ${summaryData.averageSessionLength} minutes, 
-earning a productivity score of ${summaryData.productivityScore} out of 100.
-${summaryData.productivityScore >= 80 
-  ? "You maintained excellent consistency and focus throughout the day! 🎯" 
-  : "There’s room for improvement — try optimizing your break intervals for better energy flow. ⚡"}
-Here are your AI insights:
-${summaryData.insights.map((i) => `- ${i}`).join('\n')}
-`
-
-  // 🧠 Step 2: Summarize using the Summarizer API
   const handleSummarize = async () => {
     setIsSummarizing(true)
     setError(null)
 
     try {
-      const ai = (window as any).ai
-    if (!ai ) {
-      throw new Error('The Summarizer API is not supported in this browser or is disabled.')
-    }
-
-      const availability = await (window as any).ai?.summarizer?.availability()
-      if (availability === 'unavailable') {
-        throw new Error('Summarizer API is not available in this browser.')
-      }
-
-      // Create summarizer instance
-      const summarizer = await (window as any).ai.summarizer.create({
-        type: 'key-points',
-        format: 'markdown',
-        length: 'medium',
-        expectedInputLanguages: ['en'],
-        outputLanguage: 'en',
-        sharedContext: 'This is a productivity and focus session summary.',
-        monitor(m: any) {
-          m.addEventListener('downloadprogress', (e: any) => {
-            console.log(`Downloaded ${(e.loaded * 100).toFixed(0)}%`)
-          })
-        },
-      })
-
-      // Perform summarization
-      const result = await summarizer.summarize(presetParagraph, {
-        context: 'Provide an insightful, motivational summary for the user.',
-      })
-
+      const presetText = buildPresetSummaryText(summaryData)
+      const result = await generateSummary(presetText)
       setSummaryText(result)
     } catch (err: any) {
       console.error('Summarize failed:', err)
