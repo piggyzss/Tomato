@@ -92,14 +92,14 @@ export function TaskListNew() {
       <div className="flex items-center justify-between mb-4">
         <h3
           className={`text-lg font-bold tracking-tight transition-colors duration-300 ${
-            theme === 'dark' ? 'text-white' : 'text-gray-800'
+            theme === 'dark' ? 'text-white' : 'text-[#3d2b2b]'
           }`}
         >
           Tasks
         </h3>
         <span
           className={`text-sm font-semibold transition-colors duration-300 ${
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            theme === 'dark' ? 'text-gray-400' : 'text-[#3d2b2b]'
           }`}
         >
           {completedCount}/{tasks.length}
@@ -113,7 +113,7 @@ export function TaskListNew() {
       ></div>
 
       {/* Task List */}
-      <div className="space-y-2 mb-4 max-h-96 overflow-y-auto relative">
+      <div className="mb-4 h-[180px] overflow-y-auto relative scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
         {tasks.length === 0 ? (
           <div
             className={`text-center py-10 transition-colors duration-300 ${
@@ -124,7 +124,8 @@ export function TaskListNew() {
             <div className="font-medium">No tasks yet</div>
           </div>
         ) : (
-          tasks.map(task => {
+          <div className="space-y-2">
+            {tasks.map(task => {
             const isActive = currentTaskId === task.id
 
             return (
@@ -150,7 +151,7 @@ export function TaskListNew() {
                       task.status === 'completed'
                         ? theme === 'dark'
                           ? 'bg-green-600 border-green-600'
-                          : 'bg-gray-800 border-gray-800'
+                          : 'bg-[#3d2b2b] border-[#3d2b2b]'
                         : theme === 'dark'
                           ? 'border-gray-500 hover:border-gray-400'
                           : 'border-gray-300 hover:border-gray-400'
@@ -165,15 +166,16 @@ export function TaskListNew() {
                   <div className="flex-1 min-w-0">
                     <div
                       className={clsx(
-                        'font-semibold text-sm transition-colors duration-300',
+                        'font-semibold text-sm transition-colors duration-300 truncate',
                         task.status === 'completed'
                           ? theme === 'dark'
                             ? 'line-through text-gray-500'
                             : 'line-through text-gray-400'
                           : theme === 'dark'
                             ? 'text-white'
-                            : 'text-gray-800'
+                            : 'text-[#3d2b2b]'
                       )}
+                      title={task.title}
                     >
                       {task.title}
                     </div>
@@ -258,7 +260,8 @@ export function TaskListNew() {
                 </div>
               </div>
             )
-          })
+          })}
+          </div>
         )}
       </div>
 
@@ -281,11 +284,7 @@ export function TaskListNew() {
           <div className="flex gap-2 mt-3 flex-wrap">
             <button
               onClick={handleAddTask}
-              className={`px-4 py-2 rounded-lg transition-colors text-sm font-semibold ${
-                theme === 'dark'
-                  ? 'bg-tomato text-white hover:bg-tomato/90'
-                  : 'bg-gray-800 text-white hover:bg-gray-900'
-              }`}
+              className="px-4 py-2 rounded-lg transition-colors text-sm font-semibold bg-tomato text-white hover:bg-tomato/90"
             >
               Save
             </button>
@@ -294,7 +293,7 @@ export function TaskListNew() {
               className={`px-4 py-2 rounded-lg transition-colors text-sm font-semibold ${
                 theme === 'dark'
                   ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  : 'text-[#3d2b2b] hover:bg-gray-100'
               }`}
             >
               Cancel

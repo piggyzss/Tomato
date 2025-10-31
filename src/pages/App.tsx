@@ -234,8 +234,8 @@ function App() {
           className="fixed inset-x-0 z-50 flex items-end justify-center px-4"
           style={{
             top: 'auto',
-            bottom: '120px',
-            height: 'calc(100vh - 220px)',
+            bottom: '80px',
+            height: 'calc(100vh - 180px)',
             pointerEvents: 'none',
           }}
         >
