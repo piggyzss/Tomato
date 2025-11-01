@@ -18,7 +18,7 @@ export default function TotalTime({ onBack }: TotalTimeProps) {
   const { theme } = useSettingsStore()
   const { tasks } = useTaskStore()
 
-  const [timeRange, setTimeRange] = useState<TimeRange>('week')
+  const [timeRange, setTimeRange] = useState<TimeRange>('day')
   const [timeDisplayMode, setTimeDisplayMode] =
     useState<TimeDisplayMode>('working')
   const [taskGrouping, setTaskGrouping] = useState<TaskGrouping>('overall')

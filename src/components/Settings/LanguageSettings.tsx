@@ -1,13 +1,9 @@
-import { Save } from 'lucide-react'
-import { useState } from 'react'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import type { SettingsPageProps } from '@/components/Settings/types'
 import { ModalWithBack } from '@/components/Common'
 
 export default function LanguageSettings({ onBack }: SettingsPageProps) {
   const { language, updateSettings } = useSettingsStore()
-  const [selectedLanguage, setSelectedLanguage] = useState(language)
-  const [showLanguageSaved, setShowLanguageSaved] = useState(false)
 
   const languages = [
     {
@@ -33,10 +29,8 @@ export default function LanguageSettings({ onBack }: SettingsPageProps) {
     },
   ]
 
-  const handleSaveLanguage = () => {
-    updateSettings({ language: selectedLanguage })
-    setShowLanguageSaved(true)
-    setTimeout(() => setShowLanguageSaved(false), 2000)
+  const handleLanguageChange = (newLanguage: 'zh-CN' | 'en-US' | 'ja-JP') => {
+    updateSettings({ language: newLanguage })
   }
 
   return (
@@ -66,9 +60,9 @@ export default function LanguageSettings({ onBack }: SettingsPageProps) {
             🌍 Message Language
           </h3>
           <select
-            value={selectedLanguage}
+            value={language}
             onChange={e =>
-              setSelectedLanguage(e.target.value as 'zh-CN' | 'en-US' | 'ja-JP')
+              handleLanguageChange(e.target.value as 'zh-CN' | 'en-US' | 'ja-JP')
             }
             className="w-full p-3 rounded-lg bg-black/30 border border-white/20 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
           >
@@ -77,22 +71,6 @@ export default function LanguageSettings({ onBack }: SettingsPageProps) {
             <option value="ja-JP">🇯🇵 Japanese</option>
           </select>
         </div>
-
-        {/* Save Button */}
-        <button
-          onClick={handleSaveLanguage}
-          className="w-full py-3 rounded-xl bg-white/20 hover:bg-white/30 transition-all font-semibold text-white flex items-center justify-center gap-2"
-        >
-          <Save size={18} />
-          Save Language
-        </button>
-
-        {/* Save Confirmation */}
-        {showLanguageSaved && (
-          <div className="bg-green-500 text-white rounded-lg p-3 text-center font-semibold text-sm">
-            ✅ Language saved successfully!
-          </div>
-        )}
 
         {/* Current Language Summary */}
         <div className="bg-black/20 rounded-xl p-4 border border-white/20">
