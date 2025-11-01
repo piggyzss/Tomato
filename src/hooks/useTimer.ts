@@ -4,7 +4,7 @@ import { useTimerStore } from '@/store/useTimerStore'
 import { useCallback, useEffect } from 'react'
 
 /**
- * 番茄钟计时器逻辑 Hook
+ * Pomodoro timer logic Hook
  */
 export function useTimer() {
   const {
@@ -25,38 +25,38 @@ export function useTimer() {
     notificationEnabled,
   } = useSettingsStore()
 
-  // 开始工作计时
+  // Start work timer
   const startWork = useCallback(() => {
     setTotalSeconds(workDuration * 60)
     setStatus('running')
   }, [workDuration, setTotalSeconds, setStatus])
 
-  // 开始休息
+  // Start break
   const startBreak = useCallback(() => {
     setTotalSeconds(shortBreakDuration * 60)
     setStatus('break')
   }, [shortBreakDuration, setTotalSeconds, setStatus])
 
-  // 暂停
+  // Pause
   const pause = useCallback(() => {
     setStatus('paused')
   }, [setStatus])
 
-  // 继续
+  // Resume
   const resume = useCallback(() => {
     setStatus(status === 'break' ? 'break' : 'running')
   }, [status, setStatus])
 
-  // 重置
+  // Reset
   const reset = useCallback(() => {
     resetTimer()
   }, [resetTimer])
 
-  // 完成一个番茄钟
+  // Complete a pomodoro
   const completePomodo = useCallback(() => {
     incrementPomodoro()
 
-    // 更新当前任务的番茄数
+    // Update current task's pomodoro count
     if (currentTaskId) {
       const currentTask = useTaskStore
         .getState()
@@ -68,18 +68,18 @@ export function useTimer() {
       }
     }
 
-    // 发送通知
+    // Send notification
     if (notificationEnabled) {
       chrome.runtime.sendMessage({
         type: 'SHOW_NOTIFICATION',
-        title: '🍅 番茄钟完成！',
-        body: '干得漂亮！休息一下吧~',
+        title: '🍅 Pomodoro Completed!',
+        body: 'Well done! Time for a break~',
       })
     }
 
-    // 播放音效（如果启用）
+    // Play sound effect (if enabled)
     if (soundEnabled) {
-      // TODO: 添加音效播放逻辑
+      // TODO: Add sound effect playing logic
     }
   }, [
     currentTaskId,
@@ -89,7 +89,7 @@ export function useTimer() {
     soundEnabled,
   ])
 
-  // 倒计时结束处理
+  // Handle countdown end
   useEffect(() => {
     if (remainingSeconds === 0 && status === 'running') {
       completePomodo()

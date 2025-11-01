@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { AIProvider } from '@/types'
 
 /**
- * AI 会话配置
+ * AI session configuration
  */
 export interface AISessionConfig {
   systemPrompt?: string
@@ -11,7 +11,7 @@ export interface AISessionConfig {
 }
 
 /**
- * AI 响应结果
+ * AI response result
  */
 export interface AIResponse {
   text: string
@@ -19,7 +19,7 @@ export interface AIResponse {
 }
 
 /**
- * AI 会话接口 - 统一的抽象层
+ * AI session interface - unified abstraction layer
  */
 export interface IAISession {
   prompt(input: string): Promise<string>
@@ -28,7 +28,7 @@ export interface IAISession {
 }
 
 /**
- * 内置 AI 会话实现
+ * Built-in AI session implementation
  */
 class BuiltInAISession implements IAISession {
   private session: any
@@ -46,13 +46,13 @@ class BuiltInAISession implements IAISession {
   }
 
   destroy(): void {
-    // 内置 AI 可能需要清理资源
+    // Built-in AI may need to clean up resources
     this.session = null
   }
 }
 
 /**
- * 云端 AI 会话实现
+ * Cloud AI session implementation
  */
 class CloudAISession implements IAISession {
   private model: any
@@ -63,7 +63,7 @@ class CloudAISession implements IAISession {
     this.model = model
     this.systemPrompt = config?.systemPrompt
 
-    // 创建聊天会话以保持上下文
+    // Create chat session to maintain context
     this.chatSession = this.model.startChat({
       history: [],
       generationConfig: {
@@ -75,9 +75,9 @@ class CloudAISession implements IAISession {
 
   async prompt(input: string): Promise<string> {
     try {
-      // 如果有系统提示词，在第一次调用时添加
+      // Add system prompt on first call if available
       const fullPrompt = this.systemPrompt
-        ? `${this.systemPrompt}\n\n用户: ${input}`
+        ? `${this.systemPrompt}\n\nUser: ${input}`
         : input
 
       const result = await this.chatSession.sendMessage(fullPrompt)
@@ -86,17 +86,19 @@ class CloudAISession implements IAISession {
     } catch (error: any) {
       console.error('Cloud AI prompt error:', error)
 
-      // 提供更详细的错误信息
+      // Provide more detailed error information
       if (
         error?.message?.includes('404') ||
         error?.message?.includes('not found')
       ) {
         throw new Error(
-          '模型不可用。请检查：1) API Key 是否有效 2) 是否有权限访问 Gemini API 3) 建议使用 Chrome 内置 AI'
+          'Model unavailable. Please check: 1) API Key is valid 2) Has permission to access Gemini API 3) Recommend using Chrome built-in AI'
         )
       }
 
-      throw new Error('云端 AI 生成失败：' + (error?.message || '未知错误'))
+      throw new Error(
+        'Cloud AI generation failed: ' + (error?.message || 'Unknown error')
+      )
     }
   }
 
@@ -117,17 +119,19 @@ class CloudAISession implements IAISession {
     } catch (error: any) {
       console.error('Cloud AI prompt error:', error)
 
-      // 提供更详细的错误信息
+      // Provide more detailed error information
       if (
         error?.message?.includes('404') ||
         error?.message?.includes('not found')
       ) {
         throw new Error(
-          '模型不可用。请检查：1) API Key 是否有效 2) 是否有权限访问 Gemini API 3) 建议使用 Chrome 内置 AI'
+          'Model unavailable. Please check: 1) API Key is valid 2) Has permission to access Gemini API 3) Recommend using Chrome built-in AI'
         )
       }
 
-      throw new Error('云端 AI 生成失败：' + (error?.message || '未知错误'))
+      throw new Error(
+        'Cloud AI generation failed: ' + (error?.message || 'Unknown error')
+      )
     }
   }
 
@@ -138,25 +142,25 @@ class CloudAISession implements IAISession {
 }
 
 /**
- * AI 服务 - 统一的服务层
+ * AI service - unified service layer
  */
 export class AIService {
   private cloudClient?: GoogleGenerativeAI
   private apiKey?: string
-  private modePreference: AIProvider = 'builtin' // 默认使用内置 AI
+  private modePreference: AIProvider = 'builtin' // Default to built-in AI
 
   /**
-   * 设置云端 API Key
+   * Set cloud API Key
    */
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey
-    // 初始化 Google Generative AI 客户端
-    // 使用默认配置，SDK 会自动选择合适的 API 版本
+    // Initialize Google Generative AI client
+    // Use default configuration, SDK will auto-select appropriate API version
     this.cloudClient = new GoogleGenerativeAI(apiKey)
   }
 
   /**
-   * 下载内置 AI 模型（如果需要）
+   * Download built-in AI model (if needed)
    */
   async downloadBuiltInModel(
     onProgress?: (percent: number) => void
@@ -186,21 +190,21 @@ export class AIService {
   }
 
   /**
-   * 设置 AI 模式偏好
+   * Set AI mode preference
    */
   setModePreference(mode: AIProvider): void {
     this.modePreference = mode
   }
 
   /**
-   * 获取 AI 模式偏好
+   * Get AI mode preference
    */
   getModePreference(): AIProvider {
     return this.modePreference
   }
 
   /**
-   * 检查内置 AI 是否可用
+   * Check if built-in AI is available
    */
   async checkBuiltInAvailability(): Promise<boolean> {
     try {
@@ -241,8 +245,8 @@ export class AIService {
   }
 
   /**
-   * 获取内置 AI 的详细可用性状态
-   * 使用 availability() 方法以支持不同版本的 Chrome API
+   * Get detailed availability status of built-in AI
+   * Use availability() method to support different Chrome API versions
    */
   async getBuiltInAvailabilityStatus(): Promise<string> {
     try {
@@ -260,14 +264,14 @@ export class AIService {
   }
 
   /**
-   * 检查云端 AI 是否可用
+   * Check if cloud AI is available
    */
   checkCloudAvailability(): boolean {
     return !!this.apiKey && !!this.cloudClient
   }
 
   /**
-   * 获取可用的 AI 提供商
+   * Get available AI provider
    */
   async getAvailableProvider(): Promise<AIProvider | null> {
     console.log(
@@ -316,7 +320,7 @@ export class AIService {
   }
 
   /**
-   * 创建 AI 会话
+   * Create AI session
    */
   async createSession(
     config?: AISessionConfig,
@@ -370,13 +374,14 @@ export class AIService {
       return { session, provider: 'cloud' }
     }
 
-    throw new Error('没有可用的 AI 提供商')
+    throw new Error('No available AI providers')
   }
 
   /**
-   * 创建内置 AI 会话
+   * Create built-in AI session
    * Chrome - Prompt API (languageModel)
    */
+
   private async createBuiltInSession(
     config?: AISessionConfig
   ): Promise<IAISession> {
@@ -389,8 +394,50 @@ export class AIService {
         throw new Error('LanguageModel API not found')
       }
 
+      // @panpan
+      const params = await LanguageModel.params()
       const session = await LanguageModel.create({
         systemPrompt: config?.systemPrompt,
+        expectedOutputs: [
+          {
+            type: 'text',
+            languages: ['en'],
+          },
+        ],
+        initialPrompts: [
+          {
+            role: 'system',
+            content:
+              'You are Chat Cat 🐱, a warm, concise productivity companion who answers helpfully and keeps messages warm, kind and motivating.',
+          },
+          { role: 'user', content: 'Can you say something to motivate me?' },
+          { role: 'assistant', content: 'You work so hard! Good job!' },
+          { role: 'user', content: 'I am so tired' },
+          {
+            role: 'assistant',
+            content: 'Have a short break and stretch! Even cats need rest. 😸',
+          },
+          {
+            role: 'user',
+            content: 'It’s late, but I still have work left.',
+          },
+          {
+            role: 'assistant',
+            content:
+              'Be kind to yourself. A little rest now might make tomorrow smoother. Cats know the value of sleep. 🌙',
+          },
+          {
+            role: 'user',
+            content: 'I’m proud of myself today.',
+          },
+          {
+            role: 'assistant',
+            content:
+              'As you should be! Celebrate that sparkle—you’ve earned it! ✨',
+          },
+        ],
+        temperature: params.defaultTemperature,
+        topK: params.defaultTopK,
       })
 
       console.log('✅ Built-in AI session created successfully')
@@ -398,25 +445,25 @@ export class AIService {
     } catch (error) {
       console.error('Create built-in session error:', error)
       throw new Error(
-        '创建内置 AI 会话失败: ' +
-          (error instanceof Error ? error.message : '未知错误')
+        'Failed to create built-in AI session: ' +
+          (error instanceof Error ? error.message : 'Unknown error')
       )
     }
   }
 
   /**
-   * 创建云端 AI 会话
+   * Create cloud AI session
    */
   private async createCloudSession(
     config?: AISessionConfig
   ): Promise<IAISession> {
     if (!this.cloudClient) {
-      throw new Error('云端 AI 未配置，请先设置 API Key')
+      throw new Error('Cloud AI not configured, please set API Key first')
     }
 
     try {
-      // 使用最新的 Gemini Flash 模型
-      // gemini-flash-latest 是当前推荐的稳定模型
+      // Use latest Gemini Flash model
+      // gemini-flash-latest is current recommended stable model
       const model = this.cloudClient.getGenerativeModel({
         model: 'gemini-flash-latest',
       })
@@ -424,12 +471,12 @@ export class AIService {
       return new CloudAISession(model, config)
     } catch (error) {
       console.error('Create cloud session error:', error)
-      throw new Error('创建云端 AI 会话失败')
+      throw new Error('Failed to create cloud AI session')
     }
   }
 
   /**
-   * 快速生成（一次性调用，不保持会话）
+   * Quick generation (one-time call, no session maintained)
    */
   async generate(
     prompt: string,
@@ -450,7 +497,7 @@ export class AIService {
   }
 }
 
-// 导出单例
+// Export singleton
 export const aiService = new AIService()
 
 //one problem: buitIn AI prompt input type is not string,
