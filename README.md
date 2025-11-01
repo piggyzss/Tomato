@@ -1,199 +1,314 @@
-# 🍅🐱 番茄猫 - Tomato Cat Timer
+# 🍅🐱 Tomato Cat Timer
 
-基于番茄工作法的学习工作陪伴 Chrome 插件，可爱的猫咪陪你专注每一刻。
+> An AI-powered Pomodoro timer Chrome extension that helps you stay focused and productive.
 
-## ✨ 特性
+[![Chrome Built-in AI](https://img.shields.io/badge/Chrome%20Built--in%20AI-Enabled-blue)](https://developer.chrome.com/docs/ai/built-in)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- 🍅 **番茄工作法**：科学的时间管理，25 分钟工作 + 5 分钟休息
-- 🐱 **猫咪陪伴**：可爱的虚拟猫咪，根据状态变化表情和对话
-- 📝 **任务管理**：清晰的任务清单，支持优先级和状态管理
-- 📊 **数据统计**：记录专注时长和任务完成情况
-- 🎨 **现代设计**：温暖的番茄红 + 奶油白配色，圆润可爱的界面
-- 🤖 **AI 增强**：（开发中）智能生成鼓励语、日报总结等
-
-## 🛠️ 技术栈
-
-- **前端框架**：React 18 + TypeScript
-- **构建工具**：Vite 5.x
-- **状态管理**：Zustand
-- **样式方案**：TailwindCSS
-- **动画库**：Framer Motion
-- **图标库**：Lucide React
-
-## 📦 安装依赖
-
-```bash
-npm install
-
-## 🚀 开发
-
-```bash
-npm run dev
-```
-
-构建插件：
-
-```bash
-npm run build
-```
-
-构建完成后，在 Chrome 浏览器中：
-1. 打开 `chrome://extensions/`
-2. 开启「开发者模式」
-3. 点击「加载已解压的扩展程序」
-4. 选择项目的 `dist` 目录
-5. 点击插件图标（或拼图图标 🧩 → 番茄猫）即可打开侧边栏
-
-## 📁 项目结构
-
-```
-tomato/
-├── index.html          # 主页面入口（侧边栏）
-├── public/             # 静态资源
-│   └── manifest.json   # Chrome 插件配置
-├── src/
-│   ├── components/     # React 组件
-│   │   ├── BigTimer.tsx       # 番茄钟计时器
-│   │   ├── CurrentTask.tsx    # 当前任务显示
-│   │   ├── TaskListNew.tsx    # 任务列表
-│   │   └── ModeSelector.tsx   # 模式选择器
-│   ├── pages/         # 页面组件
-│   │   ├── App.tsx    # 主应用组件
-│   │   └── main.tsx   # React 入口
-│   ├── store/         # Zustand 状态管理
-│   │   ├── useTimerStore.ts     # 计时器状态
-│   │   ├── useTaskStore.ts      # 任务状态
-│   │   └── useSettingsStore.ts  # 设置状态
-│   ├── utils/         # 工具函数
-│   ├── types/         # TypeScript 类型
-│   ├── styles/        # 全局样式
-│   └── background/    # Service Worker
-│       └── index.ts   # 后台服务
-├── doc/               # 项目文档
-├── dist/              # 构建输出
-└── ...配置文件
-```
-
-## 🎯 核心功能
-
-### 1. 番茄钟
-- 自定义工作时长（默认 25 分钟）
-- 自定义休息时长（短休息 5 分钟，长休息 15 分钟）
-- 暂停、继续、重置功能
-- 完成提醒通知
-
-### 2. 任务清单
-- 添加、编辑、删除任务
-- 任务状态管理（待办/进行中/已完成）
-- 任务优先级标记
-- 番茄钟计数
-
-### 3. 猫咪陪伴
-- 根据状态显示不同表情和对话
-- 呼吸动画效果
-- 随机鼓励语句
-
-### 4. 数据持久化
-- 使用 Chrome Storage API 保存数据
-- 自动同步任务和设置
-
-## 💡 使用技巧
-
-### 番茄工作法原则
-
-1. **选择任务** - 挑选一个要完成的任务
-2. **开始专注** - 设置 25 分钟倒计时
-3. **专心工作** - 直到计时器响起
-4. **短暂休息** - 休息 5 分钟
-5. **重复循环** - 每 4 个番茄钟后，休息 15-30 分钟
-
-### 基本操作
-
-#### 1. 添加任务
-在任务清单区域：
-- 输入任务名称
-- 点击「Add Task」按钮或按回车添加
-
-#### 2. 开始番茄钟
-- 点击任务选中它（左边框变红，背景变灰）
-- 点击「START」按钮
-- 专心工作！（默认 10 秒用于调试）
-
-#### 3. 暂停/重置
-- 工作中可以随时「PAUSE」
-- 点击跳过图标可以结束当前番茄钟
-
-#### 4. 完成任务
-- 点击任务前的复选框标记为完成
-- 已完成的任务会显示删除线和灰色文字
-
-#### 5. 删除任务
-- 点击任务右侧的三个点
-- 选择「Delete」
-
-## 📊 状态管理
-
-使用 Zustand 进行状态管理，分为三个 Store：
-
-### useTimerStore
-管理番茄钟状态：
-- 计时器状态（idle/running/paused/break）
-- 剩余时间
-- 番茄数计数
-
-### useTaskStore
-管理任务列表：
-- 任务列表
-- 当前选中任务
-- 任务 CRUD 操作
-
-### useSettingsStore
-管理用户设置：
-- 番茄钟时长配置
-- 音效和通知开关
-- 主题和语言设置
-
-## 💾 数据持久化
-
-使用 Chrome Storage API 存储数据：
-- 自动保存任务列表
-- 保存用户设置
-- 保存统计数据
-
-**工具函数**: `src/utils/storage.ts`
-
-## 🔮 开发路线图
-
-- [x] Phase 1: 基础框架搭建 + 番茄钟核心功能
-- [ ] Phase 2: 完善任务清单功能
-- [ ] Phase 3: 优化猫咪 UI 和动画
-- [ ] Phase 4: 集成 Google AI API
-- [ ] Phase 5: 数据统计和可视化
-
-## 📝 注意事项
-
-### 更多文档
-
-详细文档位于 `doc/` 目录：
-- `DEVELOPMENT.md` - 完整开发指南（包含快速开始和加载教程）
-- `HOW_TO_VIEW_COMPONENTS.md` - 组件查看和调试指南
-- `PROJECT_SUMMARY.md` - 项目总结
-- `TODO.md` - 开发任务清单
-- `CHANGELOG.md` - 版本更新日志
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 📄 许可
-
-MIT License
-
-## 💖 致谢
-
-感谢所有为开源社区做出贡献的开发者们！
+**Tomato Cat Timer** combines the proven Pomodoro Technique with Chrome's Built-in AI to provide intelligent productivity insights and companionship. All AI features run locally on your device for complete privacy.
 
 ---
 
-Made with ❤️ and 🍅
+## ✨ Features
 
+### 🤖 AI-Powered Features
+
+- **Chat Cat** - Your friendly AI companion that provides encouragement and support during work sessions (uses Chrome Prompt API)
+- **Daily Summary** - Automatically generates intelligent insights about your productivity patterns (uses Chrome Summarizer API)
+- **Smart AI Switching** - Seamlessly falls back to cloud AI when needed, with user preference controls
+
+### 📊 Core Productivity Features
+
+- **Pomodoro Timer** - Customizable work/break intervals (default: 25/5/15 minutes)
+- **Task Management** - Create, track, and complete tasks with automatic time tracking
+- **Analytics Dashboard** - View task completion rates and time analysis with flexible filtering
+- **Multi-language Support** - English, Chinese (简体中文), and Japanese (日本語)
+- **Dark/Light Mode** - Comfortable viewing in any environment
+- **Data Persistence** - All your data is saved locally using Chrome Storage API
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Chrome/Edge browser version **131+** (Dev or Canary channel recommended)
+- Chrome Built-in AI enabled (see [Setup Guide](doc/CHROME_AI_SETUP.md))
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/tomato-cat-timer.git
+   cd tomato-cat-timer
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Build the extension**
+   ```bash
+   npm run build
+   ```
+
+4. **Load in Chrome**
+   - Open `chrome://extensions/`
+   - Enable "Developer mode" (top right)
+   - Click "Load unpacked"
+   - Select the `dist` folder
+   - Pin the extension to your toolbar
+
+### Enable Chrome Built-in AI
+
+For AI features to work, you need to enable Chrome's Built-in AI:
+
+1. Enable flags at:
+   - `chrome://flags/#prompt-api-for-gemini-nano`
+   - `chrome://flags/#summarization-api-for-gemini-nano`
+
+2. Download the Gemini Nano model (~1.5GB):
+   - Visit `chrome://components/`
+   - Find "Optimization Guide On Device Model"
+   - Click "Check for update"
+
+📖 **Detailed setup guide**: [doc/CHROME_AI_SETUP.md](doc/CHROME_AI_SETUP.md)
+
+---
+
+## 💡 How to Use
+
+### Basic Workflow
+
+1. **Add a task** - Type your task name and click "Save"
+2. **Select the task** - Click on it to make it active
+3. **Start the timer** - Click "START" to begin your Pomodoro session
+4. **Focus on work** - Work until the timer rings (default: 25 minutes)
+5. **Take a break** - Enjoy a short break (5 minutes)
+6. **Repeat** - After 4 Pomodoros, take a longer break (15 minutes)
+
+### AI Features
+
+#### Chat Cat
+- Click the Bot icon (🤖) at the bottom
+- Select "💬 Chat Cat"
+- Chat with your AI companion for motivation and support
+- Works completely offline!
+
+#### Daily Summary
+- Complete some Pomodoro sessions
+- Click Bot icon → "📊 Daily Summary"
+- Click "Generate Summary" to get AI-powered insights
+- Review recommendations to improve your productivity
+
+#### AI Configuration
+- Click Bot icon → "⚙️ AI Configuration"
+- Choose between Built-in AI (offline) or Cloud AI (requires API key)
+- View availability status and configure settings
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite 5.x
+- **State Management**: Zustand
+- **Styling**: TailwindCSS
+- **AI Integration**: Chrome Built-in AI APIs (Prompt API + Summarizer API)
+- **Cloud AI Fallback**: Google Gemini API (optional)
+
+---
+
+## 📁 Project Structure
+
+```
+tomato-cat-timer/
+├── src/
+│   ├── components/          # React components
+│   │   ├── AI/             # AI-related features
+│   │   ├── Analysis/       # Analytics dashboard
+│   │   ├── Settings/       # Settings panels
+│   │   └── Common/         # Shared components
+│   ├── services/           # Business logic
+│   │   ├── aiService.ts              # AI service layer
+│   │   └── builtInSummaryService.ts  # Summarizer API wrapper
+│   ├── hooks/              # Custom React hooks
+│   ├── store/              # Zustand state management
+│   ├── utils/              # Utility functions
+│   └── types/              # TypeScript definitions
+├── doc/                    # Documentation
+│   ├── CHROME_AI_SETUP.md           # AI setup guide
+│   ├── AI_FEATURES_USER_GUIDE.md    # User guide
+│   └── GEMINI_API_KEY_SETUP.md      # Cloud AI setup
+└── public/
+    └── manifest.json       # Chrome extension manifest
+```
+
+---
+
+## 🎨 Chrome Built-in AI Implementation
+
+### Prompt API (Language Model)
+
+Used for conversational AI in Chat Cat:
+
+```typescript
+const session = await window.ai.languageModel.create({
+  systemPrompt: "You are a cute, encouraging tomato cat assistant..."
+});
+const response = await session.prompt(userMessage);
+```
+
+### Summarizer API
+
+Used for generating daily productivity summaries:
+
+```typescript
+const summarizer = await window.ai.summarizer.create({
+  type: 'key-points',
+  format: 'markdown',
+  length: 'medium'
+});
+const summary = await summarizer.summarize(productivityData);
+```
+
+### Privacy & Offline Features
+
+✅ **100% Local Processing** - All AI runs on your device  
+✅ **No Data Upload** - Your data never leaves your machine  
+✅ **Offline Capable** - Full functionality without internet  
+✅ **Fast Response** - Instant AI feedback
+
+---
+
+## 🔧 Development
+
+### Available Scripts
+
+```bash
+# Development mode with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# Type checking
+npm run type-check
+
+# Lint code
+npm run lint
+```
+
+### Development Workflow
+
+1. Make changes to source files in `src/`
+2. Run `npm run dev` for development mode
+3. Load/reload extension in Chrome
+4. Test your changes
+5. Run `npm run build` for production build
+
+---
+
+## 📚 Documentation
+
+- **[Chrome AI Setup Guide](doc/CHROME_AI_SETUP.md)** - Complete setup instructions for Chrome Built-in AI
+- **[AI Features User Guide](doc/AI_FEATURES_USER_GUIDE.md)** - How to use AI features
+- **[Gemini API Key Setup](doc/GEMINI_API_KEY_SETUP.md)** - Optional cloud AI fallback setup
+- **[AI Quick Reference](doc/AI_QUICK_REFERENCE.md)** - Developer reference for AI integration
+- **[Changelog](doc/CHANGELOG.md)** - Version history and updates
+
+---
+
+## 🙋 FAQ
+
+**Q: Do I need a Gemini API key?**  
+A: No! The extension works fully with Chrome Built-in AI. Cloud AI is an optional fallback.
+
+**Q: Does this work offline?**  
+A: Yes! All Built-in AI features work completely offline once the model is downloaded.
+
+**Q: What data is collected?**  
+A: None. All data stays local on your device. We don't collect or transmit any user data.
+
+**Q: Which Chrome version do I need?**  
+A: Chrome 131+ (Dev or Canary channel recommended for best AI support).
+
+**Q: Why isn't the AI working?**  
+A: Make sure you've enabled the Chrome flags and downloaded the Gemini Nano model. See [Setup Guide](doc/CHROME_AI_SETUP.md).
+
+**Q: Can I use this in production?**  
+A: Yes, but note that Chrome Built-in AI is currently experimental and may change.
+
+---
+
+## 🎯 Roadmap
+
+- [x] Core Pomodoro timer functionality
+- [x] Task management system
+- [x] Chrome Built-in AI integration (Prompt API)
+- [x] Chrome Built-in AI integration (Summarizer API)
+- [x] Daily summary and insights
+- [x] Analytics dashboard
+- [x] Dark/Light theme
+- [x] Multi-language support
+- [ ] Advanced AI features (Writer API, Rewriter API)
+- [ ] Team collaboration features
+- [ ] Browser sync across devices
+- [ ] Mobile companion app
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🏅 Acknowledgments
+
+- **Chrome Built-in AI Team** - For the amazing on-device AI APIs
+- **Google Gemini Team** - For the cloud AI fallback option
+- **Open Source Community** - For inspiration and tools
+
+---
+
+## 📧 Contact & Support
+
+- **Issues**: [GitHub Issues](https://github.com/yourusername/tomato-cat-timer/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/tomato-cat-timer/discussions)
+- **Email**: your.email@example.com
+
+---
+
+## 🌟 Show Your Support
+
+If you find this project helpful, please consider:
+- ⭐ Starring the repository
+- 🐛 Reporting bugs
+- 💡 Suggesting new features
+- 📢 Sharing with others
+
+---
+
+> **Note for Judges**: If you're evaluating this project for the Chrome Built-in AI Challenge 2025, please see [JUDGES_README.md](JUDGES_README.md) for quick testing instructions.
+
+---
+
+**Built with ❤️ and 🍅**
+
+*Combining productivity, AI, and a touch of cuteness* 🐱✨
