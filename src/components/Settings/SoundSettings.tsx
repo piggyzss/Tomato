@@ -12,17 +12,17 @@ export default function SoundSettings({ onBack }: SettingsPageProps) {
     name: string
     description: string
   }> = [
-    { id: 'ding', name: '叮', description: 'Clear single tone' },
-    { id: 'ding-dong', name: '叮咚', description: 'Two-tone chime' },
-    { id: 'chord', name: '三音和弦', description: 'Harmonious chord' },
+    { id: 'ding', name: 'ding', description: 'Clear single tone' },
+    { id: 'ding-dong', name: 'ding-dong', description: 'Two-tone chime' },
+    { id: 'chord', name: 'chord', description: 'Harmonious chord' },
     {
       id: 'victory',
-      name: '游戏胜利音效',
+      name: 'victory',
       description: 'Ascending victory tune',
     },
-    { id: 'soft', name: '柔和通知音效', description: 'Gentle notification' },
-    { id: 'water-drop', name: '水滴声', description: 'Water drop sound' },
-    { id: 'knock', name: '敲击声', description: 'Knock sound' },
+    { id: 'soft', name: 'soft', description: 'Gentle notification' },
+    { id: 'water-drop', name: 'water-drop', description: 'Water drop sound' },
+    { id: 'knock', name: 'knock', description: 'Knock sound' },
   ]
 
   const handleSoundEnabledToggle = () => {

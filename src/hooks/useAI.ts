@@ -1,39 +1,34 @@
 import { useState, useEffect, useCallback } from 'react'
-import {
-  aiService,
-  AISessionConfig,
-  IAISession,
-} from '@/services/aiService'
+import { aiService, AISessionConfig, IAISession } from '@/services/aiService'
 import type { AIProvider, AIStatus } from '@/types'
 
-
 /**
- * useAI Hook 返回值
+ * useAI Hook return values
  */
 export interface UseAIReturn {
-  // 状态
+  // Status
   status: AIStatus
   provider: AIProvider | null
   isLoading: boolean
   error: string | null
 
-  // 会话
+  // Session
 
   session: IAISession | null
-  // 方法
+  // Methods
   createSession: (config?: AISessionConfig) => Promise<void>
   prompt: (input: string) => Promise<string>
   generate: (input: string, config?: AISessionConfig) => Promise<string>
   setApiKey: (apiKey: string) => void
   destroySession: () => void
 
-  // 可用性检查
+  // Availability check
   builtInAvailable: boolean
   cloudAvailable: boolean
 }
 
 /**
- * useAI Hook - 在组件中使用 AI 服务
+ * useAI Hook - Use AI service in components
  */
 export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
   const [status, setStatus] = useState<AIStatus>('checking')
@@ -44,7 +39,7 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
   const [builtInAvailable, setBuiltInAvailable] = useState(false)
   const [cloudAvailable, setCloudAvailable] = useState(false)
 
-  // 检查可用性
+  // Check availability
   useEffect(() => {
     const checkAvailability = async () => {
       try {
@@ -64,54 +59,65 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
       } catch (err) {
         console.error('Check availability error:', err)
         setStatus('error')
-        setError('检查 AI 可用性失败')
+        setError('Failed to check AI availability')
       }
     }
 
     checkAvailability()
   }, [])
 
-  // 自动初始化会话
+  // Auto initialize session
   useEffect(() => {
-    if (autoInit && status === 'ready' && !session && (builtInAvailable || cloudAvailable)) {
+    if (
+      autoInit &&
+      status === 'ready' &&
+      !session &&
+      (builtInAvailable || cloudAvailable)
+    ) {
       createSession(config)
     }
   }, [autoInit, status, session, builtInAvailable, cloudAvailable])
 
-  // 创建会话
-  const createSession = useCallback(async (sessionConfig?: AISessionConfig) => {
-    // 检查是否有可用的 AI
-    if (!builtInAvailable && !cloudAvailable) {
-      const errorMsg = '没有可用的 AI 提供商，请配置云端 AI 或启用内置 AI'
-      setError(errorMsg)
-      setStatus('unavailable')
-      return
-    }
+  // Create session
+  const createSession = useCallback(
+    async (sessionConfig?: AISessionConfig) => {
+      // Check if AI is available
+      if (!builtInAvailable && !cloudAvailable) {
+        const errorMsg =
+          'No available AI provider, please configure cloud AI or enable built-in AI'
+        setError(errorMsg)
+        setStatus('unavailable')
+        return
+      }
 
-    setIsLoading(true)
-    setError(null)
+      setIsLoading(true)
+      setError(null)
 
-    try {
-      const { session: newSession, provider: usedProvider } =
-        await aiService.createSession(sessionConfig)
+      try {
+        const { session: newSession, provider: usedProvider } =
+          await aiService.createSession(sessionConfig)
 
-      setSession(newSession)
-      setProvider(usedProvider)
-      setStatus('ready')
-    } catch (err) {
-      console.error('Create session error:', err)
-      setStatus('error')
-      setError(err instanceof Error ? err.message : '创建会话失败')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [builtInAvailable, cloudAvailable])
+        setSession(newSession)
+        setProvider(usedProvider)
+        setStatus('ready')
+      } catch (err) {
+        console.error('Create session error:', err)
+        setStatus('error')
+        setError(
+          err instanceof Error ? err.message : 'Failed to create session'
+        )
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [builtInAvailable, cloudAvailable]
+  )
 
-  // 发送提示词（使用现有会话）
+  // Send prompt (using existing session)
   const prompt = useCallback(
     async (input: string): Promise<string> => {
       if (!session) {
-        throw new Error('会话未创建，请先调用 createSession')
+        throw new Error('Session not created, please call createSession first')
       }
 
       setIsLoading(true)
@@ -122,7 +128,8 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
         return response
       } catch (err) {
         console.error('Prompt error:', err)
-        const errorMsg = err instanceof Error ? err.message : '生成失败'
+        const errorMsg =
+          err instanceof Error ? err.message : 'Generation failed'
         setError(errorMsg)
         throw new Error(errorMsg)
       } finally {
@@ -132,7 +139,7 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
     [session]
   )
 
-  // 快速生成（一次性调用）
+  // Quick generation (one-time call)
   const generate = useCallback(
     async (input: string, genConfig?: AISessionConfig): Promise<string> => {
       setIsLoading(true)
@@ -144,7 +151,8 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
         return result.text
       } catch (err) {
         console.error('Generate error:', err)
-        const errorMsg = err instanceof Error ? err.message : '生成失败'
+        const errorMsg =
+          err instanceof Error ? err.message : 'Generation failed'
         setError(errorMsg)
         throw new Error(errorMsg)
       } finally {
@@ -154,13 +162,13 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
     []
   )
 
-  // 设置 API Key
+  // Set API Key
   const setApiKey = useCallback(
     (apiKey: string) => {
       aiService.setApiKey(apiKey)
       setCloudAvailable(true)
 
-      // 重新检查状态
+      // Recheck status
       if (status === 'unavailable') {
         setStatus('ready')
         setProvider('cloud')
@@ -169,7 +177,7 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
     [status]
   )
 
-  // 销毁会话
+  // Destroy session
   const destroySession = useCallback(() => {
     if (session) {
       session.destroy?.()
@@ -177,7 +185,7 @@ export function useAI(autoInit = false, config?: AISessionConfig): UseAIReturn {
     }
   }, [session])
 
-  // 组件卸载时清理
+  // Cleanup when component unmounts
   useEffect(() => {
     return () => {
       destroySession()

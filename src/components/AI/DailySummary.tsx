@@ -10,12 +10,15 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import Summary from './Summary'
-import { 
+import {
   buildInsightsPrompt,
-  generateInsights 
+  generateInsights,
 } from '@/services/builtInSummaryService'
 import { getMultipleStorage } from '@/utils/storage'
-import { generateDefaultInsights, parseAISummaryToInsights } from '@/utils/insightsGenerator'
+import {
+  generateDefaultInsights,
+  parseAISummaryToInsights,
+} from '@/utils/insightsGenerator'
 import { calculateAllStatistics } from '@/utils/statisticsCalculator'
 import { ModalWithBack } from '@/components/Common'
 
@@ -156,117 +159,119 @@ export default function DailySummary({ onBack }: AIDailySummaryProps) {
 
       {!isLoading && summaryData && (
         <div className="space-y-6 mt-4">
-      {/* Date Header */}
-      <div className="flex items-center gap-2 text-center justify-center">
-        <Calendar size={18} className="text-white/70" />
-        <h2 className="text-lg font-semibold text-white">{summaryData.date}</h2>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-black/20 rounded-lg p-3 text-center">
-          <Clock size={20} className="text-blue-400 mx-auto mb-2" />
-          <div className="font-bold text-white text-lg">
-            {summaryData.totalFocusTime}m
+          {/* Date Header */}
+          <div className="flex items-center gap-2 text-center justify-center">
+            <Calendar size={18} className="text-white/70" />
+            <h2 className="text-lg font-semibold text-white">
+              {summaryData.date}
+            </h2>
           </div>
-          <div className="text-xs text-white/70">Focus Time</div>
-        </div>
 
-        <div className="bg-black/20 rounded-lg p-3 text-center">
-          <Target size={20} className="text-orange-400 mx-auto mb-2" />
-          <div className="font-bold text-white text-lg">
-            {summaryData.completedPomodoros}
-          </div>
-          <div className="text-xs text-white/70">Pomodoros</div>
-        </div>
-
-        <div className="bg-black/20 rounded-lg p-3 text-center">
-          <Award size={20} className="text-green-400 mx-auto mb-2" />
-          <div className="font-bold text-white text-lg">
-            {summaryData.completedTasks}
-          </div>
-          <div className="text-xs text-white/70">Tasks Done</div>
-        </div>
-
-        <div className="bg-black/20 rounded-lg p-3 text-center">
-          <TrendingUp size={20} className="text-purple-400 mx-auto mb-2" />
-          <div className="font-bold text-white text-lg">
-            {summaryData.averageSessionLength}m
-          </div>
-          <div className="text-xs text-white/70">Avg Session</div>
-        </div>
-      </div>
-
-      {/* Productivity Score */}
-      <div className="bg-black/20 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-white mb-3 text-center">
-          Productivity Score
-        </h3>
-        <div className="text-center">
-          <div
-            className={`text-3xl font-bold ${getProductivityColor(summaryData.productivityScore)} mb-2`}
-          >
-            {summaryData.productivityScore}%{' '}
-            {getProductivityEmoji(summaryData.productivityScore)}
-          </div>
-          <div className="w-full bg-white/20 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full transition-all duration-1000"
-              style={{ width: `${summaryData.productivityScore}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      {/* AI Insights - Actionable Recommendations */}
-      <div className="bg-black/20 rounded-lg p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-white">AI Insights</h3>
-          <button
-            onClick={generateNewInsights}
-            disabled={isGenerating}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
-            title="Generate Actionable Recommendations"
-          >
-            <RefreshCw
-              size={14}
-              className={`text-white/70 ${isGenerating ? 'animate-spin' : ''}`}
-            />
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          {summaryData.insights.map((insight, index) => (
-            <div
-              key={index}
-              className="text-xs text-white/80 bg-black/20 rounded-md p-2 border-l-2 border-purple-400"
-            >
-              {insight}
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-black/20 rounded-lg p-3 text-center">
+              <Clock size={20} className="text-blue-400 mx-auto mb-2" />
+              <div className="font-bold text-white text-lg">
+                {summaryData.totalFocusTime}m
+              </div>
+              <div className="text-xs text-white/70">Focus Time</div>
             </div>
-          ))}
-        </div>
 
-        {isGenerating && (
-          <div className="mt-3 text-center text-xs text-white/60">
-            🧠 AI is generating personalized recommendations...
+            <div className="bg-black/20 rounded-lg p-3 text-center">
+              <Target size={20} className="text-orange-400 mx-auto mb-2" />
+              <div className="font-bold text-white text-lg">
+                {summaryData.completedPomodoros}
+              </div>
+              <div className="text-xs text-white/70">Pomodoros</div>
+            </div>
+
+            <div className="bg-black/20 rounded-lg p-3 text-center">
+              <Award size={20} className="text-green-400 mx-auto mb-2" />
+              <div className="font-bold text-white text-lg">
+                {summaryData.completedTasks}
+              </div>
+              <div className="text-xs text-white/70">Tasks Done</div>
+            </div>
+
+            <div className="bg-black/20 rounded-lg p-3 text-center">
+              <TrendingUp size={20} className="text-purple-400 mx-auto mb-2" />
+              <div className="font-bold text-white text-lg">
+                {summaryData.averageSessionLength}m
+              </div>
+              <div className="text-xs text-white/70">Avg Session</div>
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-2">
-        <button className="bg-black/20 hover:bg-black/30 text-white text-xs py-2 px-3 rounded-lg transition-colors">
-          📈 Weekly Report
-        </button>
-        <button className="bg-black/20 hover:bg-black/30 text-white text-xs py-2 px-3 rounded-lg transition-colors">
-          🎯 Set Goals
-        </button>
-      </div>
+          {/* Productivity Score */}
+          <div className="bg-black/20 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-white mb-3 text-center">
+              Productivity Score
+            </h3>
+            <div className="text-center">
+              <div
+                className={`text-3xl font-bold ${getProductivityColor(summaryData.productivityScore)} mb-2`}
+              >
+                {summaryData.productivityScore}%{' '}
+                {getProductivityEmoji(summaryData.productivityScore)}
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full transition-all duration-1000"
+                  style={{ width: `${summaryData.productivityScore}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
 
-      {/* Tips */}
-      <div className="text-center text-xs text-white/60 bg-black/20 rounded-lg p-3">
-        💡 Tip: Your summary updates automatically after each session
-      </div>
+          {/* AI Insights - Actionable Recommendations */}
+          <div className="bg-black/20 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-white">AI Insights</h3>
+              <button
+                onClick={generateNewInsights}
+                disabled={isGenerating}
+                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                title="Generate Actionable Recommendations"
+              >
+                <RefreshCw
+                  size={14}
+                  className={`text-white/70 ${isGenerating ? 'animate-spin' : ''}`}
+                />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {summaryData.insights.map((insight, index) => (
+                <div
+                  key={index}
+                  className="text-xs text-white/80 bg-black/20 rounded-md p-2 border-l-2 border-purple-400"
+                >
+                  {insight}
+                </div>
+              ))}
+            </div>
+
+            {isGenerating && (
+              <div className="mt-3 text-center text-xs text-white/60">
+                🧠 AI is generating personalized recommendations...
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-2">
+            <button className="bg-black/20 hover:bg-black/30 text-white text-xs py-2 px-3 rounded-lg transition-colors">
+              📈 Weekly Report
+            </button>
+            <button className="bg-black/20 hover:bg-black/30 text-white text-xs py-2 px-3 rounded-lg transition-colors">
+              🎯 Set Goals
+            </button>
+          </div>
+
+          {/* Tips */}
+          <div className="text-center text-xs text-white/60 bg-black/20 rounded-lg p-3">
+            💡 Tip: Your summary updates automatically after each session
+          </div>
 
           {/* AI Summary */}
           <div className="w-full flex justify-center bg-black/20 rounded-lg items-center min-h-[200px]">

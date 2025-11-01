@@ -37,13 +37,17 @@ export default function Analysis({ onClose }: AnalysisProps) {
 
     switch (view) {
       case 'menu':
-        return <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        return (
+          <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        )
       case 'taskFinishRate':
         return <TaskFinishRate onBack={() => handleViewChange('menu')} />
       case 'totalTime':
         return <TotalTime onBack={() => handleViewChange('menu')} />
       default:
-        return <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        return (
+          <AnalysisMainMenu onClose={onClose} onNavigate={handleViewChange} />
+        )
     }
   }
 
@@ -61,7 +65,7 @@ export default function Analysis({ onClose }: AnalysisProps) {
         {/* 只渲染一个视图，使用 key 强制重新挂载 */}
         <div
           key={nextView || currentView}
-          className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+          className="absolute inset-0 px-4 pb-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
           style={{
             animation:
               nextView !== null

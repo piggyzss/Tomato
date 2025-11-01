@@ -14,7 +14,7 @@ export default function TaskFinishRate({ onBack }: TaskFinishRateProps) {
   const { theme } = useSettingsStore()
   const { tasks } = useTaskStore()
 
-  const [timeRange, setTimeRange] = useState<TimeRange>('week')
+  const [timeRange, setTimeRange] = useState<TimeRange>('day')
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
 
   // Calculate task finish rate statistics

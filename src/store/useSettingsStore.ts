@@ -16,7 +16,7 @@ const defaultSettings: UserSettings = {
   soundType: 'ding', // 默认音效类型
   notificationEnabled: true,
   theme: 'light',
-  language: 'zh-CN',
+  language: 'en-US',
   aiEnabled: false,
   aiMessages: [], // Add support for custom AI messages
   useAIMessages: false, // Toggle to use AI messages instead of default ones

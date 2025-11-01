@@ -71,7 +71,7 @@ export default function AI({ onClose }: AIProps) {
         {(nextView || currentView) === 'catMessages' ? (
           <div
             key={nextView || currentView}
-            className="absolute inset-0 px-4 flex flex-col"
+            className="absolute inset-0 px-4 pb-4 flex flex-col"
             style={{
               animation:
                 nextView !== null
@@ -84,7 +84,7 @@ export default function AI({ onClose }: AIProps) {
         ) : (
           <div
             key={nextView || currentView}
-            className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+            className="absolute inset-0 px-4 pb-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
             style={{
               animation:
                 nextView !== null

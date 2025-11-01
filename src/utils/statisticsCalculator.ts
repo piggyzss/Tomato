@@ -8,15 +8,15 @@ export function calculateBasicStatistics(
   tasks: Task[],
   pomodoroRecords: PomodoroRecord[]
 ) {
-  const completedPomodoros = pomodoroRecords.filter((r) => r.completed).length
-  
+  const completedPomodoros = pomodoroRecords.filter(r => r.completed).length
+
   const totalFocusTime = Math.round(
     pomodoroRecords.reduce((sum, r) => {
       return r.completed ? sum + r.duration / 60 : sum
     }, 0)
   )
-  
-  const completedTasks = tasks.filter((t) => t.status === 'completed').length
+
+  const completedTasks = tasks.filter(t => t.status === 'completed').length
   const totalTasks = tasks.length
 
   return {
@@ -33,8 +33,8 @@ export function calculateBasicStatistics(
 export function calculateAverageSessionLength(
   pomodoroRecords: PomodoroRecord[]
 ): number {
-  const completedRecords = pomodoroRecords.filter((r) => r.completed)
-  
+  const completedRecords = pomodoroRecords.filter(r => r.completed)
+
   if (completedRecords.length === 0) {
     return 0
   }
@@ -43,7 +43,7 @@ export function calculateAverageSessionLength(
     (sum, r) => sum + r.duration / 60,
     0
   )
-  
+
   return Math.round(totalMinutes / completedRecords.length)
 }
 

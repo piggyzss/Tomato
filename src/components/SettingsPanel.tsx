@@ -1,11 +1,5 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import {
-  ArrowLeft,
-  Globe,
-  Palette,
-  Timer,
-  Volume2,
-} from 'lucide-react'
+import { ArrowLeft, Globe, Palette, Timer, Volume2 } from 'lucide-react'
 import { useState } from 'react'
 import TimerSettings from '@/components/Settings/TimerSettings'
 import SoundSettings from '@/components/Settings/SoundSettings'
@@ -174,7 +168,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
         {/* 只渲染一个视图，使用 key 强制重新挂载 */}
         <div
           key={nextView || currentView}
-          className="absolute inset-0 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+          className="absolute inset-0 px-4 pb-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
           style={{
             animation:
               nextView !== null

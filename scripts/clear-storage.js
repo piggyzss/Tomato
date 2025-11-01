@@ -11,7 +11,7 @@ chrome.storage.local.clear(() => {
 // 或者只更新设置
 chrome.storage.local.set({
   settings: {
-    workDuration: 0.167, // 10秒
+    workDuration: 25, // 25分钟
     shortBreakDuration: 5,
     longBreakDuration: 15,
     pomodorosUntilLongBreak: 4,
@@ -22,6 +22,6 @@ chrome.storage.local.set({
     aiEnabled: false
   }
 }, () => {
-  console.log('Settings updated to 10 seconds!')
+  console.log('Settings updated to 25 minutes!')
 })
 

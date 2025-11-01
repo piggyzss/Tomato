@@ -45,7 +45,12 @@ export type SettingsView =
   | 'language'
 
 // AI 功能视图类型
-export type AIView = 'menu' | 'catMessages' | 'dailySummary' | 'apiDemo' | 'settings'
+export type AIView =
+  | 'menu'
+  | 'catMessages'
+  | 'dailySummary'
+  | 'apiDemo'
+  | 'settings'
 
 // 分析视图类型
 export type AnalysisView = 'menu' | 'taskFinishRate' | 'totalTime'

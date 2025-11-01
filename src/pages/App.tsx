@@ -27,13 +27,16 @@ function App() {
     const loadData = async () => {
       // 1. 检查是否需要归档（跨天检测）
       await checkAndArchiveIfNeeded()
-      
+
       // 2. 加载数据
-      const { tasks: savedTasks, settings: savedSettings, geminiApiKey } = 
-        await getMultipleStorage(['tasks', 'settings', 'geminiApiKey'])
+      const {
+        tasks: savedTasks,
+        settings: savedSettings,
+        geminiApiKey,
+      } = await getMultipleStorage(['tasks', 'settings', 'geminiApiKey'])
 
       if (savedTasks) setTasks(savedTasks)
-      
+
       // 加载设置（包含 aiProvider）
       if (savedSettings) {
         setSettings(savedSettings)
@@ -47,7 +50,7 @@ function App() {
         aiService.setModePreference(defaultProvider)
         console.log('使用默认 AI 模式:', defaultProvider)
       }
-      
+
       // 3. 初始化 AI 服务
       if (geminiApiKey) {
         aiService.setApiKey(geminiApiKey)
@@ -82,7 +85,7 @@ function App() {
     'settings' | 'analysis' | 'ai' | null
   >(null)
   const [isClosing, setIsClosing] = useState(false)
-  
+
   // 监听每日重置消息
   useEffect(() => {
     const handleMessage = (message: any) => {
@@ -99,7 +102,7 @@ function App() {
         setTotalSeconds(workDuration * 60)
       }
     }
-    
+
     chrome.runtime.onMessage.addListener(handleMessage)
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage)
@@ -205,7 +208,7 @@ function App() {
           >
             <BarChart3 className="w-5 h-5" />
           </button>
-          
+
           <button
             onClick={setAIPanel}
             className={`p-2 rounded-lg transition-all duration-300 ${

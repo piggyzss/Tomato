@@ -99,7 +99,7 @@ export default function ChatCat({ onBack }: ChatCatProps) {
 
     try {
       const response = await prompt(currentInput)
-      
+
       setMessages(prev => [
         ...prev,
         {
@@ -269,5 +269,3 @@ export default function ChatCat({ onBack }: ChatCatProps) {
     </div>
   )
 }
-
-

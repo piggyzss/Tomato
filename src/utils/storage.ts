@@ -7,7 +7,7 @@ const defaultData: Partial<StorageData> = {
   pomodoroRecords: [],
   aiHistory: [],
   settings: {
-    workDuration: 10 / 60, // 10秒，方便调试
+    workDuration: 25, // 25分钟
     shortBreakDuration: 5,
     longBreakDuration: 15,
     pomodorosUntilLongBreak: 4,
