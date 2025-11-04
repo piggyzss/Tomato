@@ -89,7 +89,7 @@ export function TaskListNew() {
           : 'bg-white'
       }`}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <h3
           className={`text-lg font-bold tracking-tight transition-colors duration-300 ${
             theme === 'dark' ? 'text-white' : 'text-[#3d2b2b]'
@@ -107,13 +107,13 @@ export function TaskListNew() {
       </div>
 
       <div
-        className={`border-t-2 mb-4 transition-colors duration-300 ${
+        className={`border-t-2 mb-3 transition-colors duration-300 ${
           theme === 'dark' ? 'border-gray-600' : 'border-gray-200'
         }`}
       ></div>
 
       {/* Task List */}
-      <div className="mb-4 h-[180px] overflow-y-auto relative scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+      <div className="mb-3 h-[180px] overflow-y-auto relative scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
         {tasks.length === 0 ? (
           <div
             className={`text-center py-10 transition-colors duration-300 ${
@@ -124,7 +124,7 @@ export function TaskListNew() {
             <div className="font-medium">No tasks yet</div>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {tasks.map(task => {
               const isActive = currentTaskId === task.id
 
@@ -142,7 +142,7 @@ export function TaskListNew() {
                         : 'bg-white'
                   )}
                 >
-                  <div className="px-1.5 py-3 flex items-center gap-1">
+                  <div className="px-1.5 py-2.5 flex items-center gap-1">
                     {/* Checkbox */}
                     <button
                       onClick={e => handleToggleComplete(task.id, e)}
