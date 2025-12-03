@@ -14,6 +14,11 @@ import { checkAndArchiveIfNeeded } from '@/utils/historyManager'
 import { aiService } from '@/services/aiService'
 import { BarChart3, Bot, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+// 开发环境加载存储调试工具
+if (import.meta.env.DEV) {
+  import('@/utils/storageDebug')
+}
 function App() {
   const { tasks, setTasks } = useTaskStore()
   const { setSettings, workDuration, theme } = useSettingsStore()

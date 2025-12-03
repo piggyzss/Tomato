@@ -31,7 +31,7 @@ chrome.runtime.onInstalled.addListener(async details => {
         soundType: 'ding',
         notificationEnabled: true,
         theme: 'light',
-        language: 'zh-CN',
+        language: 'en-US', // 默认英文
         aiEnabled: false,
         aiMessages: [],
         useAIMessages: false,

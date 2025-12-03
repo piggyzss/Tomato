@@ -207,6 +207,7 @@ npm run lint
 3. Load/reload extension in Chrome
 4. Test your changes
 5. Run `npm run build` for production build
+6. Run `zip -r extension.zip dist/*` for zip code
 
 ---
 

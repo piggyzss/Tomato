@@ -401,7 +401,7 @@ export class AIService {
         expectedOutputs: [
           {
             type: 'text',
-            languages: ['en'],
+            languages: ['en-US'],
           },
         ],
         initialPrompts: [

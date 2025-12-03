@@ -15,7 +15,7 @@ const defaultData: Partial<StorageData> = {
     soundType: 'ding',
     notificationEnabled: true,
     theme: 'light',
-    language: 'zh-CN',
+    language: 'en-US', // 默认英文
     aiEnabled: false,
     aiMessages: [],
     useAIMessages: false,
@@ -112,4 +112,35 @@ export function onStorageChange(
 
   // 返回取消监听函数
   return () => chrome.storage.local.onChanged.removeListener(callback)
+}
+
+// 获取存储使用情况
+export async function getStorageUsage(): Promise<{
+  bytesInUse: number
+  quota: number
+  percentage: number
+  formattedSize: string
+}> {
+  try {
+    const bytesInUse = await chrome.storage.local.getBytesInUse()
+    const quota = chrome.storage.local.QUOTA_BYTES || 10485760 // 10MB
+    const percentage = (bytesInUse / quota) * 100
+
+    // 格式化大小显示
+    const formatBytes = (bytes: number): string => {
+      if (bytes < 1024) return `${bytes} B`
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`
+      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+    }
+
+    return {
+      bytesInUse,
+      quota,
+      percentage: Math.round(percentage * 100) / 100,
+      formattedSize: formatBytes(bytesInUse),
+    }
+  } catch (error) {
+    console.error('Error getting storage usage:', error)
+    return { bytesInUse: 0, quota: 0, percentage: 0, formattedSize: '0 B' }
+  }
 }

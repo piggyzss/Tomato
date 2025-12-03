@@ -1,6 +1,6 @@
 {
     "name": "tomato-cat-timer",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "description": "基于番茄钟功能的学习工作陪伴 Chrome 插件",
     "type": "module",
     "scripts": {
